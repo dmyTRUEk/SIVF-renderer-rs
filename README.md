@@ -5,7 +5,7 @@
 ## FAQ - Frequently Asked Questions:
 ### Do everything:
 ```
-$ 
+$ cargo test && cargo doc && cargo run
 ```
 
 ### Run `main.rs`:
@@ -28,7 +28,7 @@ $ cargo test --test '*'
 
 ### Compile Docs:
 ```
-$ 
+$ cargo doc
 ```
 
 ### Open Docs in browser:
