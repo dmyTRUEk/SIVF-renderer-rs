@@ -13,12 +13,15 @@ $
 $ cargo run
 ```
 
-### Run Unit Tests:
+### Run All Tests:
+```
+$ cargo test
+```
+#### Run Unit Tests:
 ```
 $ cargo test --bin sivf-renderer-rs
 ```
-
-### Run Integration Tests:
+#### Run Integration Tests:
 ```
 $ cargo test --test '*'
 ```
