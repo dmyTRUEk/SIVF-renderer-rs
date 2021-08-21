@@ -19,10 +19,6 @@ impl<T: Copy> Array2d<T> {
     pub fn width(&self)  -> usize { self.w }
     pub fn height(&self) -> usize { self.h }
 
-    // pub fn index(&self, wh: (usize, usize)) -> T {
-    //     self.elements[wh.0][wh.1]
-    // }
-
     pub fn new(w: usize, h: usize, fill: T) -> Array2d<T> {
         // TODO
         Array2d {
@@ -57,17 +53,16 @@ impl<T: Copy> Index<(usize, usize)> for Array2d<T> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    // TODO: maybe rename tests
 
     #[test]
-    fn unit_test_array2d_new() {
+    fn new() {
         let expected: Array2d<i32> = Array2d { w: 2, h: 3, elements: vec![vec![0, 0, 0], vec![0, 0, 0]] };
         let actual  : Array2d<i32> = Array2d::new(2, 3, 0);
         assert_eq!(expected, actual);
     }
 
     #[test]
-    fn unit_test_array2d_from_ok() {
+    fn ok() {
         let elements: Vec<Vec<char>> = vec![vec!['a', 'b', 'c'], vec!['d', 'e', 'f']];
         let expected: Array2d<char> = Array2d { w: 2, h: 3, elements: elements.clone() };
         let actual  : Array2d<char> = Array2d::from(elements).unwrap();
@@ -75,7 +70,7 @@ mod tests {
     }
 
     #[test]
-    fn unit_test_array2d_from_err() {
+    fn err() {
         let elements: Vec<Vec<char>> = vec![vec!['a', 'b', 'c'], vec!['d', 'e', 'f', 'g']];
         let expected: bool = true;
         let actual  : bool = Array2d::from(elements).is_err();
