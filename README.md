@@ -40,5 +40,7 @@ file:///path_to_sivf_renderer_rs/target/doc/sivf_renderer_rs/index.html
 
 ## Useful links:
 - [Rust Project Layout](https://doc.rust-lang.org/cargo/guide/project-layout.html)
-- [`.to_string()` vs `.to_owned()`](https://users.rust-lang.org/t/to-string-vs-to-owned-for-string-literals/1441/6)
+- [Objects with Trait](https://doc.rust-lang.org/book/ch17-02-trait-objects.html)
+- [std::Iterator](https://doc.rust-lang.org/stable/std/iter/trait.Iterator.html)
+- [Image lib examples](https://github.com/image-rs/image/tree/master/examples)
 
