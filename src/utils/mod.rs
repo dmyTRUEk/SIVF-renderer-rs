@@ -14,3 +14,4 @@ pub mod date_time;
 pub mod io;
 pub mod string;
 pub mod vec2d;
+pub mod sizes;

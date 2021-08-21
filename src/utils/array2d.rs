@@ -1,6 +1,7 @@
 //! Rectangular 2d array
 
 use std::ops::Index;
+use crate::utils::sizes::{Sizes, sizes};
 
 
 
@@ -8,30 +9,30 @@ use std::ops::Index;
 /// For creating `Array2d` use `Array2d::new()` instead.
 #[derive(Clone, Debug, PartialEq)]
 pub struct Array2d<T: Copy> {
-    w: usize,
-    h: usize,
+    sizes: Sizes<usize>,
     // TODO: rewrite in flat structure ?
     //   and do measurements: flat vs nested(2d)
     elements: Vec<Vec<T>>,
 }
 
 impl<T: Copy> Array2d<T> {
-    pub fn width(&self)  -> usize { self.w }
-    pub fn height(&self) -> usize { self.h }
+    pub fn width(&self)  -> usize { self.sizes.w }
+    pub fn height(&self) -> usize { self.sizes.h }
 
-    pub fn new(w: usize, h: usize, fill: T) -> Array2d<T> {
-        // TODO
+    pub fn new(sizes: Sizes<usize>, fill: T) -> Array2d<T> {
         Array2d {
-            w, h, elements: vec![vec![fill; h]; w]
+            sizes,
+            elements: vec![vec![fill; sizes.h]; sizes.w]
         }
     }
 
     pub fn from(given_array: Vec<Vec<T>>) -> Result<Array2d<T>, String> {
         // TODO:
         let is_rectangle: bool = given_array.iter().all(|row| row.len() == given_array.first().unwrap().len() );
+        let sizes: Sizes<usize> = sizes(given_array.len(), given_array[0].len());
         return match is_rectangle {
             true => {
-                Ok(Array2d{ w: given_array.len(), h: given_array[0].len(), elements: given_array })
+                Ok(Array2d{ sizes, elements: given_array })
             }
             false => {
                 return Err("Given Vec<Vec<T>> is not rectangular".to_string());
@@ -56,15 +57,15 @@ mod tests {
 
     #[test]
     fn new() {
-        let expected: Array2d<i32> = Array2d { w: 2, h: 3, elements: vec![vec![0, 0, 0], vec![0, 0, 0]] };
-        let actual  : Array2d<i32> = Array2d::new(2, 3, 0);
+        let expected: Array2d<i32> = Array2d { sizes: sizes(2, 3), elements: vec![vec![0, 0, 0], vec![0, 0, 0]] };
+        let actual  : Array2d<i32> = Array2d::new(sizes(2, 3), 0);
         assert_eq!(expected, actual);
     }
 
     #[test]
     fn ok() {
         let elements: Vec<Vec<char>> = vec![vec!['a', 'b', 'c'], vec!['d', 'e', 'f']];
-        let expected: Array2d<char> = Array2d { w: 2, h: 3, elements: elements.clone() };
+        let expected: Array2d<char> = Array2d { sizes: sizes(2, 3), elements: elements.clone() };
         let actual  : Array2d<char> = Array2d::from(elements).unwrap();
         assert_eq!(expected, actual);
     }
@@ -76,8 +77,5 @@ mod tests {
         let actual  : bool = Array2d::from(elements).is_err();
         assert_eq!(expected, actual);
     }
-
-
-
 
 }
