@@ -4,7 +4,7 @@ use image::{ImageBuffer, Rgba};
 
 use crate::utils::array2d::Array2d;
 use crate::utils::color::*;
-use crate::utils::sizes::ImageSizes;
+use crate::utils::sizes::{ImageSizes, Sizes, sizes, image_sizes};
 use crate::sivf_objects::_blend_types::BlendType;
 
 
@@ -21,6 +21,10 @@ impl Canvas {
         }
     }
 
+    pub fn sizes(&self) -> ImageSizes {
+        image_sizes(self.pixels.width(), self.pixels.height())
+    }
+
     pub fn blend(&mut self, canvas_other: Canvas, blend_type: BlendType) {
         // TODO
         *self = canvas_other
@@ -28,8 +32,8 @@ impl Canvas {
 
     // TODO: what is second param in ImageBuffer generic
     pub fn to_image_buffer(&self) -> ImageBuffer<Rgba<u8>, Vec<u8>> {
-        let image_sizes: (u32, u32) = (self.pixels.width() as u32, self.pixels.height() as u32);
-        let mut image_buffer = ImageBuffer::new(image_sizes.0, image_sizes.1);
+        let image_sizes: Sizes<u32> = self.sizes().into();
+        let mut image_buffer = ImageBuffer::new(image_sizes.w, image_sizes.h);
         for (w, h, pixel) in image_buffer.enumerate_pixels_mut() {
             let pixel_color: Color = self.pixels[(w as usize, h as usize)];
             *pixel = image::Rgba([pixel_color.r, pixel_color.g, pixel_color.b, pixel_color.a]);

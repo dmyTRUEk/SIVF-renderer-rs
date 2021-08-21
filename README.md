@@ -43,4 +43,5 @@ file:///path_to_sivf_renderer_rs/target/doc/sivf_renderer_rs/index.html
 - [Objects with Trait](https://doc.rust-lang.org/book/ch17-02-trait-objects.html)
 - [std::Iterator](https://doc.rust-lang.org/stable/std/iter/trait.Iterator.html)
 - [Image lib examples](https://github.com/image-rs/image/tree/master/examples)
+- [Derive More](https://docs.rs/derive_more/0.99.16/derive_more/index.html)
 

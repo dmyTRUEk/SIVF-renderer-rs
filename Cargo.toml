@@ -15,4 +15,5 @@ panic = "abort"
 
 [dependencies]
 chrono = "0.4.19"
+derive_more = "0.99.16"
 image = "0.23.14"

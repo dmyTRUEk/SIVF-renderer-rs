@@ -1,6 +1,7 @@
 //! This is main file
 
 extern crate image;
+extern crate derive_more;
 
 mod help;
 mod sivf_objects;
@@ -10,7 +11,7 @@ use std::env;
 // use image::{ImageBuffer, Rgba};
 
 use crate::help::*;
-use crate::utils::color::{ColorModel};
+use crate::utils::color::ColorModel;
 use crate::utils::date_time::TraitDateTimeLocalToMyFormat;
 use crate::utils::string::{TraitStrExtensionTrimEmptyLines, TraitStrExtensionTrimLinesByFirstLine};
 use crate::sivf_objects::_sivf_struct::SivfStruct;
