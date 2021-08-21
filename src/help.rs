@@ -1,4 +1,4 @@
-//! This file contains strings that printed on `-h` or `--help`
+//! Strings that printed for `-h` or `--help`
 
 
 

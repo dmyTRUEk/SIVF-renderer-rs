@@ -1,4 +1,4 @@
-//! This file unites all utils to be able to import:
+//! Utils for `io`, `string`, ...
 //!
 //! ```
 //! mod utils;
@@ -8,5 +8,9 @@
 
 
 
+pub mod array2d;
+pub mod color;
+pub mod date_time;
 pub mod io;
 pub mod string;
+pub mod vec2d;
