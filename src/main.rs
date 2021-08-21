@@ -7,15 +7,14 @@ mod utils;
 
 use std::env;
 
-use chrono::{DateTime, Local};
 use image::{ImageBuffer, Rgba};
 
 use crate::help::*;
 use crate::utils::array2d::Array2d;
-use crate::utils::color::{ColorModel, Color};
+use crate::utils::color::{ColorModel, Color, TRANSPARENT};
 use crate::utils::date_time::TraitDateTimeLocalToMyFormat;
 use crate::utils::string::{TraitStrExtensionTrimEmptyLines, TraitStrExtensionTrimLinesByFirstLine};
-use crate::utils::vec2d::Vec2d;
+// use crate::utils::vec2d::Vec2d;
 
 
 
@@ -29,22 +28,24 @@ pub trait TraitSivfRender {
     fn render(&self) -> Canvas;
 }
 
+// #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct SivfStruct {
-    pub image_sizes: Vec2d<usize>,
+    pub image_sizes: (usize, usize),
     pub color_model: ColorModel,
     pub root_layer: SivfLayer,
 }
 impl TraitSivfRender for SivfStruct {
     fn render(&self) -> Canvas {
         // TODO
-        let mut canvas = Canvas::new(self.image_sizes.x, self.image_sizes.y);
-        for child in self.root_layer.children {
+        let mut canvas = Canvas::new(self.image_sizes.0, self.image_sizes.1);
+        for child in &self.root_layer.children {
             let canvas_child: Canvas = child.render();
         }
         canvas
     }
 }
 
+#[derive(Clone, Debug, PartialEq)]
 pub struct Canvas {
     // TODO: maybe use color from image library?
     pub pixels: Array2d<Color>
@@ -52,7 +53,7 @@ pub struct Canvas {
 impl Canvas {
     pub fn new(w: usize, h: usize) -> Canvas {
         Canvas {
-            pixels: Array2d::new(w, h)
+            pixels: Array2d::new(w, h, TRANSPARENT)
         }
     }
 
@@ -61,16 +62,20 @@ impl Canvas {
         *self = canvas_other
     }
 
-    pub fn to_image_buffer(&self) -> ImageBuffer<Rgba<usize>, Vec<T>> {
-        let mut image_buffer = ImageBuffer::new(self.pixels.w() as u32, self.pixels.h() as u32);
+    // TODO: what is second param in ImageBuffer generic
+    pub fn to_image_buffer(&self) -> ImageBuffer<Rgba<u8>, Vec<u8>> {
+        let mut image_buffer = ImageBuffer::new(self.pixels.width() as u32, self.pixels.height() as u32);
         for (w, h, pixel) in image_buffer.enumerate_pixels_mut() {
-            let pixel_color: Color = canvas[w as usize][h as usize];
+            let pixel_color: Color = self.pixels[(w as usize, h as usize)];
             *pixel = image::Rgba([pixel_color.r, pixel_color.g, pixel_color.b, pixel_color.a]);
         }
         image_buffer
     }
 }
 
+
+
+// #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct SivfLayer {
     pub children: Vec<Box<dyn TraitSivfRender>>
 }
@@ -93,9 +98,16 @@ fn main() {
         // TODO: add cli options
         let file_name_input = arg;
 
-        let file_name_output: String = chrono::Local::now().to_my_format();
+        let render_start_time: String = chrono::Local::now().to_my_format();
 
-        let sivf_struct: SivfStruct;
+        // TODO
+        let sivf_struct: SivfStruct = SivfStruct {
+            image_sizes: (200, 100),
+            color_model: ColorModel::ARGB,
+            root_layer: SivfLayer {
+                children: vec![]
+            }
+        };
 
         println!(r#"Starting render "{}"."#, file_name_input);
 
@@ -103,9 +115,11 @@ fn main() {
 
         println!("Render finished.");
 
-        let file_name = format!("img_{}__{}x{}.png", dt_now, sivf_struct.image_sizes.x, sivf_struct.image_sizes.y);
+        let image_sizes: (usize, usize) = sivf_struct.image_sizes;
+        let file_name = format!("img_{}__{}x{}.png", render_start_time, image_sizes.0, image_sizes.1);
         // println!("file_name = {}", file_name);
 
+        let image_buffer = canvas.to_image_buffer();
         image_buffer.save(file_name).unwrap();
 
         println!("Saving image finished.");

@@ -1,8 +1,8 @@
 //! Color
-#![allow(dead_code)]
 
 
 
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub enum ColorModel {
     ARGB,
     RGBA,

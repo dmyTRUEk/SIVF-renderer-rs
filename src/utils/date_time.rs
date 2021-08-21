@@ -11,12 +11,12 @@ pub trait TraitDateTimeLocalToMyFormat {
 }
 impl TraitDateTimeLocalToMyFormat for DateTime<Local> {
     fn to_my_format(&self) -> String {
-        let year  : u32 = dt_now.format("%Y").to_string().parse().unwrap();
-        let month : u32 = dt_now.format("%m").to_string().parse().unwrap();
-        let day   : u32 = dt_now.format("%d").to_string().parse().unwrap();
-        let hour  : u32 = dt_now.format("%H").to_string().parse().unwrap();
-        let minute: u32 = dt_now.format("%M").to_string().parse().unwrap();
-        let second: u32 = dt_now.format("%S").to_string().parse().unwrap();
+        let year  : u32 = self.format("%Y").to_string().parse().unwrap();
+        let month : u32 = self.format("%m").to_string().parse().unwrap();
+        let day   : u32 = self.format("%d").to_string().parse().unwrap();
+        let hour  : u32 = self.format("%H").to_string().parse().unwrap();
+        let minute: u32 = self.format("%M").to_string().parse().unwrap();
+        let second: u32 = self.format("%S").to_string().parse().unwrap();
         format!("{:04}_{:02}_{:02}__{:02}_{:02}_{:02}", year, month, day, hour, minute, second)
     }
 }
