@@ -51,9 +51,10 @@ file:///path_to_sivf_renderer_rs/target/doc/sivf_renderer_rs/index.html
   [using `Any` with traits](https://stackoverflow.com/questions/42056422/using-any-with-traits-in-rust)
 
 ### Best Practices:
-- [`Vec` of structs with some Trait](https://doc.rust-lang.org/book/ch17-02-trait-objects.html)
+- [`Vec` of structs with common Trait](https://doc.rust-lang.org/book/ch17-02-trait-objects.html)
 
 ### VS:
+- [`iter()` vs `into_iter()`](https://stackoverflow.com/questions/34733811/what-is-the-difference-between-iter-and-into-iter)
 - [`to()` vs `into()`](https://stackoverflow.com/questions/25316115/difference-between-tostring-and-intostring)
 - [`from` vs `as`](https://stackoverflow.com/questions/48795329/what-is-the-difference-between-fromfrom-and-as-in-rust)
 
