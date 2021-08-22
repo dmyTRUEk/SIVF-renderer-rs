@@ -1,5 +1,6 @@
 examples*/
 
 /target
+*.png
 
 /.idea
