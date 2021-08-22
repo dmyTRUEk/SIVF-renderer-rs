@@ -4,7 +4,6 @@ use serde_derive::{Serialize, Deserialize};
 
 use crate::utils::color::ColorModel;
 use crate::sivf_objects::sivf_complex::layer::Layer;
-use crate::sivf_misc::trait_render::TraitRender;
 use crate::sivf_misc::canvas::Canvas;
 use crate::sivf_misc::blend_types::BlendType;
 use crate::utils::sizes::{sizes, ImageSizes, image_sizes};

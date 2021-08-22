@@ -1,12 +1,13 @@
 //! SIVF Canvas
 
-use image::{ImageBuffer, Rgba};
+use image::ImageBuffer;
+use itertools::Itertools;
 
 use crate::utils::array2d::Array2d;
 use crate::utils::color::{Color, TRANSPARENT};
 use crate::utils::sizes::{ImageSizes, Sizes, image_sizes};
 use crate::sivf_misc::blend_types::BlendType;
-
+use crate::utils::extensions::usize::ExtensionIndices;
 
 
 #[derive(Clone, Debug)]
@@ -31,11 +32,18 @@ impl Canvas {
     pub fn blend_with(mut self, canvas_other: Canvas, blend_type: BlendType) -> Self {
         // TODO
         self = canvas_other;
+        // let x = (0..3).map(|i| (i * 2)..(i * 2 + 2)).collect();
+        for (w, h) in vec![0..10, 100..110].multi_cartesian_product() {
+
+        }
+        // for (w, h) in [ self.pixels.width().indices(), self.pixels.height().indices() ].multi_cartesian_product() {
+        //
+        // }
         self
     }
 
     // TODO: understand what is second param in ImageBuffer generic
-    pub fn to_image_buffer(&self) -> ImageBuffer<Rgba<u8>, Vec<u8>> {
+    pub fn to_image_buffer(&self) -> ImageBuffer<image::Rgba<u8>, Vec<u8>> {
         let image_sizes: Sizes<u32> = self.sizes().to_sizes();
         let mut image_buffer = ImageBuffer::new(image_sizes.w, image_sizes.h);
         for (w, h, pixel) in image_buffer.enumerate_pixels_mut() {
