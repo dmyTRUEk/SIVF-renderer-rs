@@ -1,5 +1,7 @@
 //! `String` extensions
 
+use regex::{Regex, RegexBuilder};
+
 
 
 pub trait ExtensionTrimEmptyLines {
@@ -86,12 +88,48 @@ impl ExtensionSplitAndKeep for String {
 
 
 
+pub trait ExtensionRemoveCLikeComments {
+    fn remove_comments(&self) -> Result<String, String>;
+    fn remove_comments_oneline(&self) -> String;
+    fn remove_comments_multiline(&self) -> String;
+}
+impl ExtensionRemoveCLikeComments for String {
+    fn remove_comments(&self) -> Result<String, String> {
+        let str_removed_order_1: String = self.remove_comments_oneline().remove_comments_multiline();
+        let str_removed_order_2: String = self.remove_comments_multiline().remove_comments_oneline();
+        if str_removed_order_1 == str_removed_order_2 {
+            Ok(str_removed_order_1)
+        }
+        else {
+            Err("Cant remove comments, possibly due to nested comments".to_string())
+        }
+    }
+
+    fn remove_comments_oneline(&self) -> String {
+        // TODO: maybe [RegexBuilder] -> [Regex] and remove [.build], for shorter code
+        let re = RegexBuilder::new(r" *//.*?(\n|\z)")
+            .build()
+            .unwrap();
+        re.replace_all(self, "").to_string()
+    }
+
+    fn remove_comments_multiline(&self) -> String {
+        // TODO: maybe [RegexBuilder] -> [Regex] and remove [.build], for shorter code
+        let re = RegexBuilder::new(r" */\*(.|\n)*?\*/(\n|\z)")
+            .build()
+            .unwrap();
+        re.replace_all(self, "").to_string()
+    }
+}
+
+
+
 #[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
-    fn unit_test_trim_empty_lines() {
+    fn trim_empty_lines() {
         assert_eq!(
             String::from(""),
             String::from("\n").trim_empty_lines()
@@ -207,7 +245,7 @@ mod tests {
 
 
     #[test]
-    fn unit_test_trim_lines_by_first_line() {
+    fn trim_lines_by_first_line() {
         assert_eq!(
             String::from("a\nb"),
             String::from("a\nb").trim_lines_by_first_line()
@@ -225,7 +263,7 @@ mod tests {
 
 
     #[test]
-    fn unit_test_split_and_keep() {
+    fn split_and_keep() {
         assert_eq!(
             Vec::<&str>::new(),
             "".to_string().split_and_keep(|c| c == ' ')
@@ -258,6 +296,240 @@ mod tests {
             vec!["1 ", "+", " 2  ", "-", "   3"],
             "1 + 2  -   3".to_string().split_and_keep(|c| c == '+' || c == '-')
         );
+    }
+
+
+
+    #[test]
+    fn remove_c_like_comments_oneline() {
+        // at begin
+        {
+
+            {   // at begin 1
+                let string: String = r#"
+                    // comment
+                    text
+                    + some 5+r4n9e sumbols
+                    yeah
+                "#.to_string();
+                let expected: String = r#"
+                    text
+                    + some 5+r4n9e sumbols
+                    yeah
+                "#.to_string();
+                let actual: String = string.remove_comments_oneline();
+                assert_eq!(expected, actual);
+            }
+
+            {   // at begin 2
+                let string: String = r#"
+                    // comment
+                    // comment 2
+                    text
+                    + some 5+r4n9e sumbols
+                    yeah
+                "#.to_string();
+                let expected: String = r#"
+                    text
+                    + some 5+r4n9e sumbols
+                    yeah
+                "#.to_string();
+                let actual: String = string.remove_comments_oneline();
+                assert_eq!(expected, actual);
+            }
+
+        }
+
+        // at middle
+        {
+
+            {
+                let string: String = r#"
+                    text
+                    // comment again
+                    + some 5+r4n9e sumbols
+                    // and once more time
+                    // and some more
+                    yeah
+                "#.to_string();
+                let expected: String = r#"
+                    text
+                    + some 5+r4n9e sumbols
+                    yeah
+                "#.to_string();
+                let actual: String = string.remove_comments_oneline();
+                assert_eq!(expected, actual);
+            }
+
+        }
+
+        // at end
+        {
+            // TODO LATER: rewrite prettier
+
+            {   // 1
+                let string: String = r#"
+                    text
+                    + some 5+r4n9e sumbols
+                    yeah
+                    // comment"#.to_string();
+                let expected: String = r#"
+                    text
+                    + some 5+r4n9e sumbols
+                    yeah
+"#.to_string();
+                let actual: String = string.remove_comments_oneline();
+                assert_eq!(expected, actual);
+            }
+
+            {   // 2
+                let string: String = r#"
+                    text
+                    + some 5+r4n9e sumbols
+                    yeah
+                    // comment
+                    // comment 2"#.to_string();
+                let expected: String = r#"
+                    text
+                    + some 5+r4n9e sumbols
+                    yeah
+"#.to_string();
+                let actual: String = string.remove_comments_oneline();
+                assert_eq!(expected, actual);
+            }
+
+        }
+    }
+
+    #[test]
+    fn remove_c_like_comments_multiline() {
+        // at begin
+        {
+
+            {   // oneline
+                let string: String = r#"
+                /* comment */
+                text
+                // but this is not a multiline comment
+                + some 5+r4n9e sumbols
+                yeah
+            "#.to_string();
+                let expected: String = r#"
+                text
+                // but this is not a multiline comment
+                + some 5+r4n9e sumbols
+                yeah
+            "#.to_string();
+                let actual: String = string.remove_comments_multiline();
+                assert_eq!(expected, actual);
+            }
+
+            {   // multiline
+                let string: String = r#"
+                /*
+                    comment
+                */
+                text
+                // but this is not a multiline comment
+                + some 5+r4n9e sumbols
+                yeah
+            "#.to_string();
+                let expected: String = r#"
+                text
+                // but this is not a multiline comment
+                + some 5+r4n9e sumbols
+                yeah
+            "#.to_string();
+                let actual: String = string.remove_comments_multiline();
+                assert_eq!(expected, actual);
+            }
+
+        }
+
+        // at middle
+        {
+
+            {   // oneline
+                let string: String = r#"
+                text
+                /* comment */
+                // but this is not a multiline comment
+                + some 5+r4n9e sumbols
+                yeah
+            "#.to_string();
+                let expected: String = r#"
+                text
+                // but this is not a multiline comment
+                + some 5+r4n9e sumbols
+                yeah
+            "#.to_string();
+                let actual: String = string.remove_comments_multiline();
+                assert_eq!(expected, actual);
+            }
+
+            {   // multiline
+                let string: String = r#"
+                text
+                /*
+                    comment
+                */
+                // but this is not a multiline comment
+                + some 5+r4n9e sumbols
+                yeah
+            "#.to_string();
+                let expected: String = r#"
+                text
+                // but this is not a multiline comment
+                + some 5+r4n9e sumbols
+                yeah
+            "#.to_string();
+                let actual: String = string.remove_comments_multiline();
+                assert_eq!(expected, actual);
+            }
+
+        }
+
+        // at end
+        {
+            // TODO LATER: rewrite prettier
+
+            {   // oneline
+                let string: String = r#"
+                    text
+                    // but this is not a multiline comment
+                    + some 5+r4n9e sumbols
+                    yeah
+                    /* comment */"#.to_string();
+                let expected: String = r#"
+                    text
+                    // but this is not a multiline comment
+                    + some 5+r4n9e sumbols
+                    yeah
+"#.to_string();
+                let actual: String = string.remove_comments_multiline();
+                assert_eq!(expected, actual);
+            }
+
+            {   // multiline
+                let string: String = r#"
+                    text
+                    // but this is not a multiline comment
+                    + some 5+r4n9e sumbols
+                    yeah
+                    /*
+                        comment
+                    */"#.to_string();
+                let expected: String = r#"
+                    text
+                    // but this is not a multiline comment
+                    + some 5+r4n9e sumbols
+                    yeah
+"#.to_string();
+                let actual: String = string.remove_comments_multiline();
+                assert_eq!(expected, actual);
+            }
+
+        }
     }
 
 }
