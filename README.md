@@ -44,12 +44,14 @@ file:///path_to_sivf_renderer_rs/target/doc/sivf_renderer_rs/index.html
 - [useful `deny`s](https://rust-unofficial.github.io/patterns/anti_patterns/deny-warnings.html)
 
 ### Rust `std`:
-- [Rust Docs](https://doc.rust-lang.org/std/)
-- [std::Iterator](https://doc.rust-lang.org/stable/std/iter/trait.Iterator.html)
-- [Objects with Trait](https://doc.rust-lang.org/book/ch17-02-trait-objects.html)
+- [`std` Docs](https://doc.rust-lang.org/std/)
+- [`Iterator`](https://doc.rust-lang.org/stable/std/iter/trait.Iterator.html)
 - [`TryFrom`](https://doc.rust-lang.org/std/convert/trait.TryFrom.html)
 - [`Any`](https://doc.rust-lang.org/std/any/trait.Any.html)  
   [using `Any` with traits](https://stackoverflow.com/questions/42056422/using-any-with-traits-in-rust)
+
+### Best Practices:
+- [`Vec` of structs with some Trait](https://doc.rust-lang.org/book/ch17-02-trait-objects.html)
 
 ### VS:
 - [`to()` vs `into()`](https://stackoverflow.com/questions/25316115/difference-between-tostring-and-intostring)
