@@ -14,7 +14,9 @@ use crate::utils::sizes::ImageSizes;
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Layer {
+    // TODO: make default = Overlap
     pub blend_type: BlendType,
+    // TODO: maybe smt like #[serde(flatten)]
     children: Vec<SivfObject>,
 }
 

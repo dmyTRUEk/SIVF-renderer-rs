@@ -1,5 +1,6 @@
 //! Main file
 
+// TODO LATER: turn on as max as possible
 #![deny(
 
     // bad_style,
@@ -131,12 +132,6 @@ fn main() {
                 continue;
             }
         };
-        // let sivf_struct: SivfStruct = SivfStruct {
-        //     image_sizes: image_sizes(200, 100),
-        //     color_model: ColorModel::ARGB,
-        //     // root_layer: layer(BlendType::FullOverlap, vec![]),
-        //     root_layer: Layer::new(BlendType::Overlap, vec![]),
-        // };
         println!("OK");
 
         print!(r#"Rendering "{}"... "#, file_name_input);

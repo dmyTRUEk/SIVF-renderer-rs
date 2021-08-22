@@ -13,9 +13,11 @@ use crate::sivf_misc::trait_render::TraitRender;
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub enum SivfObject {
     // complex:
+    #[serde(rename="layer")]
     Layer(Layer),
 
     // objects:
+    #[serde(rename="circle")]
     Circle(SivfCircle),
 
 }

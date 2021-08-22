@@ -13,9 +13,13 @@ use crate::utils::sizes::ImageSizes;
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct SivfCircle {
+    #[serde(rename="xy")]
+    // TODO: force serde to create Vec2d from array [x, y]
     position: Vec2d<MetricUnit>,
     radius: MetricUnit,
+    // TODO: explain to serde that color can be read from str "#ff112233"
     color: Color,
+    // TODO: default = false
     inverted: bool,
 }
 
