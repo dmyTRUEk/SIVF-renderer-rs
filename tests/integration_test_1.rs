@@ -4,7 +4,7 @@
 
 #[cfg(test)]
 mod integration_tests {
-    use super::*;
+    // use super::*;
 
     #[test]
     fn _2_plus_2_eq_4() {

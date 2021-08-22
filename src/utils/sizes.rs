@@ -6,9 +6,11 @@ use std::convert::TryFrom;
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct Sizes<T> { pub w: T, pub h: T }
+#[inline]
 pub fn sizes<T>(w: T, h: T) -> Sizes<T> { Sizes { w, h } }
 
 pub type ImageSizes = Sizes<usize>;
+#[inline]
 pub fn image_sizes(w: usize, h: usize) -> ImageSizes { ImageSizes { w, h } }
 
 impl<T: Copy> Sizes<T> {

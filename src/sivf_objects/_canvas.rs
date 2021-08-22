@@ -3,8 +3,8 @@
 use image::{ImageBuffer, Rgba};
 
 use crate::utils::array2d::Array2d;
-use crate::utils::color::*;
-use crate::utils::sizes::{ImageSizes, Sizes, sizes, image_sizes};
+use crate::utils::color::{Color, TRANSPARENT};
+use crate::utils::sizes::{ImageSizes, Sizes, image_sizes};
 use crate::sivf_objects::_blend_types::BlendType;
 
 
@@ -12,6 +12,7 @@ use crate::sivf_objects::_blend_types::BlendType;
 #[derive(Clone, Debug, PartialEq)]
 pub struct Canvas {
     // TODO: maybe use color from image library?
+    // TODO: do it private, and implement [get(w, h)]
     pub pixels: Array2d<Color>
 }
 impl Canvas {
@@ -25,7 +26,7 @@ impl Canvas {
         image_sizes(self.pixels.width(), self.pixels.height())
     }
 
-    pub fn blend(&mut self, canvas_other: Canvas, blend_type: BlendType) {
+    pub fn blend_with(&mut self, canvas_other: Canvas, blend_type: BlendType) {
         // TODO
         *self = canvas_other
     }

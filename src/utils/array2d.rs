@@ -10,8 +10,7 @@ use crate::utils::sizes::{Sizes, sizes};
 #[derive(Clone, Debug, PartialEq)]
 pub struct Array2d<T: Copy> {
     sizes: Sizes<usize>,
-    // TODO: rewrite in flat structure ?
-    //   and do measurements: flat vs nested(2d)
+    // TODO: rewrite [elements] in flat structure and do measurements: flat vs nested(2d)
     elements: Vec<Vec<T>>,
 }
 

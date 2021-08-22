@@ -38,7 +38,7 @@ mod utils;
 use std::env;
 // use image::{ImageBuffer, Rgba};
 
-use crate::help::*;
+use crate::help::HELP_STR;
 use crate::utils::color::ColorModel;
 use crate::utils::extensions::date_time::ExtensionDateTimeLocalToMyFormat;
 use crate::utils::extensions::string::{ExtensionTrimEmptyLines, ExtensionTrimLinesByFirstLine};
@@ -97,6 +97,7 @@ fn main() {
 
 
 
+// TODO: remove this tests (tests mustnt be in [main])
 #[cfg(test)]
 mod tests {
     use super::*;
