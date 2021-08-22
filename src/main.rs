@@ -1,4 +1,32 @@
-//! This is main file
+//! Main file
+
+// #![deny(
+//     bad_style,
+//     const_err,
+//     dead_code,
+//     improper_ctypes,
+//     non_shorthand_field_patterns,
+//     no_mangle_generic_items,
+//     overflowing_literals,
+//     path_statements ,
+//     patterns_in_fns_without_body,
+//     private_in_public,
+//     unconditional_recursion,
+//     unused,
+//     unused_allocation,
+//     unused_comparisons,
+//     unused_parens,
+//     while_true,
+//     // LINTS:
+//     missing_debug_implementations,
+//     // missing_docs,
+//     trivial_casts,
+//     trivial_numeric_casts,
+//     unused_extern_crates,
+//     unused_import_braces,
+//     unused_qualifications,
+//     unused_results
+// )]
 
 extern crate image;
 extern crate derive_more;
@@ -12,8 +40,8 @@ use std::env;
 
 use crate::help::*;
 use crate::utils::color::ColorModel;
-use crate::utils::date_time::TraitDateTimeLocalToMyFormat;
-use crate::utils::string::{TraitStrExtensionTrimEmptyLines, TraitStrExtensionTrimLinesByFirstLine};
+use utils::extensions::date_time::TraitDateTimeLocalToMyFormat;
+use utils::extensions::string::{TraitStrExtensionTrimEmptyLines, TraitStrExtensionTrimLinesByFirstLine};
 use crate::sivf_objects::_sivf_struct::SivfStruct;
 use crate::sivf_objects::layer::SivfLayer;
 use crate::utils::sizes::{ImageSizes, image_sizes};

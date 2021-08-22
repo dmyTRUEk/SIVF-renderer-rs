@@ -1,4 +1,4 @@
-//! This file contains useful funcs for `&str`
+//! `String` extensions
 
 
 

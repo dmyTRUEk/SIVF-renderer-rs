@@ -1,4 +1,4 @@
-//! Date and Time utils
+//! Date and Time extensions
 
 extern crate chrono;
 

@@ -32,7 +32,7 @@ impl Canvas {
 
     // TODO: what is second param in ImageBuffer generic
     pub fn to_image_buffer(&self) -> ImageBuffer<Rgba<u8>, Vec<u8>> {
-        let image_sizes: Sizes<u32> = self.sizes().into();
+        let image_sizes: Sizes<u32> = self.sizes().into_sizes();
         let mut image_buffer = ImageBuffer::new(image_sizes.w, image_sizes.h);
         for (w, h, pixel) in image_buffer.enumerate_pixels_mut() {
             let pixel_color: Color = self.pixels[(w as usize, h as usize)];
