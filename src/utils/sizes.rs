@@ -15,7 +15,11 @@ pub fn image_sizes(w: usize, h: usize) -> ImageSizes { ImageSizes { w, h } }
 
 impl<T: Copy> Sizes<T> {
 
-    pub fn into_sizes<R: TryFrom<T>>(self) -> Sizes<R> {
+    pub fn new(w: T, h: T) -> Sizes<T> {
+        Sizes { w, h }
+    }
+
+    pub fn to_sizes<R: TryFrom<T>>(&self) -> Sizes<R> {
         Sizes {
             w: R::try_from(self.w).ok().unwrap(),
             h: R::try_from(self.h).ok().unwrap(),
@@ -35,9 +39,16 @@ mod tests {
     use super::*;
 
     #[test]
-    fn into() {
+    fn to_sizes_explicit_type() {
         let expected: Sizes<u32> = Sizes { w: 3840_u32, h: 2160_u32 };
-        let actual  : Sizes<u32> = Sizes { w: 3840_usize, h: 2160_usize }.into_sizes();
+        let actual  : Sizes<u32> = Sizes { w: 3840_usize, h: 2160_usize }.to_sizes::<u32>();
+        assert_eq!(expected, actual);
+    }
+
+    #[test]
+    fn to_sizes_implicit_type() {
+        let expected: Sizes<u32> = Sizes { w: 3840_u32, h: 2160_u32 };
+        let actual  : Sizes<u32> = Sizes { w: 3840_usize, h: 2160_usize }.to_sizes();
         assert_eq!(expected, actual);
     }
 

@@ -13,8 +13,16 @@ pub struct Array2d<T: Copy> {
     // TODO: rewrite [elements] in flat structure and do measurements: flat vs nested(2d)
     elements: Vec<Vec<T>>,
 }
+// TODO: make iter:
+//   ```
+//   let array2d = Array2d::new(...);
+//   for (w, h, item) in array2d.iter() {
+//       ...
+//   }
+//   ```
 
 impl<T: Copy> Array2d<T> {
+
     pub fn width(&self)  -> usize { self.sizes.w }
     pub fn height(&self) -> usize { self.sizes.h }
 
@@ -38,6 +46,7 @@ impl<T: Copy> Array2d<T> {
             }
         };
     }
+
 }
 
 impl<T: Copy> Index<(usize, usize)> for Array2d<T> {

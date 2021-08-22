@@ -2,9 +2,9 @@
 
 
 
-// TODO: maybe rename to [SivfUnit]
+#[derive(Clone, Debug)]
 pub enum MetricUnit {
     Pixels(i32),
     Percents(f64),
-    // TODO: add other metrics?
+    // TODO LATER: add other metrics?
 }

@@ -55,6 +55,7 @@ file:///path_to_sivf_renderer_rs/target/doc/sivf_renderer_rs/index.html
 
 ### VS:
 - [`iter()` vs `into_iter()`](https://stackoverflow.com/questions/34733811/what-is-the-difference-between-iter-and-into-iter)
+- [`Foo::new()` vs `Foo::from()`](https://t.me/rust_beginners_ru/127903)
 - [`to()` vs `into()`](https://stackoverflow.com/questions/25316115/difference-between-tostring-and-intostring)
 - [`from` vs `as`](https://stackoverflow.com/questions/48795329/what-is-the-difference-between-fromfrom-and-as-in-rust)
 

@@ -9,6 +9,7 @@ use crate::utils::sizes::ImageSizes;
 
 
 
+#[derive(Clone, Debug)]
 pub struct SivfCircle {
     position: Vec2d<MetricUnit>,
     radius: MetricUnit,
