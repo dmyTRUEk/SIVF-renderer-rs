@@ -1,35 +1,35 @@
 //! Main file
 
-// #![deny(
-//
-//     bad_style,
-//     const_err,
-//     dead_code,
-//     improper_ctypes,
-//     non_shorthand_field_patterns,
-//     no_mangle_generic_items,
-//     overflowing_literals,
-//     path_statements ,
-//     patterns_in_fns_without_body,
-//     private_in_public,
-//     unconditional_recursion,
-//     unused,
-//     unused_allocation,
-//     unused_comparisons,
-//     unused_parens,
-//     while_true,
-//
-//     // LINTS:
-//     missing_debug_implementations,
-//     // missing_docs,
-//     trivial_casts,
-//     trivial_numeric_casts,
-//     unused_extern_crates,
-//     unused_import_braces,
-//     unused_qualifications,
-//     unused_results
-//
-// )]
+#![deny(
+
+    // bad_style,
+    // const_err,
+    // dead_code,
+    // improper_ctypes,
+    // non_shorthand_field_patterns,
+    // no_mangle_generic_items,
+    // overflowing_literals,
+    // path_statements ,
+    // patterns_in_fns_without_body,
+    // private_in_public,
+    // unconditional_recursion,
+    // unused,
+    // unused_allocation,
+    // unused_comparisons,
+    // unused_parens,
+    // while_true,
+
+    // LINTS:
+    // missing_debug_implementations,
+    // missing_docs,
+    // trivial_casts,
+    // trivial_numeric_casts,
+    // unused_extern_crates,
+    // unused_import_braces,
+    // unused_qualifications,
+    // unused_results
+
+)]
 
 extern crate image;
 extern crate serde_json;
@@ -42,20 +42,20 @@ mod sivf_objects;
 mod utils;
 
 use std::env;
+use std::fs::File;
+use std::io::Read;
 
 // use image::{ImageBuffer, Rgba};
-use std::fs::File;
-
-use sivf_objects::sivf_complex::layer::Layer;
-use sivf_misc::sivf_struct::SivfStruct;
 
 use crate::help::HELP_STR;
 use crate::utils::color::ColorModel;
 use crate::utils::extensions::date_time::ExtensionDateTimeLocalToMyFormat;
 use crate::utils::extensions::string::{ExtensionTrimEmptyLines, ExtensionTrimLinesByFirstLine};
 use crate::utils::sizes::{image_sizes, ImageSizes};
+use crate::sivf_misc::sivf_struct::SivfStruct;
 use crate::sivf_misc::blend_types::BlendType;
-use std::io::Read;
+use crate::sivf_objects::sivf_complex::layer::Layer;
+
 
 
 // TODO: rewrite main using only functionals
