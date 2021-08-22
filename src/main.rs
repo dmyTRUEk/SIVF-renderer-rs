@@ -40,8 +40,8 @@ use std::env;
 
 use crate::help::*;
 use crate::utils::color::ColorModel;
-use utils::extensions::date_time::TraitDateTimeLocalToMyFormat;
-use utils::extensions::string::{TraitStrExtensionTrimEmptyLines, TraitStrExtensionTrimLinesByFirstLine};
+use utils::extensions::date_time::ExtensionDateTimeLocalToMyFormat;
+use utils::extensions::string::{ExtensionTrimEmptyLines, ExtensionTrimLinesByFirstLine};
 use crate::sivf_objects::_sivf_struct::SivfStruct;
 use crate::sivf_objects::layer::SivfLayer;
 use crate::utils::sizes::{ImageSizes, image_sizes};

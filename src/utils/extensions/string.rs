@@ -2,10 +2,10 @@
 
 
 
-pub trait TraitStrExtensionTrimEmptyLines {
+pub trait ExtensionTrimEmptyLines {
     fn trim_empty_lines(&self) -> Self;
 }
-impl TraitStrExtensionTrimEmptyLines for String {
+impl ExtensionTrimEmptyLines for String {
     fn trim_empty_lines(&self) -> Self {
         let mut res = String::from("");
         let mut found_non_empty_at_begin: bool = false;
@@ -35,10 +35,10 @@ impl TraitStrExtensionTrimEmptyLines for String {
 
 
 
-pub trait TraitStrExtensionTrimLinesByFirstLine {
+pub trait ExtensionTrimLinesByFirstLine {
     fn trim_lines_by_first_line(&self) -> Self;
 }
-impl TraitStrExtensionTrimLinesByFirstLine for String {
+impl ExtensionTrimLinesByFirstLine for String {
     fn trim_lines_by_first_line(&self) -> Self {
         let mut trim_len: usize = 0;
         for c in self.chars() {
@@ -62,10 +62,10 @@ impl TraitStrExtensionTrimLinesByFirstLine for String {
 
 
 
-pub trait TraitStrExtensionSplitAndKeep {
+pub trait ExtensionSplitAndKeep {
     fn split_and_keep(&self, func: impl Fn(char) -> bool) -> Vec<&str>;
 }
-impl TraitStrExtensionSplitAndKeep for String {
+impl ExtensionSplitAndKeep for String {
     fn split_and_keep(&self, func: impl Fn(char) -> bool) -> Vec<&str> {
         if self == "" { return vec![]; }
         let res: Vec<&str> = self.split_inclusive(func).collect::<Vec<&str>>();

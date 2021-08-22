@@ -6,10 +6,10 @@ use chrono::{ DateTime, Local };
 
 
 
-pub trait TraitDateTimeLocalToMyFormat {
+pub trait ExtensionDateTimeLocalToMyFormat {
     fn to_my_format(&self) -> String;
 }
-impl TraitDateTimeLocalToMyFormat for DateTime<Local> {
+impl ExtensionDateTimeLocalToMyFormat for DateTime<Local> {
     fn to_my_format(&self) -> String {
         let year  : u32 = self.format("%Y").to_string().parse().unwrap();
         let month : u32 = self.format("%m").to_string().parse().unwrap();
