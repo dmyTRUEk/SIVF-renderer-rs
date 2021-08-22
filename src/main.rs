@@ -116,11 +116,11 @@ fn main() {
         let file_name = format!("img_{}__{}x{}.png", render_time_start.to_my_format(), image_sizes.w, image_sizes.h);
         // println!("file_name = {}", file_name);
 
-        print!("Reading file... ");
+        print!("Converting renderer array to image... ");
         let image_buffer = canvas.to_image_buffer();
         println!("OK");
 
-        print!("Reading file... ");
+        print!("Saving image... ");
         image_buffer.save(file_name).unwrap();
         println!("OK");
 
