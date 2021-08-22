@@ -31,6 +31,7 @@
 
 )]
 
+// TODO: this is not idiomatic?
 extern crate image;
 extern crate serde_json;
 extern crate serde_yaml;
@@ -50,7 +51,7 @@ use std::io::Read;
 use crate::help::HELP_STR;
 use crate::utils::color::ColorModel;
 use crate::utils::extensions::date_time::ExtensionDateTimeLocalToMyFormat;
-use crate::utils::extensions::string::{ExtensionTrimEmptyLines, ExtensionTrimLinesByFirstLine};
+use crate::utils::extensions::string::{ExtensionTrimEmptyLines, ExtensionTrimLinesByFirstLine, ExtensionRemoveCLikeComments};
 use crate::utils::sizes::{image_sizes, ImageSizes};
 use crate::sivf_misc::sivf_struct::SivfStruct;
 use crate::sivf_misc::blend_types::BlendType;
@@ -58,7 +59,7 @@ use crate::sivf_objects::sivf_complex::layer::Layer;
 
 
 
-// TODO: rewrite main using only functionals
+// TODO: rewrite whole main using only functionals
 fn main() {
     // get cli args
     let args_all: Vec<String> = env::args().collect();
@@ -105,7 +106,6 @@ fn main() {
                 file_content
             }
             Err(_) => {
-                // println!("Error opening file {}: {}", filename, error);
                 println!(r#"Can't open file "{}", skipping it"#, file_name_input);
                 continue;
             }
@@ -113,15 +113,24 @@ fn main() {
         // println!("file content = \n{}", file_content);
         println!("OK");
 
+        print!("Removing comments... ");
+        let sivf_file_as_string: String = match sivf_file_as_string.remove_comments() {
+            Ok(v) => { v }
+            Err(e) => {
+                println!("Can't remove comments, skipping");
+                continue;
+            }
+        };
+        println!("OK");
+
         print!("Parsing file... ");
         let sivf_struct: SivfStruct = match serde_json::from_str(&sivf_file_as_string) {
             Ok(v) => { v }
             Err(e) => {
-                println!("Cant parse file: {}", e);
+                println!(r#"Cant parse file: "{}""#, e);
                 continue;
             }
         };
-
         // let sivf_struct: SivfStruct = SivfStruct {
         //     image_sizes: image_sizes(200, 100),
         //     color_model: ColorModel::ARGB,
@@ -152,23 +161,4 @@ fn main() {
     }
 
     println!("\nProgram finished successfully!");
-}
-
-
-
-// TODO: remove this tests (tests mustnt be in [main])
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn unit_test_2_plus_2_eq_4() {
-        assert_eq!(2 + 2, 4);
-    }
-
-    #[test]
-    fn unit_test_3_plus_3_eq_6() {
-        assert_eq!(3 + 3, 6);
-    }
-
 }
