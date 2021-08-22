@@ -1,6 +1,6 @@
 //! Sizes, ImageSizes (w, h)
 
-use std::convert::From;
+use std::convert::TryFrom;
 
 
 
@@ -13,7 +13,7 @@ pub fn image_sizes(w: usize, h: usize) -> ImageSizes { ImageSizes { w, h } }
 
 impl<T: Copy> Sizes<T> {
 
-    pub fn into_sizes<R: std::convert::TryFrom<T>>(&self) -> Sizes<R> {
+    pub fn into_sizes<R: TryFrom<T>>(self) -> Sizes<R> {
         Sizes {
             w: R::try_from(self.w).ok().unwrap(),
             h: R::try_from(self.h).ok().unwrap(),
