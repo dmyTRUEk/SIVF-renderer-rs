@@ -31,22 +31,23 @@
 extern crate image;
 extern crate derive_more;
 
-mod help;
-mod sivf_objects;
-mod utils;
-
 use std::env;
-// use image::{ImageBuffer, Rgba};
+
+use sivf_items::sivf_complex::layer::Layer;
+use sivf_misc::sivf_struct::SivfStruct;
 
 use crate::help::HELP_STR;
 use crate::utils::color::ColorModel;
 use crate::utils::extensions::date_time::ExtensionDateTimeLocalToMyFormat;
 use crate::utils::extensions::string::{ExtensionTrimEmptyLines, ExtensionTrimLinesByFirstLine};
-use crate::sivf_objects::_sivf_struct::SivfStruct;
-use crate::sivf_objects::layer::SivfLayer;
-use crate::utils::sizes::{ImageSizes, image_sizes};
+use crate::utils::sizes::{image_sizes, ImageSizes};
 
+mod help;
+mod sivf_misc;
+mod sivf_items;
+mod utils;
 
+// use image::{ImageBuffer, Rgba};
 
 fn main() {
     // get cli args
@@ -70,7 +71,7 @@ fn main() {
         let sivf_struct: SivfStruct = SivfStruct {
             image_sizes: image_sizes(200, 100),
             color_model: ColorModel::ARGB,
-            root_layer: SivfLayer {
+            root_layer: Layer {
                 children: vec![]
             }
         };

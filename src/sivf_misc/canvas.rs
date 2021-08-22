@@ -5,7 +5,7 @@ use image::{ImageBuffer, Rgba};
 use crate::utils::array2d::Array2d;
 use crate::utils::color::{Color, TRANSPARENT};
 use crate::utils::sizes::{ImageSizes, Sizes, image_sizes};
-use crate::sivf_objects::_blend_types::BlendType;
+use crate::sivf_misc::blend_types::BlendType;
 
 
 

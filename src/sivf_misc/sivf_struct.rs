@@ -1,10 +1,10 @@
 //! SIVF Struct
 
 use crate::utils::color::ColorModel;
-use crate::sivf_objects::layer::SivfLayer;
-use crate::sivf_objects::_trait_render::TraitSivfRender;
-use crate::sivf_objects::_canvas::Canvas;
-use crate::sivf_objects::_blend_types::BlendType;
+use crate::sivf_items::sivf_complex::layer::Layer;
+use crate::sivf_misc::trait_render::TraitRender;
+use crate::sivf_misc::canvas::Canvas;
+use crate::sivf_misc::blend_types::BlendType;
 use crate::utils::sizes::{sizes, ImageSizes, image_sizes};
 
 
@@ -13,7 +13,7 @@ use crate::utils::sizes::{sizes, ImageSizes, image_sizes};
 pub struct SivfStruct {
     pub image_sizes: ImageSizes,
     pub color_model: ColorModel,
-    pub root_layer: SivfLayer,
+    pub root_layer: Layer,
 }
 
 impl SivfStruct {
