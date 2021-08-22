@@ -1,5 +1,7 @@
 //! SIVF Circle
 
+use serde_derive::{Serialize, Deserialize};
+
 use crate::sivf_misc::canvas::Canvas;
 use crate::sivf_misc::metric_units::MetricUnit;
 use crate::sivf_misc::trait_render::TraitRender;
@@ -9,7 +11,7 @@ use crate::utils::sizes::ImageSizes;
 
 
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct SivfCircle {
     position: Vec2d<MetricUnit>,
     radius: MetricUnit,

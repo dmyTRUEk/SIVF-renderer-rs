@@ -1,15 +1,17 @@
 //! Color
 
+use serde_derive::{Serialize, Deserialize};
 
 
-#[derive(Clone, Copy, Debug, PartialEq)]
+
+#[derive(Clone, Copy, Debug, PartialEq, Serialize, Deserialize)]
 pub enum ColorModel {
     ARGB,
     RGBA,
     // TODO: add `CMYA`, `ACMY`, `XYZ`?
 }
 
-#[derive(Clone, Copy, Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq, Serialize, Deserialize)]
 pub struct Color {
     pub a: u8,
     pub r: u8,

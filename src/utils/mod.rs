@@ -10,6 +10,7 @@
 
 // other packages:
 pub mod extensions;
+pub mod functionals;
 
 pub mod array2d;
 pub mod color;

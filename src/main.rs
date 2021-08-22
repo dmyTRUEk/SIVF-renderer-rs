@@ -32,7 +32,9 @@
 // )]
 
 extern crate image;
-extern crate derive_more;
+extern crate serde_json;
+extern crate serde_yaml;
+// extern crate derive_more;
 
 mod help;
 mod sivf_misc;
@@ -53,7 +55,7 @@ use crate::utils::extensions::date_time::ExtensionDateTimeLocalToMyFormat;
 use crate::utils::extensions::string::{ExtensionTrimEmptyLines, ExtensionTrimLinesByFirstLine};
 use crate::utils::sizes::{image_sizes, ImageSizes};
 use crate::sivf_misc::blend_types::BlendType;
-
+use std::io::Read;
 
 
 // TODO: rewrite main using only functionals
@@ -74,12 +76,17 @@ fn main() {
         .filter(|arg| !arg.starts_with("-"))
         .collect();
     if file_names.is_empty() {
+        // TODO: then ask user for file to render
         println!("No files to render was provided.");
         println!("Exiting...");
         return;
     }
 
-    // TODO: add cli options
+    // TODO: maybe use some cli lib for managing args
+    // TODO: add cli options:
+    //   - -h or --help -> help
+    //   - --log -> show logs, if error
+    //   - --progress -> show render progress
     // TODO:
     // if arg == "-h" {
     //     println!("{}", HELP_STR.to_string().trim_empty_lines().trim_lines_by_first_line());
@@ -87,24 +94,41 @@ fn main() {
     // }
 
     for file_name_input in file_names {
+        println!();
 
         print!("Reading file... ");
-        let file = match File::open(&file_name_input) {
-            Ok(f) => { f }
-            Err(e) => {
+        // TODO: instead of [match] try to use [unwrap_or_else()]
+        let sivf_file_as_string: String = match File::open(&file_name_input) {
+            Ok(mut file) => {
+                let mut file_content = String::new();
+                file.read_to_string(&mut file_content).unwrap();
+                file_content
+            }
+            Err(_) => {
+                // println!("Error opening file {}: {}", filename, error);
                 println!(r#"Can't open file "{}", skipping it"#, file_name_input);
                 continue;
             }
         };
+        // println!("file content = \n{}", file_content);
         println!("OK");
 
-        // TODO
-        let sivf_struct: SivfStruct = SivfStruct {
-            image_sizes: image_sizes(200, 100),
-            color_model: ColorModel::ARGB,
-            // root_layer: layer(BlendType::FullOverlap, vec![]),
-            root_layer: Layer::new(BlendType::Overlap, vec![]),
+        print!("Parsing file... ");
+        let sivf_struct: SivfStruct = match serde_json::from_str(&sivf_file_as_string) {
+            Ok(v) => { v }
+            Err(e) => {
+                println!("Cant parse file: {}", e);
+                continue;
+            }
         };
+
+        // let sivf_struct: SivfStruct = SivfStruct {
+        //     image_sizes: image_sizes(200, 100),
+        //     color_model: ColorModel::ARGB,
+        //     // root_layer: layer(BlendType::FullOverlap, vec![]),
+        //     root_layer: Layer::new(BlendType::Overlap, vec![]),
+        // };
+        println!("OK");
 
         print!(r#"Rendering "{}"... "#, file_name_input);
         let render_time_start = chrono::Local::now();
@@ -127,7 +151,7 @@ fn main() {
         println!("File render finished successfully.");
     }
 
-    println!("Program finished successfully!");
+    println!("\nProgram finished successfully!");
 }
 
 

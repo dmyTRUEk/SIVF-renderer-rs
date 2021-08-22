@@ -1,10 +1,12 @@
 //! Sizes, ImageSizes (w, h)
 
+use serde_derive::{Serialize, Deserialize};
+
 use std::convert::TryFrom;
 
 
 
-#[derive(Clone, Copy, Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq, Serialize, Deserialize)]
 pub struct Sizes<T> { pub w: T, pub h: T }
 #[inline]
 pub fn sizes<T>(w: T, h: T) -> Sizes<T> { Sizes { w, h } }

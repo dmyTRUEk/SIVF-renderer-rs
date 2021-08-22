@@ -1,5 +1,7 @@
 //! SIVF Struct
 
+use serde_derive::{Serialize, Deserialize};
+
 use crate::utils::color::ColorModel;
 use crate::sivf_objects::sivf_complex::layer::Layer;
 use crate::sivf_misc::trait_render::TraitRender;
@@ -9,7 +11,7 @@ use crate::utils::sizes::{sizes, ImageSizes, image_sizes};
 
 
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct SivfStruct {
     pub image_sizes: ImageSizes,
     pub color_model: ColorModel,

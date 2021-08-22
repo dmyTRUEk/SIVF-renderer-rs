@@ -2,6 +2,8 @@
 
 use std::any::Any;
 
+use serde_derive::{Serialize, Deserialize};
+
 use crate::sivf_objects::sivf_any_object::SivfObject;
 use crate::sivf_misc::blend_types::BlendType;
 use crate::sivf_misc::canvas::Canvas;
@@ -10,7 +12,7 @@ use crate::utils::sizes::ImageSizes;
 
 
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Layer {
     pub blend_type: BlendType,
     children: Vec<SivfObject>,

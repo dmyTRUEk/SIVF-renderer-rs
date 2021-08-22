@@ -1,10 +1,12 @@
 //! Blend types (overlap, add, add_overflow, ...)
 
+use serde_derive::{Serialize, Deserialize};
+
 use crate::utils::color::Color;
 
 
 
-#[derive(Clone, Copy, Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq, Serialize, Deserialize)]
 pub enum BlendType {
     FullOverlap,
     Overlap,
