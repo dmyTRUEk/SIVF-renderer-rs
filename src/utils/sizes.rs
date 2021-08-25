@@ -6,7 +6,7 @@ use std::convert::TryFrom;
 
 
 
-#[derive(Clone, Copy, Debug, PartialEq, Serialize, Deserialize)]
+#[derive(Clone, Copy, Debug, PartialEq, /*Serialize,*/ Deserialize)]
 pub struct Sizes<T> { pub w: T, pub h: T }
 #[inline]
 pub fn sizes<T>(w: T, h: T) -> Sizes<T> { Sizes { w, h } }

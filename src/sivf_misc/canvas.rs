@@ -10,6 +10,7 @@ use crate::sivf_misc::blend_types::BlendType;
 use crate::utils::extensions::usize::ExtensionIndices;
 
 
+
 #[derive(Clone, Debug)]
 pub struct Canvas {
     // TODO: maybe use color from image library?
@@ -33,9 +34,9 @@ impl Canvas {
         // TODO
         self = canvas_other;
         // let x = (0..3).map(|i| (i * 2)..(i * 2 + 2)).collect();
-        for (w, h) in vec![0..10, 100..110].multi_cartesian_product() {
-
-        }
+        // for (w, h) in vec![0..10, 100..110].multi_cartesian_product() {
+        //
+        // }
         // for (w, h) in [ self.pixels.width().indices(), self.pixels.height().indices() ].multi_cartesian_product() {
         //
         // }

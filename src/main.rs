@@ -27,14 +27,14 @@
     trivial_numeric_casts,
     // unused_extern_crates,
     unused_import_braces,
-    unused_qualifications,
+    // unused_qualifications,
     // unused_results,
 
 )]
 
 // TODO: this is not idiomatic?
 extern crate image;
-extern crate serde_json;
+// extern crate serde_json;
 extern crate serde_yaml;
 // extern crate derive_more;
 
@@ -87,8 +87,8 @@ fn main() {
     // TODO: maybe use some cli lib for managing args
     // TODO: add cli options:
     //   - -h or --help -> help
-    //   - --log -> show logs, if error
-    //   - --progress -> show render progress
+    //   - --log=0/1 -> show logs, if error
+    //   - --progress=0/1 -> show render progress
     // TODO:
     // if arg == "-h" {
     //     println!("{}", HELP_STR.to_string().trim_empty_lines().trim_lines_by_first_line());
@@ -98,9 +98,9 @@ fn main() {
     for file_name_input in file_names {
         println!();
 
-        print!("Reading file... ");
+        print!(r#"Reading file "{}"... "#, file_name_input);
         // TODO: instead of [match] try to use [unwrap_or_else()]
-        let sivf_file_as_string: String = match File::open(&file_name_input) {
+        let sivf_file_content: String = match File::open(&file_name_input) {
             Ok(mut file) => {
                 let mut file_content = String::new();
                 file.read_to_string(&mut file_content).unwrap();
@@ -115,7 +115,7 @@ fn main() {
         println!("OK");
 
         print!("Removing comments... ");
-        let sivf_file_as_string: String = match sivf_file_as_string.remove_comments() {
+        let sivf_file_content: String = match sivf_file_content.remove_comments() {
             Ok(v) => { v }
             Err(e) => {
                 println!("Can't remove comments, skipping");
@@ -125,7 +125,8 @@ fn main() {
         println!("OK");
 
         print!("Parsing file... ");
-        let sivf_struct: SivfStruct = match serde_json::from_str(&sivf_file_as_string) {
+        // println!("{}", &sivf_file_content);
+        let sivf_struct: SivfStruct = match serde_yaml::from_str(&sivf_file_content) {
             Ok(v) => { v }
             Err(e) => {
                 println!(r#"Cant parse file: "{}""#, e);
@@ -134,17 +135,18 @@ fn main() {
         };
         println!("OK");
 
-        print!(r#"Rendering "{}"... "#, file_name_input);
+        print!(r"Rendering ... ");
         let render_time_start = chrono::Local::now();
         let canvas = sivf_struct.render();
         let render_time_end = chrono::Local::now();
-        println!("Render finished in {}s.", (render_time_end-render_time_start).num_seconds());
+        print!("Render finished in {}s. ", (render_time_end-render_time_start).num_seconds());
+        println!("OK");
 
         let image_sizes: ImageSizes = sivf_struct.image_sizes;
         let file_name = format!("img_{}__{}x{}.png", render_time_start.to_my_format(), image_sizes.w, image_sizes.h);
         // println!("file_name = {}", file_name);
 
-        print!("Converting renderer array to image... ");
+        print!("Converting rendered array to image... ");
         let image_buffer = canvas.to_image_buffer();
         println!("OK");
 

@@ -6,7 +6,7 @@ use crate::utils::color::Color;
 
 
 
-#[derive(Clone, Copy, Debug, PartialEq, Serialize, Deserialize)]
+#[derive(Clone, Copy, Debug, PartialEq, /*Serialize,*/ Deserialize)]
 pub enum BlendType {
     FullOverlap,
     Overlap,

@@ -10,7 +10,7 @@ use crate::utils::sizes::{sizes, ImageSizes, image_sizes};
 
 
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, /*Serialize,*/ Deserialize)]
 pub struct SivfStruct {
     // TODO: force serde convert array of two into [ImageSizes]
     pub image_sizes: ImageSizes,

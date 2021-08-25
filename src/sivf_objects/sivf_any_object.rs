@@ -3,22 +3,23 @@
 use serde_derive::{Serialize, Deserialize};
 
 use crate::sivf_objects::sivf_complex::layer::Layer;
-use crate::sivf_objects::sivf_shapes::circle::SivfCircle;
+use crate::sivf_objects::sivf_shapes::circle::Circle;
 use crate::utils::sizes::ImageSizes;
 use crate::sivf_misc::canvas::Canvas;
 use crate::sivf_misc::trait_render::TraitRender;
 
 
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, /*Serialize,*/ Deserialize)]
 pub enum SivfObject {
+
     // complex:
     #[serde(rename="layer")]
     Layer(Layer),
 
     // objects:
     #[serde(rename="circle")]
-    Circle(SivfCircle),
+    Circle(Circle),
 
 }
 

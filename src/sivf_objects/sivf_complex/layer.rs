@@ -12,12 +12,47 @@ use crate::utils::sizes::ImageSizes;
 
 
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, /*Serialize,*/ Deserialize)]
 pub struct Layer {
-    // TODO: make default = Overlap
+
+    #[serde(default="deserialize::blend_type")]
     pub blend_type: BlendType,
-    // TODO: maybe smt like #[serde(flatten)]
+
+    // TODO: maybe smt like #[serde(with="")]
+    #[serde(deserialize_with="deserialize::children", flatten)]
     children: Vec<SivfObject>,
+
+}
+
+mod deserialize {
+
+    use std::str::FromStr;
+    use std::fmt::Display;
+
+    use serde::Deserializer;
+
+    use crate::sivf_misc::blend_types::BlendType;
+    use crate::sivf_objects::sivf_any_object::SivfObject;
+
+
+
+    pub(crate) fn blend_type() -> BlendType {
+        BlendType::Overlap
+    }
+
+    pub(crate) fn children<'de, D>(deserializer: D) -> Result<Vec<SivfObject>, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        Ok(vec![])
+    }
+
+}
+
+#[derive(Clone, Debug, /*Serialize,*/ Deserialize)]
+pub enum LayerElement {
+    BlendType(BlendType),
+    SivfObject(SivfObject),
 }
 
 impl Layer {
