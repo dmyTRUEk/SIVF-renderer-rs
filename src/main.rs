@@ -62,16 +62,16 @@ fn main() {
 
     // remove first cli arg (which is just path to this binary)
     let args: Vec<String> = (&args_all[1..]).to_vec();
-    // println!("args = {:?}", args);
+    println!("args = {:?}", args);
 
     // TODO: separate args?
 
-    let file_names: Vec<String> = args
+    let file_paths: Vec<String> = args
         .iter()
         .cloned()
         .filter(|arg| !arg.starts_with("-"))
         .collect();
-    if file_names.is_empty() {
+    if file_paths.is_empty() {
         // TODO: then ask user for file to render
         println!("No files to render was provided.");
         println!("Exiting...");
@@ -95,19 +95,20 @@ fn main() {
     //     continue;
     // }
 
-    for file_name_input in file_names {
+    // TODO LATER: make it parallel, so many pictures at the same time can render
+    for file_input_path in file_paths {
         println!();
 
-        print!(r#"Reading file "{}"... "#, file_name_input);
+        print!(r#"Reading file "{}"... "#, file_input_path);
         // TODO: instead of [match] try to use [unwrap_or_else()]
-        let sivf_file_content: String = match File::open(&file_name_input) {
+        let sivf_file_content: String = match File::open(&file_input_path) {
             Ok(mut file) => {
                 let mut file_content = String::new();
                 file.read_to_string(&mut file_content).unwrap();
                 file_content
             }
             Err(_) => {
-                println!(r#"Can't open file "{}", skipping it"#, file_name_input);
+                println!(r#"Can't open file "{}", skipping it"#, file_input_path);
                 continue;
             }
         };
@@ -124,8 +125,9 @@ fn main() {
         };
         println!("OK");
 
+        println!("{}", &sivf_file_content);
+
         print!("Parsing file... ");
-        // println!("{}", &sivf_file_content);
         let sivf_struct: SivfStruct = match serde_yaml::from_str(&sivf_file_content) {
             Ok(v) => { v }
             Err(e) => {
@@ -135,6 +137,8 @@ fn main() {
         };
         println!("OK");
 
+        println!("Parse result: {:#?}", sivf_struct);
+
         print!(r"Rendering ... ");
         let render_time_start = chrono::Local::now();
         let canvas = sivf_struct.render();
@@ -143,15 +147,24 @@ fn main() {
         println!("OK");
 
         let image_sizes: ImageSizes = sivf_struct.image_sizes;
-        let file_name = format!("img_{}__{}x{}.png", render_time_start.to_my_format(), image_sizes.w, image_sizes.h);
+        // TODO LATER: separate this into function
+        let file_output_name = format!(
+            "img_{}__{}x{}.png",
+            render_time_start.to_my_format(),
+            image_sizes.w,
+            image_sizes.h
+        );
+        // TODO: file_path_output
+        let file_output_path: String = file_output_name;
         // println!("file_name = {}", file_name);
 
         print!("Converting rendered array to image... ");
         let image_buffer = canvas.to_image_buffer();
         println!("OK");
 
+        println!(r#"Output file name: "{}""#, file_output_path);
         print!("Saving image... ");
-        image_buffer.save(file_name).unwrap();
+        image_buffer.save(file_output_path).unwrap();
         println!("OK");
 
         println!("File render finished successfully.");

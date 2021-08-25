@@ -6,22 +6,54 @@ use crate::utils::color::Color;
 
 
 
+pub const DEFAULT_BLEND_TYPE_ALPHA: BlendType = BlendType::Overlap;
+pub const DEFAULT_BLEND_TYPE_COLOR: BlendType = BlendType::Overlap;
+
+
+
 #[derive(Clone, Copy, Debug, PartialEq, /*Serialize,*/ Deserialize)]
-pub enum BlendType {
-    FullOverlap,
-    Overlap,
-    Add,
-    AddOverflow,
-    // TODO
+pub struct BlendTypes {
+    pub alpha: BlendType,
+    pub color: BlendType,
 }
 
-pub fn blend_pixels(pixel1: Color, pixel2: Color, blend_type: BlendType) -> Color {
-    match blend_type {
-        BlendType::FullOverlap => {
-            pixel2
-        }
-        _ => {
-            todo!()
+impl BlendTypes {
+
+    pub fn new() -> Self {
+        BlendTypes {
+            alpha: DEFAULT_BLEND_TYPE_ALPHA,
+            color: DEFAULT_BLEND_TYPE_COLOR,
         }
     }
+
+}
+
+
+
+#[derive(Clone, Copy, Debug, PartialEq, /*Serialize,*/ Deserialize)]
+pub enum BlendType {
+
+    #[serde(rename="full_overlap")]
+    FullOverlap,
+
+    #[serde(rename="overlap")]
+    Overlap,
+
+    #[serde(rename="add")]
+    Add,
+
+    #[serde(rename="add_overflow")]
+    AddOverflow,
+
+    // TODO: add other?:
+    //   - minus
+    //   - multiply
+}
+
+
+
+// TODO: blend type different for alpha and pure color
+pub fn blend_colors(color1: Color, color2: Color, blend_types: BlendTypes) -> Color {
+    // TODO
+    color2
 }

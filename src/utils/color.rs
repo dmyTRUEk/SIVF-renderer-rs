@@ -8,7 +8,7 @@ use serde_derive::{Serialize, Deserialize};
 pub enum ColorModel {
     ARGB,
     RGBA,
-    // TODO: add `CMYA`, `ACMY`, `XYZ`?
+    // TODO LATER: add `CMYA`, `ACMY`, `XYZ`?
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Serialize, Deserialize)]

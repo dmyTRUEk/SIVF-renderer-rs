@@ -6,7 +6,7 @@ use itertools::Itertools;
 use crate::utils::array2d::Array2d;
 use crate::utils::color::{Color, TRANSPARENT};
 use crate::utils::sizes::{ImageSizes, Sizes, image_sizes};
-use crate::sivf_misc::blend_types::BlendType;
+use crate::sivf_misc::blend_types::BlendTypes;
 use crate::utils::extensions::usize::ExtensionIndices;
 
 
@@ -30,16 +30,15 @@ impl Canvas {
         image_sizes(self.pixels.width(), self.pixels.height())
     }
 
-    pub fn blend_with(mut self, canvas_other: Canvas, blend_type: BlendType) -> Self {
+    pub fn blend_with(mut self, canvas_other: Canvas, blend_types: BlendTypes) -> Self {
         // TODO
         self = canvas_other;
         // let x = (0..3).map(|i| (i * 2)..(i * 2 + 2)).collect();
         // for (w, h) in vec![0..10, 100..110].multi_cartesian_product() {
-        //
         // }
         // for (w, h) in [ self.pixels.width().indices(), self.pixels.height().indices() ].multi_cartesian_product() {
-        //
         // }
+        // for pixel use [blend_types::blend_colors]
         self
     }
 
