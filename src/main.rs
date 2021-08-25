@@ -1,6 +1,6 @@
 //! Main file
 
-// TODO LATER: turn on as max as possible
+// TODO LATER: turn on all
 #![deny(
 
     bad_style,
@@ -44,13 +44,13 @@ mod sivf_objects;
 mod utils;
 
 use crate::help::HELP_STR;
+use crate::sivf_misc::sivf_struct::SivfStruct;
+use crate::sivf_misc::blend_types::BlendType;
+use crate::sivf_objects::sivf_complex::layer::Layer;
 use crate::utils::color::ColorModel;
 use crate::utils::extensions::date_time::ExtensionDateTimeLocalToMyFormat;
 use crate::utils::extensions::string::{ExtensionTrimEmptyLines, ExtensionTrimLinesByFirstLine, ExtensionRemoveCLikeComments};
 use crate::utils::sizes::{image_sizes, ImageSizes};
-use crate::sivf_misc::sivf_struct::SivfStruct;
-use crate::sivf_misc::blend_types::BlendType;
-use crate::sivf_objects::sivf_complex::layer::Layer;
 
 
 
