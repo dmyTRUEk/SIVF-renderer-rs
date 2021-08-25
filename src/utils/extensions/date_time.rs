@@ -1,7 +1,5 @@
 //! Date and Time extensions
 
-extern crate chrono;
-
 use chrono::{ DateTime, Local };
 
 

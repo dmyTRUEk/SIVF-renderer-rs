@@ -25,29 +25,23 @@
     missing_docs,
     trivial_casts,
     trivial_numeric_casts,
-    // unused_extern_crates,
+    unused_extern_crates,
     unused_import_braces,
-    // unused_qualifications,
+    unused_qualifications,
     // unused_results,
 
 )]
-
-// TODO: this is not idiomatic?
-extern crate image;
-// extern crate serde_json;
-extern crate serde_yaml;
-// extern crate derive_more;
-
-mod help;
-mod sivf_misc;
-mod sivf_objects;
-mod utils;
 
 use std::env;
 use std::fs::File;
 use std::io::Read;
 
 // use image::{ImageBuffer, Rgba};
+
+mod help;
+mod sivf_misc;
+mod sivf_objects;
+mod utils;
 
 use crate::help::HELP_STR;
 use crate::utils::color::ColorModel;
@@ -86,9 +80,15 @@ fn main() {
 
     // TODO: maybe use some cli lib for managing args
     // TODO: add cli options:
-    //   - -h or --help -> help
-    //   - --log=0/1 -> show logs, if error
-    //   - --progress=0/1 -> show render progress
+    //   -h --help -> help
+    //   -l --log=0/1 -> show logs, if error
+    //   -p --progress=0/1 -> show render progress
+    //   -n="..." --name="%i_%s__%wx%h" -> name of the output file
+    //     %f - file input name
+    //     %s - start render time
+    //     %e - end render time
+    //     %w - width of the image
+    //     %h - height of the image
     // TODO:
     // if arg == "-h" {
     //     println!("{}", HELP_STR.to_string().trim_empty_lines().trim_lines_by_first_line());
