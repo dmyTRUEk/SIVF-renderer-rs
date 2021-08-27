@@ -125,9 +125,9 @@ fn main() {
         };
         println!("OK");
 
-        println!("{}", &sivf_file_content);
+        // println!("{}", &sivf_file_content);
 
-        print!("Parsing file... ");
+        print!("Parsing file to YAML... ");
         let value: serde_yaml::Value = match serde_yaml::from_str(&sivf_file_content) {
             Ok(v) => { v }
             Err(e) => {
@@ -135,13 +135,10 @@ fn main() {
                 continue;
             }
         };
-        let sivf_struct: SivfStruct = match SivfStruct::from(&value) {
-            Ok(v) => { v }
-            Err(e) => {
-                println!(r#"Cant parse to SivfStruct: "{}""#, e);
-                continue;
-            }
-        };
+        println!("OK");
+
+        print!("Parsing YAML to SIVF struct... ");
+        let sivf_struct: SivfStruct = SivfStruct::from(&value);
         println!("OK");
 
         println!("Parse result: {:#?}", sivf_struct);

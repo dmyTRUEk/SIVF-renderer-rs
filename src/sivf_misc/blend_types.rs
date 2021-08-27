@@ -10,6 +10,22 @@ pub const DEFAULT_BLEND_TYPE_COLOR: BlendType = BlendType::Overlap;
 
 
 #[derive(Clone, Copy, Debug, PartialEq)]
+pub enum BlendType {
+    Overlap,
+    Add,
+    Max,
+    Min,
+    AddOverflow,
+    Avg,
+
+    // TODO: add other?:
+    //   - minus
+    //   - multiply
+}
+
+
+
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub struct BlendTypes {
     pub alpha: BlendType,
     pub color: BlendType,
@@ -25,22 +41,6 @@ impl BlendTypes {
         BlendTypes { alpha, color }
     }
 
-}
-
-
-
-#[derive(Clone, Copy, Debug, PartialEq)]
-pub enum BlendType {
-    Overlap,
-    Add,
-    Max,
-    Min,
-    AddOverflow,
-    Avg,
-
-    // TODO: add other?:
-    //   - minus
-    //   - multiply
 }
 
 

@@ -1,6 +1,5 @@
 //! SIVF Layer
 
-// use std::any::Any;
 use std::fmt::{self, Display};
 use std::str::FromStr;
 
@@ -25,12 +24,12 @@ pub enum LayerElement {
 impl Layer {
 
     pub fn new() -> Self {
-        // child.all(sivf_object) have [.render()] is guaranteed by [SivfObject]
+        /// child.all(sivf_object) have [.render()] is guaranteed by [SivfObject]
         Layer { elements: vec![] }
     }
 
     pub fn from(children: Vec<LayerElement>) -> Self {
-        // child.all(sivf_object) have [.render()] is guaranteed by [SivfObject]
+        /// child.all(sivf_object) have [.render()] is guaranteed by [SivfObject]
         Layer { elements: children }
     }
 
@@ -46,22 +45,25 @@ impl Layer {
     }
 
     pub fn render(&self, image_sizes: ImageSizes) -> Canvas {
+        struct CurrentRenderingState { pub canvas: Canvas, pub blend_types: BlendTypes }
         // TODO LATER: try different approaches and measure times:
         //   - render all, then blend all
         //   - render one, blend one, repeat
         self.elements.iter().fold(
-            (Canvas::new(image_sizes), BlendTypes::new()),
-            |acc, child| match child {
+            CurrentRenderingState { canvas: Canvas::new(image_sizes), blend_types: BlendTypes::new() },
+            |mut acc, child| match child {
                 LayerElement::BlendTypes(blend_types) => {
-                    let canvas: Canvas = acc.0;
-                    (canvas, *blend_types)
+                    acc.blend_types = *blend_types;
+                    acc
                 }
                 LayerElement::SivfObject(sivf_object) => {
-                    let blend_types: BlendTypes = acc.1;
-                    (acc.0.blend_with(sivf_object.render(image_sizes), blend_types), blend_types)
+                    let canvas_child = sivf_object.render(image_sizes);
+                    let blend_types: BlendTypes = acc.blend_types;
+                    acc.canvas.blend_with(canvas_child, &blend_types);
+                    acc
                 }
             }
-        ).0
+        ).canvas
     }
 
 }

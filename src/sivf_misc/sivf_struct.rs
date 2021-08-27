@@ -20,7 +20,7 @@ pub struct SivfStruct {
 
 impl SivfStruct {
 
-    pub fn from(value: &serde_yaml::Value) -> Result<Self, String> {
+    pub fn from(value: &serde_yaml::Value) -> Self {
         deserialize_to_sivf_struct(value)
     }
 
@@ -30,7 +30,7 @@ impl SivfStruct {
         // for child in self.root_layer.get_children().iter() {
         //     let blend_type: BlendType = self.root_layer.blend_type;
         //     let canvas_child: Canvas = child.render(self.image_sizes);
-        //     canvas_main.blend_with(canvas_child, blend_type);
+        //     canvas_main.blend_with(canvas_child, &blend_type);
         // }
         canvas_main
     }

@@ -28,16 +28,16 @@ impl Canvas {
         ImageSizes::new(self.pixels.width(), self.pixels.height())
     }
 
-    pub fn blend_with(mut self, canvas_other: Canvas, blend_types: BlendTypes) -> Self {
+    pub fn blend_with(&mut self, canvas_other: Canvas, blend_types: &BlendTypes) -> Self {
         // TODO
-        self = canvas_other;
+        // self = &mut canvas_other.clone();
         // let x = (0..3).map(|i| (i * 2)..(i * 2 + 2)).collect();
         // for (w, h) in vec![0..10, 100..110].multi_cartesian_product() {
         // }
         // for (w, h) in [ self.pixels.width().indices(), self.pixels.height().indices() ].multi_cartesian_product() {
         // }
         // for pixel use [blend_types::blend_colors]
-        self
+        self.clone()
     }
 
     // TODO: understand what is second param in ImageBuffer generic

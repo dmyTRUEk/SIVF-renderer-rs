@@ -31,7 +31,7 @@ pub const KW_XY: &str = "xy";
 
 // Entities and their custom properties:
 pub const KW_CIRCLE: &str = "circle";
-pub const KW_CIRCLE_R: &str = "r";
+pub const KW_CIRCLE_RADIUS: &str = "r";
 
 // Combine:
 pub const KW_COMBINE: &str = "combine";

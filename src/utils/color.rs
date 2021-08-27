@@ -41,13 +41,13 @@ impl Color {
         Color { a, r, g, b }
     }
 
-    pub fn from(str: &str) -> Result<Self, ParseIntError> {
-        Ok(Color {
-            a: u8::from_str_radix(&str[0..=1], 16)?,
-            r: u8::from_str_radix(&str[2..=3], 16)?,
-            g: u8::from_str_radix(&str[4..=5], 16)?,
-            b: u8::from_str_radix(&str[6..=7], 16)?,
-        })
+    pub fn from(str: &str) -> Self {
+        Color {
+            a: u8::from_str_radix(&str[0..=1], 16).unwrap(),
+            r: u8::from_str_radix(&str[2..=3], 16).unwrap(),
+            g: u8::from_str_radix(&str[4..=5], 16).unwrap(),
+            b: u8::from_str_radix(&str[6..=7], 16).unwrap(),
+        }
     }
 
 }
@@ -84,7 +84,7 @@ mod tests {
     #[test]
     fn from_str_ok() {
         let expected: Color = Color::new(0x11, 0x22, 0x33, 0x44);
-        let actual  : Color = Color::from("11223344").unwrap();
+        let actual  : Color = Color::from("11223344");
         assert_eq!(expected, actual);
     }
 
