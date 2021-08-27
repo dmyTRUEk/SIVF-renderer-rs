@@ -37,6 +37,7 @@ use std::fs::File;
 use std::io::Read;
 
 // use image::{ImageBuffer, Rgba};
+// use serde_yaml::Value;
 
 mod help;
 mod sivf_misc;
@@ -50,8 +51,7 @@ use crate::sivf_objects::sivf_complex::layer::Layer;
 use crate::utils::color::ColorModel;
 use crate::utils::extensions::date_time::ExtensionDateTimeLocalToMyFormat;
 use crate::utils::extensions::string::{ExtensionTrimEmptyLines, ExtensionTrimLinesByFirstLine, ExtensionRemoveCLikeComments};
-use crate::utils::sizes::{image_sizes, ImageSizes};
-
+use crate::utils::sizes::ImageSizes;
 
 
 // TODO: rewrite whole main using only functionals
@@ -128,10 +128,17 @@ fn main() {
         println!("{}", &sivf_file_content);
 
         print!("Parsing file... ");
-        let sivf_struct: SivfStruct = match serde_yaml::from_str(&sivf_file_content) {
+        let value: serde_yaml::Value = match serde_yaml::from_str(&sivf_file_content) {
             Ok(v) => { v }
             Err(e) => {
                 println!(r#"Cant parse file: "{}""#, e);
+                continue;
+            }
+        };
+        let sivf_struct: SivfStruct = match SivfStruct::from(&value) {
+            Ok(v) => { v }
+            Err(e) => {
+                println!(r#"Cant parse to SivfStruct: "{}""#, e);
                 continue;
             }
         };

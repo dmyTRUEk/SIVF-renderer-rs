@@ -89,19 +89,22 @@ impl ExtensionSplitAndKeep for String {
 
 
 pub trait ExtensionRemoveCLikeComments {
-    fn remove_comments(&self) -> Result<String, String>;
+    fn remove_comments(&self) -> Result<String, &str>;
     fn remove_comments_oneline(&self) -> String;
     fn remove_comments_multiline(&self) -> String;
 }
+
+// TODO LATER: rewrite it so it clear lines, instead of deleting.
+//   this will be useful, if error on line N occurred
 impl ExtensionRemoveCLikeComments for String {
-    fn remove_comments(&self) -> Result<String, String> {
+    fn remove_comments(&self) -> Result<String, &str> {
         let str_removed_order_1: String = self.remove_comments_oneline().remove_comments_multiline();
         let str_removed_order_2: String = self.remove_comments_multiline().remove_comments_oneline();
         if str_removed_order_1 == str_removed_order_2 {
             Ok(str_removed_order_1)
         }
         else {
-            Err("Cant remove comments, possibly due to nested comments".to_string())
+            Err("Cant remove comments, possibly due to nested comments")
         }
     }
 

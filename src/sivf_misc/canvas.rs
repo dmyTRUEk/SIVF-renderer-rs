@@ -5,7 +5,7 @@ use itertools::Itertools;
 
 use crate::utils::array2d::Array2d;
 use crate::utils::color::{Color, TRANSPARENT};
-use crate::utils::sizes::{ImageSizes, Sizes, image_sizes};
+use crate::utils::sizes::{ImageSizes, Sizes};
 use crate::sivf_misc::blend_types::BlendTypes;
 use crate::utils::extensions::usize::ExtensionIndices;
 
@@ -20,14 +20,12 @@ pub struct Canvas {
 
 impl Canvas {
 
-    pub fn new(image_sizes: ImageSizes) -> Canvas {
-        Canvas {
-            pixels: Array2d::new(image_sizes, TRANSPARENT)
-        }
+    pub fn new(image_sizes: ImageSizes) -> Self {
+        Canvas { pixels: Array2d::new(image_sizes, TRANSPARENT) }
     }
 
     pub fn sizes(&self) -> ImageSizes {
-        image_sizes(self.pixels.width(), self.pixels.height())
+        ImageSizes::new(self.pixels.width(), self.pixels.height())
     }
 
     pub fn blend_with(mut self, canvas_other: Canvas, blend_types: BlendTypes) -> Self {

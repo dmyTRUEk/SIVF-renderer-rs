@@ -1,25 +1,55 @@
 //! Color
 
-use serde_derive::{Serialize, Deserialize};
+use std::num::ParseIntError;
 
 
 
-#[derive(Clone, Copy, Debug, PartialEq, /*Serialize,*/ Deserialize)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub enum ColorModel {
     ARGB,
     RGBA,
     // TODO LATER: add `CMYA`, `ACMY`, `XYZ`?
 }
 
-#[derive(Clone, Copy, Debug, PartialEq, Serialize, Deserialize)]
+impl ColorModel {
+
+    pub fn from(str: &str) -> Self {
+        match str {
+            str if str == "ARGB" => {
+                ColorModel::ARGB
+            }
+            str if str == "RGBA" => {
+                ColorModel::RGBA
+            }
+            _ => { panic!() }
+        }
+    }
+
+}
+
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub struct Color {
     pub a: u8,
     pub r: u8,
     pub g: u8,
     pub b: u8,
 }
-pub fn color(a: u8, r: u8, g: u8, b: u8) -> Color {
-    Color{a, r, g, b}
+
+impl Color {
+
+    pub fn new(a: u8, r: u8, g: u8, b: u8) -> Self {
+        Color { a, r, g, b }
+    }
+
+    pub fn from(str: &str) -> Result<Self, ParseIntError> {
+        Ok(Color {
+            a: u8::from_str_radix(&str[0..=1], 16)?,
+            r: u8::from_str_radix(&str[2..=3], 16)?,
+            g: u8::from_str_radix(&str[4..=5], 16)?,
+            b: u8::from_str_radix(&str[6..=7], 16)?,
+        })
+    }
+
 }
 
 
@@ -44,3 +74,18 @@ pub const BLUE    : Color = Color { a: 255, r: 000, g:   0, b: 255 };
 pub const CYAN    : Color = Color { a: 255, r:   0, g: 255, b: 255 };
 pub const MAGENTA : Color = Color { a: 255, r: 255, g:   0, b: 255 };
 pub const YELLOW  : Color = Color { a: 255, r: 255, g: 255, b:   0 };
+
+
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn from_str_ok() {
+        let expected: Color = Color::new(0x11, 0x22, 0x33, 0x44);
+        let actual  : Color = Color::from("11223344").unwrap();
+        assert_eq!(expected, actual);
+    }
+
+}

@@ -1,7 +1,5 @@
 //! Blend types (overlap, add, add_overflow, ...)
 
-use serde_derive::{Serialize, Deserialize};
-
 use crate::utils::color::Color;
 
 
@@ -11,7 +9,7 @@ pub const DEFAULT_BLEND_TYPE_COLOR: BlendType = BlendType::Overlap;
 
 
 
-#[derive(Clone, Copy, Debug, PartialEq, /*Serialize,*/ Deserialize)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub struct BlendTypes {
     pub alpha: BlendType,
     pub color: BlendType,
@@ -20,30 +18,25 @@ pub struct BlendTypes {
 impl BlendTypes {
 
     pub fn new() -> Self {
-        BlendTypes {
-            alpha: DEFAULT_BLEND_TYPE_ALPHA,
-            color: DEFAULT_BLEND_TYPE_COLOR,
-        }
+        BlendTypes { alpha: DEFAULT_BLEND_TYPE_ALPHA, color: DEFAULT_BLEND_TYPE_COLOR }
+    }
+
+    pub fn from(alpha: BlendType, color: BlendType) -> Self {
+        BlendTypes { alpha, color }
     }
 
 }
 
 
 
-#[derive(Clone, Copy, Debug, PartialEq, /*Serialize,*/ Deserialize)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub enum BlendType {
-
-    #[serde(rename="full_overlap")]
-    FullOverlap,
-
-    #[serde(rename="overlap")]
     Overlap,
-
-    #[serde(rename="add")]
     Add,
-
-    #[serde(rename="add_overflow")]
+    Max,
+    Min,
     AddOverflow,
+    Avg,
 
     // TODO: add other?:
     //   - minus

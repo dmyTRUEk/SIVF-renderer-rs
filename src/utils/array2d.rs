@@ -1,7 +1,8 @@
 //! Rectangular 2d array
 
 use std::ops::Index;
-use crate::utils::sizes::{Sizes, sizes};
+
+use crate::utils::sizes::Sizes;
 
 
 
@@ -26,23 +27,22 @@ impl<T: Copy> Array2d<T> {
     pub fn width(&self)  -> usize { self.sizes.w }
     pub fn height(&self) -> usize { self.sizes.h }
 
-    pub fn new(sizes: Sizes<usize>, fill: T) -> Array2d<T> {
+    pub fn new(sizes: Sizes<usize>, fill: T) -> Self {
         Array2d {
             sizes,
             elements: vec![vec![fill; sizes.h]; sizes.w]
         }
     }
 
-    pub fn from(given_array: Vec<Vec<T>>) -> Result<Array2d<T>, String> {
-        // TODO:
+    pub fn from(given_array: Vec<Vec<T>>) -> Result<Self, &'static str> {
         let is_rectangle: bool = given_array.iter().all(|row| row.len() == given_array.first().unwrap().len() );
-        let sizes: Sizes<usize> = sizes(given_array.len(), given_array[0].len());
         return match is_rectangle {
             true => {
+                let sizes: Sizes<usize> = Sizes::new(given_array.len(), given_array[0].len());
                 Ok(Array2d{ sizes, elements: given_array })
             }
             false => {
-                return Err("Given Vec<Vec<T>> is not rectangular".to_string());
+                return Err("Given Vec<Vec<T>> is not rectangular");
             }
         };
     }
@@ -65,15 +65,15 @@ mod tests {
 
     #[test]
     fn new() {
-        let expected: Array2d<i32> = Array2d { sizes: sizes(2, 3), elements: vec![vec![0, 0, 0], vec![0, 0, 0]] };
-        let actual  : Array2d<i32> = Array2d::new(sizes(2, 3), 0);
+        let expected: Array2d<i32> = Array2d { sizes: Sizes::new(2, 3), elements: vec![vec![0, 0, 0], vec![0, 0, 0]] };
+        let actual  : Array2d<i32> = Array2d::new(Sizes::new(2, 3), 0);
         assert_eq!(expected, actual);
     }
 
     #[test]
     fn ok() {
         let elements: Vec<Vec<char>> = vec![vec!['a', 'b', 'c'], vec!['d', 'e', 'f']];
-        let expected: Array2d<char> = Array2d { sizes: sizes(2, 3), elements: elements.clone() };
+        let expected: Array2d<char> = Array2d { sizes: Sizes::new(2, 3), elements: elements.clone() };
         let actual  : Array2d<char> = Array2d::from(elements).unwrap();
         assert_eq!(expected, actual);
     }

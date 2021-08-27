@@ -1,7 +1,5 @@
 //! used for array of SIVF items
 
-use serde_derive::{Serialize, Deserialize};
-
 use crate::sivf_objects::sivf_complex::layer::Layer;
 use crate::sivf_objects::sivf_shapes::circle::Circle;
 use crate::utils::sizes::ImageSizes;
@@ -10,15 +8,13 @@ use crate::sivf_misc::trait_render::TraitRender;
 
 
 
-#[derive(Clone, Debug, /*Serialize,*/ Deserialize)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum SivfObject {
 
     // complex:
-    #[serde(rename="layer")]
     Layer(Layer),
 
     // objects:
-    #[serde(rename="circle")]
     Circle(Circle),
 
 }

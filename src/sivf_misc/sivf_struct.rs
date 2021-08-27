@@ -1,16 +1,15 @@
 //! SIVF Struct
 
-use serde_derive::{Serialize, Deserialize};
-
 use crate::utils::color::ColorModel;
 use crate::sivf_objects::sivf_complex::layer::Layer;
 use crate::sivf_misc::canvas::Canvas;
 use crate::sivf_misc::blend_types::BlendType;
-use crate::utils::sizes::{sizes, ImageSizes, image_sizes};
+use crate::utils::sizes::ImageSizes;
+use crate::sivf_misc::serde::deserialize_to_sivf_struct;
 
 
 
-#[derive(Clone, Debug, /*Serialize,*/ Deserialize)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct SivfStruct {
     // TODO: force serde convert array of two into [ImageSizes]
     pub image_sizes: ImageSizes,
@@ -20,6 +19,10 @@ pub struct SivfStruct {
 }
 
 impl SivfStruct {
+
+    pub fn from(value: &serde_yaml::Value) -> Result<Self, String> {
+        deserialize_to_sivf_struct(value)
+    }
 
     pub fn render(&self) -> Canvas {
         let mut canvas_main = Canvas::new(self.image_sizes);

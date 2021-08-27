@@ -1,23 +1,18 @@
 //! Sizes, ImageSizes (w, h)
 
-use serde_derive::{Serialize, Deserialize};
-
 use std::convert::TryFrom;
 
 
 
-#[derive(Clone, Copy, Debug, PartialEq, /*Serialize,*/ Deserialize)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub struct Sizes<T> { pub w: T, pub h: T }
-#[inline]
-pub fn sizes<T>(w: T, h: T) -> Sizes<T> { Sizes { w, h } }
 
 pub type ImageSizes = Sizes<usize>;
-#[inline]
-pub fn image_sizes(w: usize, h: usize) -> ImageSizes { ImageSizes { w, h } }
 
 impl<T: Copy> Sizes<T> {
 
-    pub fn new(w: T, h: T) -> Sizes<T> {
+    #[inline]
+    pub fn new(w: T, h: T) -> Self {
         Sizes { w, h }
     }
 
