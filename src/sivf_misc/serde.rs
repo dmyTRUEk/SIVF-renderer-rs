@@ -12,7 +12,7 @@ use crate::utils::vec2d::Vec2d;
 use crate::sivf_misc::blend_types::{BlendTypes, BlendType};
 use crate::sivf_misc::metric_units::MetricUnit;
 use crate::sivf_objects::sivf_shapes::circle::Circle;
-
+use evalexpr::eval;
 
 
 const SHOW_DESERIALIZATION_PROGRESS: bool = true;
@@ -222,10 +222,17 @@ fn deserialize_to_metric_units(value: &Value) -> MetricUnit {
         }
         value if value.is_string() => {
             let str = value.as_str().unwrap().trim();
-            // TODO:
-            // assert!(str.count('%') == 1 && str.ends_with('%'));
-            let percents_str = &str[0..str.len()-1];
-            todo!("eval")
+            if str.ends_with('%') {
+                let percents_str = &str[0..str.len()-1];
+                // TODO:
+                // assert!(str.count('%') == 1 && str.ends_with('%'));
+                // todo!("eval")
+                let percents_number = eval(percents_str).unwrap();
+                MetricUnit::Percents(percents_number.as_float().unwrap_or(percents_number.as_int().unwrap() as f64))
+            }
+            else {
+                MetricUnit::Pixels(eval(str).unwrap().as_float().unwrap())
+            }
         }
         _ => {
             panic!()

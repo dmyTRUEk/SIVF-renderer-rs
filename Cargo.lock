@@ -167,6 +167,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e78d4f1cc4ae33bbfc157ed5d5a5ef3bc29227303d595861deb238fcec4e9457"
 
 [[package]]
+name = "evalexpr"
+version = "6.5.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e3147686f6ddffd86c76f7a2cd2fcd6fb17e380c10fcf86c3992b3265de8d2a9"
+
+[[package]]
 name = "gif"
 version = "0.11.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -519,6 +525,7 @@ version = "0.1.0"
 dependencies = [
  "chrono",
  "derive_more",
+ "evalexpr",
  "image",
  "itertools",
  "regex",
