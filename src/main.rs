@@ -139,15 +139,19 @@ fn main() {
 
         print!("Parsing YAML to SIVF struct... ");
         let sivf_struct: SivfStruct = SivfStruct::from(&value);
+        // println!("Parse result: {:#?}", sivf_struct);
         println!("OK");
 
-        println!("Parse result: {:#?}", sivf_struct);
-
-        print!(r"Rendering ... ");
+        print!("Rendering... ");
         let render_time_start = chrono::Local::now();
         let canvas = sivf_struct.render();
         let render_time_end = chrono::Local::now();
-        print!("Render finished in {}s. ", (render_time_end-render_time_start).num_seconds());
+        print!("finished in {}s. ", (render_time_end-render_time_start).num_seconds());
+        println!("OK");
+
+
+        print!("Converting rendered array to image... ");
+        let image_buffer = canvas.to_image_buffer();
         println!("OK");
 
         let image_sizes: ImageSizes = sivf_struct.image_sizes;
@@ -161,13 +165,7 @@ fn main() {
         // TODO: file_path_output
         let file_output_path: String = file_output_name;
         // println!("file_name = {}", file_name);
-
-        print!("Converting rendered array to image... ");
-        let image_buffer = canvas.to_image_buffer();
-        println!("OK");
-
-        println!(r#"Output file name: "{}""#, file_output_path);
-        print!("Saving image... ");
+        print!(r#"Saving image as "{}"... "#, file_output_path);
         image_buffer.save(file_output_path).unwrap();
         println!("OK");
 

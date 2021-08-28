@@ -1,22 +1,24 @@
 //! Convert json/yaml to sivf struct
 
+use evalexpr::eval;
 use serde_yaml::Value;
 
+use crate::sivf_misc::blend_types::{BlendTypes, BlendType};
 use crate::sivf_misc::keywords_and_consts::*;
+use crate::sivf_misc::metric_units::MetricUnit;
 use crate::sivf_misc::sivf_struct::SivfStruct;
 use crate::sivf_objects::sivf_any_object::SivfObject;
 use crate::sivf_objects::sivf_complex::layer::{Layer, LayerElement};
+use crate::sivf_objects::sivf_shapes::circle::Circle;
+use crate::sivf_objects::sivf_shapes::square::Square;
 use crate::utils::color::{ColorModel, Color};
 use crate::utils::sizes::ImageSizes;
 use crate::utils::vec2d::Vec2d;
-use crate::sivf_misc::blend_types::{BlendTypes, BlendType};
-use crate::sivf_misc::metric_units::MetricUnit;
-use crate::sivf_objects::sivf_shapes::circle::Circle;
-use evalexpr::eval;
 
 
-const SHOW_DESERIALIZATION_PROGRESS: bool = true;
-// const SHOW_DESERIALIZATION_PROGRESS: bool = false;
+
+// const SHOW_DESERIALIZATION_PROGRESS: bool = true;
+const SHOW_DESERIALIZATION_PROGRESS: bool = false;
 
 
 
@@ -101,6 +103,7 @@ fn deserialize_to_layer_element(value: &Value) -> LayerElement {
 
             let key_blending: &Value = &KW_BLENDING.to_value();
             let key_circle  : &Value = &KW_CIRCLE.to_value();
+            let key_square  : &Value = &KW_SQUARE.to_value();
 
             match map {
                 map if map.contains_key(key_blending) => {
@@ -113,7 +116,13 @@ fn deserialize_to_layer_element(value: &Value) -> LayerElement {
                     let circle: Circle = deserialize_to_circle(value);
                     LayerElement::SivfObject(SivfObject::Circle(circle))
                 }
+                map if map.contains_key(key_square) => {
+                    let value = map.get(key_square).unwrap();
+                    let square: Square = deserialize_to_square(value);
+                    LayerElement::SivfObject(SivfObject::Square(square))
+                }
                 _ => {
+                    // TODO: create list of all KW and search for similar, and if so, show it
                     println!("------");
                     println!("found unknown structure: {:#?}", map);
                     let unknown_thing_name = map.iter().next().unwrap().0.as_str().unwrap();
@@ -148,7 +157,28 @@ fn deserialize_to_circle(value: &Value) -> Circle {
         }
         _ => { panic!() }
     }
+}
 
+
+
+fn deserialize_to_square(value: &Value) -> Square {
+    if SHOW_DESERIALIZATION_PROGRESS {
+        println!("-------- deserializing to SQUARE:");
+        println!("{:#?}", value);
+    }
+    match value {
+        value if value.is_mapping() => {
+            let map = value.as_mapping().unwrap();
+            let value_false = Value::Bool(false);
+            Square::new(
+                deserialize_to_vec2d_metric_unit(map.get(&KW_XY.to_value()).unwrap()),
+                deserialize_to_metric_units(map.get(&KW_SQUARE_SIDE.to_value()).unwrap()),
+                deserialize_to_color(map.get(&KW_COLOR.to_value()).unwrap()),
+                map.get(&KW_INVERSE.to_value()).unwrap_or(&value_false).as_bool().unwrap()
+            )
+        }
+        _ => { panic!() }
+    }
 }
 
 
@@ -217,6 +247,20 @@ fn deserialize_to_metric_units(value: &Value) -> MetricUnit {
         println!("-------- deserializing to METRIC UNITS:");
         println!("{:#?}", value);
     }
+    trait ExtensionToF64 {
+        fn to_f64(&self) -> f64;
+    }
+    impl ExtensionToF64 for Value {
+        fn to_f64(&self) -> f64 {
+            // *self.clone().as_float().unwrap_or(self.as_int().unwrap() as f64)
+            self.clone().as_f64().unwrap_or(self.as_i64().unwrap() as f64)
+        }
+    }
+    impl ExtensionToF64 for evalexpr::Value {
+        fn to_f64(&self) -> f64 {
+            self.as_float().unwrap_or(self.as_int().unwrap() as f64)
+        }
+    }
     match value {
         value if value.is_number() => {
             let number = value.as_f64().unwrap();
@@ -230,10 +274,11 @@ fn deserialize_to_metric_units(value: &Value) -> MetricUnit {
                 // assert!(str.count('%') == 1 && str.ends_with('%'));
                 // todo!("eval")
                 let percents_number = eval(percents_str).unwrap();
-                MetricUnit::Percents(percents_number.as_float().unwrap_or(percents_number.as_int().unwrap() as f64))
+                MetricUnit::Percents(percents_number.to_f64())
             }
             else {
-                MetricUnit::Pixels(eval(str).unwrap().as_float().unwrap())
+                let result = eval(str).unwrap();
+                MetricUnit::Pixels(result.to_f64())
             }
         }
         _ => {
@@ -314,7 +359,6 @@ mod tests {
         }
     }
 
-    // #[ignore]
     #[test]
     fn circle() {
         let str: String = r#"

@@ -2,6 +2,7 @@
 
 use crate::sivf_objects::sivf_complex::layer::Layer;
 use crate::sivf_objects::sivf_shapes::circle::Circle;
+use crate::sivf_objects::sivf_shapes::square::Square;
 use crate::utils::sizes::ImageSizes;
 use crate::sivf_misc::canvas::Canvas;
 use crate::sivf_misc::trait_render::TraitRender;
@@ -16,6 +17,7 @@ pub enum SivfObject {
 
     // objects:
     Circle(Circle),
+    Square(Square),
 
 }
 
@@ -32,7 +34,7 @@ impl SivfObject {
             }
 
             _ => {
-                panic!("unknown Sivf Object: {:?}", *self);
+                panic!("dont know how to render this Sivf Object: {:?}", *self);
             }
         }
     }

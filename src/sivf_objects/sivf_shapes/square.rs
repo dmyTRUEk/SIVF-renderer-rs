@@ -1,4 +1,4 @@
-//! SIVF Circle
+//! SIVF Square
 
 use crate::sivf_misc::canvas::Canvas;
 use crate::sivf_misc::metric_units::MetricUnit;
@@ -10,25 +10,24 @@ use crate::utils::sizes::ImageSizes;
 
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct Circle {
+pub struct Square {
     position: Vec2d<MetricUnit>,
-    radius: MetricUnit,
+    side: MetricUnit,
     color: Color,
     inverted: bool,
 }
 
-impl Circle {
+impl Square {
 
-    pub fn new(position: Vec2d<MetricUnit>, radius: MetricUnit, color: Color, inverted: bool) -> Self {
-        Circle { position, radius, color, inverted }
+    pub fn new(position: Vec2d<MetricUnit>, side: MetricUnit, color: Color, inverted: bool) -> Self {
+        Square { position, side, color, inverted }
     }
 
 }
 
-impl TraitRender for Circle {
+impl TraitRender for Square {
 
     fn render(&self, image_sizes: ImageSizes) -> Canvas {
-        // let mut canvas: Canvas = Canvas::new(image_sizes);
         todo!()
     }
 }
