@@ -114,8 +114,10 @@ fn deserialize_to_layer_element(value: &Value) -> LayerElement {
                     LayerElement::SivfObject(SivfObject::Circle(circle))
                 }
                 _ => {
-                    todo!();
-                    panic!()
+                    println!("------");
+                    println!("found unknown structure: {:#?}", map);
+                    let unknown_thing_name = map.iter().next().unwrap().0.as_str().unwrap();
+                    todo!("{}", unknown_thing_name)
                 }
             }
         }
