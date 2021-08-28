@@ -7,7 +7,7 @@ use crate::sivf_objects::sivf_any_object::SivfObject;
 use crate::sivf_misc::blend_types::{BlendTypes, BlendType};
 use crate::sivf_misc::canvas::Canvas;
 use crate::utils::sizes::ImageSizes;
-
+use crate::sivf_misc::trait_render::RenderType;
 
 
 #[derive(Clone, Debug, PartialEq)]
@@ -44,7 +44,7 @@ impl Layer {
         self.elements.clone()
     }
 
-    pub fn render(&self, image_sizes: ImageSizes) -> Canvas {
+    pub fn render(&self, image_sizes: ImageSizes, render_type: RenderType) -> Canvas {
         struct CurrentRenderingState { pub canvas: Canvas, pub blend_types: BlendTypes }
         // TODO LATER: try different approaches and measure times:
         //   - render all, then blend all
@@ -57,7 +57,7 @@ impl Layer {
                     acc
                 }
                 LayerElement::SivfObject(sivf_object) => {
-                    let canvas_child = sivf_object.render(image_sizes);
+                    let canvas_child = sivf_object.render(image_sizes, render_type);
                     let blend_types: BlendTypes = acc.blend_types;
                     acc.canvas.blend_with(canvas_child, &blend_types);
                     acc

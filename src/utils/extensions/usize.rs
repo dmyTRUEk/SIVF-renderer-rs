@@ -13,3 +13,21 @@ impl ExtensionIndices for usize {
         Range { start: 0, end: *self }
     }
 }
+
+
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn indices() {
+        {   // usize
+            let size: usize = 42;
+            let expected: Range<usize> = 0..size;
+            let actual  : Range<usize> = size.indices();
+            assert_eq!(expected, actual)
+        }
+    }
+
+}

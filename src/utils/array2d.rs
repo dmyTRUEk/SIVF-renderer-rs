@@ -1,8 +1,8 @@
 //! Rectangular 2d array
 
-use std::ops::Index;
+use std::ops::{Index, IndexMut};
 
-use crate::utils::sizes::Sizes;
+use crate::utils::sizes::{Sizes, Coordinates};
 
 
 
@@ -14,7 +14,7 @@ pub struct Array2d<T: Copy> {
     // TODO: rewrite [elements] in flat structure and do measurements: flat vs nested(2d)
     elements: Vec<Vec<T>>,
 }
-// TODO: make iter:
+// TODO: ? make iter:
 //   ```
 //   let array2d = Array2d::new(...);
 //   for (w, h, item) in array2d.iter() {
@@ -51,9 +51,23 @@ impl<T: Copy> Array2d<T> {
 
 impl<T: Copy> Index<(usize, usize)> for Array2d<T> {
     type Output = T;
-
+    #[inline]
     fn index(&self, wh: (usize, usize)) -> &Self::Output {
         &self.elements[wh.0][wh.1]
+    }
+}
+
+impl<T: Copy> Index<Coordinates<usize>> for Array2d<T> {
+    type Output = T;
+    #[inline]
+    fn index(&self, coordinates: Coordinates<usize>) -> &Self::Output {
+        &self.elements[coordinates.w][coordinates.h]
+    }
+}
+
+impl<T: Copy> IndexMut<(usize, usize)> for Array2d<T> {
+    fn index_mut(&mut self, wh: (usize, usize)) -> &mut Self::Output {
+        &mut self.elements[wh.0][wh.1]
     }
 }
 

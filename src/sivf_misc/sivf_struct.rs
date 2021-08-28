@@ -2,7 +2,7 @@
 
 use crate::sivf_objects::sivf_complex::layer::Layer;
 use crate::sivf_misc::canvas::Canvas;
-use crate::sivf_misc::blend_types::BlendType;
+use crate::sivf_misc::blend_types::{BlendType, BlendTypes};
 use crate::sivf_misc::serde::deserialize_to_sivf_struct;
 use crate::sivf_misc::trait_render::RenderType;
 use crate::utils::color::ColorModel;
@@ -28,11 +28,7 @@ impl SivfStruct {
     pub fn render(&self, render_type: RenderType) -> Canvas {
         let mut canvas_main = Canvas::new(self.image_sizes);
         // TODO: maybe use [Iterator.cloned()]
-        // for child in self.root_layer.get_children().iter() {
-        //     let blend_type: BlendType = self.root_layer.blend_type;
-        //     let canvas_child: Canvas = child.render(self.image_sizes);
-        //     canvas_main.blend_with(canvas_child, &blend_type);
-        // }
+        canvas_main = self.root_layer.render(self.image_sizes, render_type);
         canvas_main
     }
 

@@ -263,7 +263,7 @@ fn deserialize_to_metric_units(value: &Value) -> MetricUnit {
     }
     match value {
         value if value.is_number() => {
-            let number = value.as_f64().unwrap();
+            let number = value.to_f64();
             MetricUnit::Pixels(number)
         }
         value if value.is_string() => {

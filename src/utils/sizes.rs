@@ -1,13 +1,15 @@
 //! Sizes, ImageSizes (w, h)
 
 use std::convert::TryFrom;
+use crate::utils::vec2d::Vec2d;
 
 
 
 #[derive(Clone, Copy, Debug, PartialEq)]
-pub struct Sizes<T> { pub w: T, pub h: T }
+pub struct Sizes<T: Copy> { pub w: T, pub h: T }
 
 pub type ImageSizes = Sizes<usize>;
+pub type Coordinates<T: Copy> = Sizes<T>;
 
 impl<T: Copy> Sizes<T> {
 
@@ -16,15 +18,25 @@ impl<T: Copy> Sizes<T> {
         Sizes { w, h }
     }
 
-    pub fn to_sizes<R: TryFrom<T>>(&self) -> Sizes<R> {
+    #[inline]
+    pub fn to_sizes<R: Copy + TryFrom<T>>(&self) -> Sizes<R> {
         Sizes {
             w: R::try_from(self.w).ok().unwrap(),
             h: R::try_from(self.h).ok().unwrap(),
         }
     }
 
+    #[inline]
     pub fn to_tuple(&self) -> (T, T) {
         (self.w, self.h)
+    }
+
+    #[inline]
+    pub fn to_vec2d<R: Copy + TryFrom<T>>(&self) -> Vec2d<R> {
+        Vec2d {
+            x: R::try_from(self.w).ok().unwrap(),
+            y: R::try_from(self.h).ok().unwrap(),
+        }
     }
 
 }
