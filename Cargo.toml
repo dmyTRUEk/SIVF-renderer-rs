@@ -6,21 +6,21 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [profile.release]
-lto = true
+lto = "fat"
 #target-cpu = "native"
 codegen-units = 1
 opt-level = 3
 panic = "abort"
-#debuginfo = 0
+debuginfo = 0
 
 [dependencies]
 chrono = "0.4.19"
-derive_more = "0.99.16"
+#derive_more = "0.99.16"
 evalexpr = "6.5.0"
 image = "0.23.14"
 itertools = "0.10.1"
 regex = "1.5.4"
-serde = "1.0.128"
-serde_derive = "1.0.128"
-serde_json = "1.0.66"
+#serde = "1.0.128"
+#serde_derive = "1.0.128"
+#serde_json = "1.0.66"
 serde_yaml = "0.8.19"

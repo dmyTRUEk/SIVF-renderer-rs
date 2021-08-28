@@ -61,9 +61,19 @@ impl Layer {
                 }
                 LayerElement::SivfObject(sivf_object) => {
                     // println!("layer.render.fold.SivfObject:");
+                    let render_time_start = chrono::Local::now();
                     let canvas_child = sivf_object.render(image_sizes, render_type);
+                    let render_time_end = chrono::Local::now();
+                    let render_time = render_time_end - render_time_start;
+                    println!("finished render in {}s {}ms. ", render_time.num_seconds(), render_time.num_milliseconds() % 1000);
+
                     let blend_types: BlendTypes = acc.blend_types;
+
+                    let render_time_start = chrono::Local::now();
                     acc.canvas.blend_with(&canvas_child, &blend_types, &render_type);
+                    let render_time_end = chrono::Local::now();
+                    let render_time = render_time_end - render_time_start;
+                    println!("finished blend  in {}s {}ms. ", render_time.num_seconds(), render_time.num_milliseconds() % 1000);
                     // println!("acc = {:?}", acc);
                     acc
                 }

@@ -44,23 +44,13 @@ impl BlendTypes {
 pub fn blend_colors(color1: &Color, color2: &Color, blend_types: &BlendTypes) -> Color {
     let a: u8 = match blend_types.alpha {
         BlendType::Overlap => {
-            if color2.a != 0x00 {
-                color2.a
-            }
-            else {
-                color1.a
-            }
+            if color2.a != 0x00 { color2.a } else { color1.a }
         }
         _ => { todo!() }
     };
     let (r, g, b): (u8, u8, u8) = match blend_types.color {
         BlendType::Overlap => {
-            if color2.a != 0x00 {
-                (color2.r, color2.g, color2.b)
-            }
-            else {
-                (color1.r, color1.g, color1.b)
-            }
+            if color2.a != 0x00 { (color2.r, color2.g, color2.b) } else { (color1.r, color1.g, color1.b) }
         }
         _ => { todo!() }
     };

@@ -51,7 +51,6 @@ impl<T: Copy> Array2d<T> {
 
 impl<T: Copy> Index<(usize, usize)> for Array2d<T> {
     type Output = T;
-    #[inline]
     fn index(&self, wh: (usize, usize)) -> &Self::Output {
         &self.elements[wh.0][wh.1]
     }
@@ -59,7 +58,6 @@ impl<T: Copy> Index<(usize, usize)> for Array2d<T> {
 
 impl<T: Copy> Index<Coordinates<usize>> for Array2d<T> {
     type Output = T;
-    #[inline]
     fn index(&self, coordinates: Coordinates<usize>) -> &Self::Output {
         &self.elements[coordinates.w][coordinates.h]
     }

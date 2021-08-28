@@ -31,12 +31,17 @@ impl Canvas {
 
     pub fn blend_with(&mut self, canvas_other: &Canvas, blend_types: &BlendTypes, render_type: &RenderType) {
         // TODO: use [render_type]
-        for h in self.pixels.height().indices() {
-            for w in self.pixels.width().indices() {
-                let color1: Color = self.pixels[(w, h)];
-                let color2: Color = canvas_other.pixels[(w, h)];
-                self.pixels[(w, h)] = blend_colors(&color1, &color2, blend_types);
+        match render_type {
+            RenderType::Cpu1 => {
+                for h in self.pixels.height().indices() {
+                    for w in self.pixels.width().indices() {
+                        let color1: Color = self.pixels[(w, h)];
+                        let color2: Color = canvas_other.pixels[(w, h)];
+                        self.pixels[(w, h)] = blend_colors(&color1, &color2, blend_types);
+                    }
+                }
             }
+            _ => { todo!() }
         }
     }
 

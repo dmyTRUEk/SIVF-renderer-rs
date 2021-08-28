@@ -13,12 +13,10 @@ pub type Coordinates<T: Copy> = Sizes<T>;
 
 impl<T: Copy> Sizes<T> {
 
-    #[inline]
     pub fn new(w: T, h: T) -> Self {
         Sizes { w, h }
     }
 
-    #[inline]
     pub fn to_sizes<R: Copy + TryFrom<T>>(&self) -> Sizes<R> {
         Sizes {
             w: R::try_from(self.w).ok().unwrap(),
@@ -26,12 +24,10 @@ impl<T: Copy> Sizes<T> {
         }
     }
 
-    #[inline]
     pub fn to_tuple(&self) -> (T, T) {
         (self.w, self.h)
     }
 
-    #[inline]
     pub fn to_vec2d<R: Copy + TryFrom<T>>(&self) -> Vec2d<R> {
         Vec2d {
             x: R::try_from(self.w).ok().unwrap(),

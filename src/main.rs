@@ -163,6 +163,8 @@ fn main() {
         // println!("Canvas result:\n{:?}", canvas);
         println!("OK");
 
+        // todo!("remove this todo");
+
         print!("Converting rendered array to image... ");
         flush();
         let image_buffer = canvas.to_image_buffer();
