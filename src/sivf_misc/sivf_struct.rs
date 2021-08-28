@@ -26,10 +26,7 @@ impl SivfStruct {
     }
 
     pub fn render(&self, render_type: RenderType) -> Canvas {
-        let mut canvas_main = Canvas::new(self.image_sizes);
-        // TODO: maybe use [Iterator.cloned()]
-        canvas_main = self.root_layer.render(self.image_sizes, render_type);
-        canvas_main
+        self.root_layer.render(self.image_sizes, render_type)
     }
 
 }

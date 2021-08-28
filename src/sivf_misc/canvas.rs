@@ -3,10 +3,11 @@
 use image::ImageBuffer;
 use itertools::Itertools;
 
+use crate::sivf_misc::blend_types::{BlendTypes, blend_colors};
+use crate::sivf_misc::trait_render::RenderType;
 use crate::utils::array2d::Array2d;
 use crate::utils::color::{Color, TRANSPARENT};
 use crate::utils::sizes::{ImageSizes, Sizes};
-use crate::sivf_misc::blend_types::BlendTypes;
 use crate::utils::extensions::usize::ExtensionIndices;
 
 
@@ -28,16 +29,15 @@ impl Canvas {
         ImageSizes::new(self.pixels.width(), self.pixels.height())
     }
 
-    pub fn blend_with(&mut self, canvas_other: Canvas, blend_types: &BlendTypes) -> Self {
-        // TODO
-        // self = &mut canvas_other.clone();
-        // let x = (0..3).map(|i| (i * 2)..(i * 2 + 2)).collect();
-        // for (w, h) in vec![0..10, 100..110].multi_cartesian_product() {
-        // }
-        // for (w, h) in [ self.pixels.width().indices(), self.pixels.height().indices() ].multi_cartesian_product() {
-        // }
-        // for pixel use [blend_types::blend_colors]
-        self.clone()
+    pub fn blend_with(&mut self, canvas_other: &Canvas, blend_types: &BlendTypes, render_type: &RenderType) {
+        // TODO: use [render_type]
+        for h in self.pixels.height().indices() {
+            for w in self.pixels.width().indices() {
+                let color1: Color = self.pixels[(w, h)];
+                let color2: Color = canvas_other.pixels[(w, h)];
+                self.pixels[(w, h)] = blend_colors(&color1, &color2, blend_types);
+            }
+        }
     }
 
     // TODO: understand what is second param in ImageBuffer generic

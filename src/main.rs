@@ -53,6 +53,7 @@ use crate::utils::extensions::date_time::ExtensionDateTimeLocalToMyFormat;
 use crate::utils::extensions::string::{ExtensionTrimEmptyLines, ExtensionTrimLinesByFirstLine, ExtensionRemoveCLikeComments};
 use crate::utils::sizes::ImageSizes;
 use crate::sivf_misc::trait_render::RenderType;
+use crate::utils::io::flush;
 
 
 // TODO: rewrite whole main using only functionals
@@ -107,6 +108,7 @@ fn main() {
         println!();
 
         print!(r#"Reading file "{}"... "#, file_input_path);
+        flush();
         // TODO: instead of [match] try to use [unwrap_or_else()]
         let sivf_file_content: String = match File::open(&file_input_path) {
             Ok(mut file) => {
@@ -123,6 +125,7 @@ fn main() {
         // println!("file content = \n{}", sivf_file_content);
 
         print!("Removing comments... ");
+        flush();
         let sivf_file_content: String = match sivf_file_content.remove_comments() {
             Ok(v) => { v }
             Err(e) => {
@@ -134,6 +137,7 @@ fn main() {
         // println!("file content without comments = \n{}", sivf_file_content);
 
         print!("Parsing file to YAML... ");
+        flush();
         let value: serde_yaml::Value = match serde_yaml::from_str(&sivf_file_content) {
             Ok(v) => { v }
             Err(e) => {
@@ -144,18 +148,23 @@ fn main() {
         println!("OK");
 
         print!("Parsing YAML to SIVF struct... ");
+        flush();
         let sivf_struct: SivfStruct = SivfStruct::from(&value);
-        // println!("Parse result: {:#?}", sivf_struct);
+        // println!("Parse result:\n{:#?}", sivf_struct);
         println!("OK");
 
         print!("Rendering... ");
+        flush();
         let render_time_start = chrono::Local::now();
         let canvas = sivf_struct.render(render_type);
         let render_time_end = chrono::Local::now();
-        print!("finished in {}s. ", (render_time_end-render_time_start).num_seconds());
+        let render_time = render_time_end - render_time_start;
+        print!("finished in {}s {}ms. ", render_time.num_seconds(), render_time.num_milliseconds() % 1000);
+        // println!("Canvas result:\n{:?}", canvas);
         println!("OK");
 
         print!("Converting rendered array to image... ");
+        flush();
         let image_buffer = canvas.to_image_buffer();
         println!("OK");
 
@@ -171,6 +180,7 @@ fn main() {
         let file_output_path: String = file_output_name;
         // println!("file_name = {}", file_name);
         print!(r#"Saving image as "{}"... "#, file_output_path);
+        flush();
         image_buffer.save(file_output_path).unwrap();
         println!("OK");
 

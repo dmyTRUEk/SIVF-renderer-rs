@@ -32,10 +32,10 @@ impl TraitRender for Circle {
         let mut canvas: Canvas = Canvas::new(image_sizes);
         let position: Vec2d<f64> = Vec2d::new(
             self.position.x.to_pixels(image_sizes.w),
-            self.position.y.to_pixels(image_sizes.h)
+            -self.position.y.to_pixels(image_sizes.h)   // minus here because math and array coords Y are inverted
         );
         let shift: Vec2d<f64> =
-            - Vec2d::new(image_sizes.w as f64, image_sizes.h as f64)
+            - Vec2d::new(image_sizes.w as f64, image_sizes.h as f64) / 2.0_f64
             - position
             + Vec2d::new(0.5_f64, 0.5_f64);
         // TODO LATER: think about this - - - - - - - - - - - - - - - >  !W!

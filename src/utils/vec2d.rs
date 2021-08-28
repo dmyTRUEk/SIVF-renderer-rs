@@ -3,7 +3,7 @@
 use std::convert::TryFrom;
 
 use crate::utils::sizes::Sizes;
-use std::ops::{Neg, Sub, Add, Mul};
+use std::ops::{Neg, Sub, Add, Mul, Div};
 
 
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -59,6 +59,11 @@ where
         (vec_min.x <= self.x && self.x <= vec_max.x) && (vec_min.y <= self.y && self.y <= vec_max.y)
     }
 
+    #[inline]
+    pub fn is_inside_triangle(&self, p1: Vec2d<T>, p2: Vec2d<T>, p3: Vec2d<T>) -> bool {
+        todo!()
+    }
+
 }
 
 impl<T: Copy + Neg<Output=T>> Neg for Vec2d<T> {
@@ -87,6 +92,16 @@ impl<T: Copy + Sub<Output=T>> Sub for Vec2d<T> {
         Vec2d {
             x: self.x - rhs.x,
             y: self.y - rhs.y,
+        }
+    }
+}
+
+impl<T: Copy + Div<f64, Output=T>> Div<f64> for Vec2d<T> {
+    type Output = Self;
+    fn div(self, rhs: f64) -> Self::Output {
+        Vec2d {
+            x: self.x / rhs,
+            y: self.y / rhs,
         }
     }
 }
