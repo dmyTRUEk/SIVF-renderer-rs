@@ -52,6 +52,7 @@ use crate::utils::color::ColorModel;
 use crate::utils::extensions::date_time::ExtensionDateTimeLocalToMyFormat;
 use crate::utils::extensions::string::{ExtensionTrimEmptyLines, ExtensionTrimLinesByFirstLine, ExtensionRemoveCLikeComments};
 use crate::utils::sizes::ImageSizes;
+use crate::sivf_misc::trait_render::RenderType;
 
 
 // TODO: rewrite whole main using only functionals
@@ -83,6 +84,10 @@ fn main() {
     //   -h --help -> help
     //   -l --log=0/1 -> show logs, if error
     //   -p --progress=0/1 -> show render progress
+    //   -r="..." --render="..." -> renderer variants
+    //     cpu1 -> use 1 CPU core
+    //     cpu8 -> use 8 CPU cores
+    //     gpu -> use GPU
     //   -n="..." --name="%i_%s__%wx%h" -> name of the output file
     //     %f - file input name
     //     %s - start render time
@@ -94,8 +99,10 @@ fn main() {
     //     println!("{}", HELP_STR.to_string().trim_empty_lines().trim_lines_by_first_line());
     //     continue;
     // }
+    let render_type: RenderType = RenderType::Cpu1;
 
     // TODO LATER: make it parallel, so many pictures at the same time can render
+    //   or make render it self parallel, so image will be renderer faster
     for file_input_path in file_paths {
         println!();
 
@@ -112,8 +119,8 @@ fn main() {
                 continue;
             }
         };
-        // println!("file content = \n{}", file_content);
         println!("OK");
+        // println!("file content = \n{}", sivf_file_content);
 
         print!("Removing comments... ");
         let sivf_file_content: String = match sivf_file_content.remove_comments() {
@@ -124,8 +131,7 @@ fn main() {
             }
         };
         println!("OK");
-
-        // println!("{}", &sivf_file_content);
+        // println!("file content without comments = \n{}", sivf_file_content);
 
         print!("Parsing file to YAML... ");
         let value: serde_yaml::Value = match serde_yaml::from_str(&sivf_file_content) {
@@ -144,11 +150,10 @@ fn main() {
 
         print!("Rendering... ");
         let render_time_start = chrono::Local::now();
-        let canvas = sivf_struct.render();
+        let canvas = sivf_struct.render(render_type);
         let render_time_end = chrono::Local::now();
         print!("finished in {}s. ", (render_time_end-render_time_start).num_seconds());
         println!("OK");
-
 
         print!("Converting rendered array to image... ");
         let image_buffer = canvas.to_image_buffer();

@@ -1,11 +1,12 @@
 //! SIVF Struct
 
-use crate::utils::color::ColorModel;
 use crate::sivf_objects::sivf_complex::layer::Layer;
 use crate::sivf_misc::canvas::Canvas;
 use crate::sivf_misc::blend_types::BlendType;
-use crate::utils::sizes::ImageSizes;
 use crate::sivf_misc::serde::deserialize_to_sivf_struct;
+use crate::sivf_misc::trait_render::RenderType;
+use crate::utils::color::ColorModel;
+use crate::utils::sizes::ImageSizes;
 
 
 
@@ -24,7 +25,7 @@ impl SivfStruct {
         deserialize_to_sivf_struct(value)
     }
 
-    pub fn render(&self) -> Canvas {
+    pub fn render(&self, render_type: RenderType) -> Canvas {
         let mut canvas_main = Canvas::new(self.image_sizes);
         // TODO: maybe use [Iterator.cloned()]
         // for child in self.root_layer.get_children().iter() {
