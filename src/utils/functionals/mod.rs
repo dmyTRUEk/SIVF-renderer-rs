@@ -1,3 +1,3 @@
 //! Higher Order Functions
 
-mod separate;
+pub mod separate;

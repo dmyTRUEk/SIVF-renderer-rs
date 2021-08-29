@@ -45,16 +45,21 @@ mod sivf_objects;
 mod utils;
 
 use crate::help::HELP_STR;
-use crate::sivf_misc::sivf_struct::SivfStruct;
 use crate::utils::extensions::date_time::ExtensionDateTimeLocalToMyFormat;
 use crate::utils::extensions::string::{ExtensionTrimEmptyLines, ExtensionTrimLinesByFirstLine, ExtensionRemoveCLikeComments};
+use crate::utils::functionals::separate::ExtensionSeparate;
 use crate::utils::sizes::ImageSizes;
-use crate::sivf_misc::trait_render::RenderType;
 use crate::utils::io::flush;
+use crate::sivf_misc::sivf_struct::SivfStruct;
+use crate::sivf_misc::trait_render::RenderType;
+use crate::utils::extensions::vec::ExtensionContains;
+
 
 
 // TODO: rewrite whole main using only functionals
 fn main() {
+    println!();
+
     // get cli args
     let args_all: Vec<String> = env::args().collect();
     // println!("args_all = {:?}", args_all);
@@ -63,47 +68,37 @@ fn main() {
     let args: Vec<String> = (&args_all[1..]).to_vec();
     // println!("args = {:?}", args);
 
-    // TODO: separate args?
+    let (options, file_paths) = args.to_vec().separate(|v| v.starts_with('-'));
+    // println!("options = {:?}", options);
+    // println!("file_paths = {:?}", file_paths);
 
-    let file_paths: Vec<String> = args
-        .iter()
-        .cloned()
-        .filter(|arg| !arg.starts_with("-"))
-        .collect();
+    if options.contains_("-h") || options.contains_("--help")  {
+        println!("{}", HELP_STR.to_string().trim_empty_lines().trim_lines_by_first_line());
+        return;
+    }
+
+    // TODO LATER
+    // let show_log: bool = options.contains_("-l") || options.contains_("--log=1");
+    // let show_progress: bool = options.contains_("-p") || options.contains_("--progress=1");
+    let render_type: RenderType = match options {
+        option if option.contains_("-r=cpu1") || options.contains_("--render=cpu1") => { RenderType::Cpu1 }
+        // TODO
+        option if option.contains_("-r=cpu8") || options.contains_("--render=cpu8") => { RenderType::Cpu(8) }
+        option if option.contains_("-r=cpubest") || options.contains_("--render=cpubest") => { RenderType::CpuBest }
+        option if option.contains_("-r=gpu") || options.contains_("--render=gpu") => { RenderType::Gpu }
+        _ => { RenderType::Cpu1 }
+    };
+
     if file_paths.is_empty() {
-        // TODO: then ask user for file to render
+        // TODO: ? then ask user for file to render
         println!("No files to render was provided.");
         println!("Exiting...");
         return;
     }
 
-    // TODO: maybe use some cli lib for managing args
-    // TODO: add cli options:
-    //   -h --help -> help
-    //   -l --log=0/1 -> show logs, if error
-    //   -p --progress=0/1 -> show render progress
-    //   -r="..." --render="..." -> renderer variants
-    //     cpu1 -> use 1 CPU core
-    //     cpu8 -> use 8 CPU cores
-    //     gpu -> use GPU
-    //   -n="..." --name="%i_%s__%wx%h" -> name of the output file
-    //     %f - file input name
-    //     %s - start render time
-    //     %e - end render time
-    //     %w - width of the image
-    //     %h - height of the image
-    // TODO:
-    // if arg == "-h" {
-    //     println!("{}", HELP_STR.to_string().trim_empty_lines().trim_lines_by_first_line());
-    //     continue;
-    // }
-    let render_type: RenderType = RenderType::Cpu1;
-
     // TODO LATER: make it parallel, so many pictures at the same time can render
     //   or make render it self parallel, so image will be renderer faster
     for file_input_path in file_paths {
-        println!();
-
         print!(r#"Reading file "{}"... "#, file_input_path);
         flush();
         // TODO: instead of [match] try to use [unwrap_or_else()]
@@ -114,7 +109,7 @@ fn main() {
                 file_content
             }
             Err(_) => {
-                println!(r#"Can't open file "{}", skipping it"#, file_input_path);
+                println!(r#"ERROR: Can't open file "{}", skipping it"#, file_input_path);
                 continue;
             }
         };
@@ -125,8 +120,8 @@ fn main() {
         flush();
         let sivf_file_content: String = match sivf_file_content.remove_comments() {
             Ok(v) => { v }
-            Err(e) => {
-                println!("Can't remove comments, skipping");
+            Err(_) => {
+                println!("ERROR: Can't remove comments, skipping this file");
                 continue;
             }
         };
@@ -138,7 +133,7 @@ fn main() {
         let value: serde_yaml::Value = match serde_yaml::from_str(&sivf_file_content) {
             Ok(v) => { v }
             Err(e) => {
-                println!(r#"Cant parse file: "{}""#, e);
+                println!(r#"ERROR: Cant parse file: "{}""#, e);
                 continue;
             }
         };
@@ -160,7 +155,7 @@ fn main() {
         // println!("Canvas result:\n{:?}", canvas);
         println!("OK");
 
-        todo!("remove this todo");
+        // todo!("remove this todo");
 
         print!("Converting rendered array to image... ");
         flush();
@@ -184,6 +179,7 @@ fn main() {
         println!("OK");
 
         println!("File render finished successfully.");
+        println!();
     }
 
     println!("\nProgram finished successfully!");

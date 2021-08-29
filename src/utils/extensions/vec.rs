@@ -15,6 +15,36 @@ impl<T: Clone> ExtensionFlatten<T> for Vec<Vec<T>> {
 
 
 
+pub trait ExtensionContains<T> {
+    // TODO LATER: remove _
+    fn contains_(&self, el: T) -> bool;
+}
+
+impl ExtensionContains<&str> for Vec<&str> {
+    fn contains_(&self, el: &str) -> bool {
+        self.contains(&el)
+    }
+}
+
+impl ExtensionContains<String> for Vec<String> {
+    fn contains_(&self, el: String) -> bool {
+        self.contains(&el)
+    }
+}
+
+impl ExtensionContains<&str> for Vec<String> {
+    fn contains_(&self, el: &str) -> bool {
+        self.contains(&el.to_string())
+    }
+}
+
+impl ExtensionContains<String> for Vec<&str> {
+    fn contains_(&self, el: String) -> bool {
+        self.contains(&&*el)
+    }
+}
+
+
 
 #[cfg(test)]
 mod tests {
@@ -27,4 +57,5 @@ mod tests {
         let actual  : Vec<i32> = v.flatten();
         assert_eq!(expected, actual);
     }
+
 }

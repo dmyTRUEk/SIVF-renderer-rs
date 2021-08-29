@@ -50,7 +50,7 @@ impl TraitRender for Circle {
                     }
                 }
             }
-            RenderType::Cpu(n_cores) => todo!(),
+            RenderType::Cpu(_n_cores) => todo!(),
             RenderType::CpuBest => todo!(),
             RenderType::Gpu => todo!(),
         }

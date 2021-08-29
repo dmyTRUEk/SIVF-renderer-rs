@@ -7,14 +7,15 @@ edition = "2018"
 
 [profile.release]
 lto = "fat"
-#target-cpu = "native"
 codegen-units = 1
 opt-level = 3
 panic = "abort"
-debuginfo = 0
+#target-cpu = "native"
+#debuginfo = 0
 
 [dependencies]
 chrono = "0.4.19"
+clap = "2.33.3"
 #derive_more = "0.99.16"
 evalexpr = "6.5.0"
 image = "0.23.14"
