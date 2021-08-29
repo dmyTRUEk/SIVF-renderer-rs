@@ -64,7 +64,7 @@ fn main() {
 
     // remove first cli arg (which is just path to this binary)
     let args: Vec<String> = (&args_all[1..]).to_vec();
-    println!("args = {:?}", args);
+    // println!("args = {:?}", args);
 
     // TODO: separate args?
 
@@ -163,7 +163,7 @@ fn main() {
         // println!("Canvas result:\n{:?}", canvas);
         println!("OK");
 
-        // todo!("remove this todo");
+        todo!("remove this todo");
 
         print!("Converting rendered array to image... ");
         flush();

@@ -5,7 +5,7 @@ use crate::sivf_misc::metric_units::{MetricUnit, ExtensionToPixels};
 use crate::sivf_misc::trait_render::{TraitRender, RenderType};
 use crate::utils::vec2d::Vec2d;
 use crate::utils::color::{Color, TRANSPARENT};
-use crate::utils::sizes::{ImageSizes, Coordinates};
+use crate::utils::sizes::ImageSizes;
 use crate::utils::extensions::usize::ExtensionIndices;
 
 

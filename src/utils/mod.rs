@@ -13,6 +13,7 @@ pub mod extensions;
 pub mod functionals;
 
 pub mod array2d;
+pub mod array2d_flat;
 pub mod color;
 pub mod io;
 pub mod vec2d;

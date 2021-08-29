@@ -1,13 +1,14 @@
-//! Rectangular 2d array
+//! Rectangular 2d array (deprecated)
 
 use std::ops::{Index, IndexMut};
 
-use crate::utils::sizes::{Sizes, Coordinates};
+use crate::utils::sizes::Sizes;
 
 
 
 /// This structure mustnt be used outside implementation.
 /// For creating `Array2d` use `Array2d::new()` instead.
+#[deprecated]
 #[derive(Clone, Debug, PartialEq)]
 pub struct Array2d<T: Copy> {
     sizes: Sizes<usize>,
@@ -30,7 +31,7 @@ impl<T: Copy> Array2d<T> {
     pub fn new(sizes: Sizes<usize>, fill: T) -> Self {
         Array2d {
             sizes,
-            elements: vec![vec![fill; sizes.h]; sizes.w]
+            elements: vec![vec![fill; sizes.w]; sizes.h]
         }
     }
 
@@ -38,7 +39,7 @@ impl<T: Copy> Array2d<T> {
         let is_rectangle: bool = given_array.iter().all(|row| row.len() == given_array.first().unwrap().len() );
         return match is_rectangle {
             true => {
-                let sizes: Sizes<usize> = Sizes::new(given_array.len(), given_array[0].len());
+                let sizes: Sizes<usize> = Sizes::new(given_array[0].len(), given_array.len());
                 Ok(Array2d{ sizes, elements: given_array })
             }
             false => {
@@ -56,13 +57,6 @@ impl<T: Copy> Index<(usize, usize)> for Array2d<T> {
     }
 }
 
-impl<T: Copy> Index<Coordinates<usize>> for Array2d<T> {
-    type Output = T;
-    fn index(&self, coordinates: Coordinates<usize>) -> &Self::Output {
-        &self.elements[coordinates.w][coordinates.h]
-    }
-}
-
 impl<T: Copy> IndexMut<(usize, usize)> for Array2d<T> {
     fn index_mut(&mut self, wh: (usize, usize)) -> &mut Self::Output {
         &mut self.elements[wh.0][wh.1]
@@ -77,15 +71,15 @@ mod tests {
 
     #[test]
     fn new() {
-        let expected: Array2d<i32> = Array2d { sizes: Sizes::new(2, 3), elements: vec![vec![0, 0, 0], vec![0, 0, 0]] };
-        let actual  : Array2d<i32> = Array2d::new(Sizes::new(2, 3), 0);
+        let expected: Array2d<i32> = Array2d { sizes: Sizes::new(3, 2), elements: vec![vec![0, 0, 0], vec![0, 0, 0]] };
+        let actual  : Array2d<i32> = Array2d::new(Sizes::new(3, 2), 0);
         assert_eq!(expected, actual);
     }
 
     #[test]
     fn ok() {
         let elements: Vec<Vec<char>> = vec![vec!['a', 'b', 'c'], vec!['d', 'e', 'f']];
-        let expected: Array2d<char> = Array2d { sizes: Sizes::new(2, 3), elements: elements.clone() };
+        let expected: Array2d<char> = Array2d { sizes: Sizes::new(3, 2), elements: elements.clone() };
         let actual  : Array2d<char> = Array2d::from(elements).unwrap();
         assert_eq!(expected, actual);
     }

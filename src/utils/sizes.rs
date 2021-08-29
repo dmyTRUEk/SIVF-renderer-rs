@@ -9,7 +9,7 @@ use crate::utils::vec2d::Vec2d;
 pub struct Sizes<T: Copy> { pub w: T, pub h: T }
 
 pub type ImageSizes = Sizes<usize>;
-pub type Coordinates<T: Copy> = Sizes<T>;
+pub type Coordinates<T> = Sizes<T>;
 
 impl<T: Copy> Sizes<T> {
 

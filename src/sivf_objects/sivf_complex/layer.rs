@@ -23,26 +23,27 @@ pub enum LayerElement {
 
 impl Layer {
 
-    pub fn new() -> Self {
-        /// child.all(sivf_object) have [.render()] is guaranteed by [SivfObject]
-        Layer { elements: vec![] }
-    }
+    // pub fn new() -> Self {
+    //     /// child.all(sivf_object) have [.render()] is guaranteed by [SivfObject]
+    //     Layer { elements: vec![] }
+    // }
 
     pub fn from(children: Vec<LayerElement>) -> Self {
         /// child.all(sivf_object) have [.render()] is guaranteed by [SivfObject]
         Layer { elements: children }
     }
 
-    pub fn push(&mut self, layer_element: LayerElement) {
-        self.elements.push(layer_element);
-    }
-    pub fn extend(&mut self, layer_elements: Vec<LayerElement>) {
-        self.elements.extend(layer_elements);
-    }
+    // pub fn push(&mut self, layer_element: LayerElement) {
+    //     self.elements.push(layer_element);
+    // }
 
-    pub fn get_children(&self) -> Vec<LayerElement> {
-        self.elements.clone()
-    }
+    // pub fn extend(&mut self, layer_elements: Vec<LayerElement>) {
+    //     self.elements.extend(layer_elements);
+    // }
+
+    // pub fn get_children(&self) -> Vec<LayerElement> {
+    //     self.elements.clone()
+    // }
 
     pub fn render(&self, image_sizes: ImageSizes, render_type: RenderType) -> Canvas {
         #[derive(Clone, Debug)]
@@ -60,7 +61,7 @@ impl Layer {
                     acc
                 }
                 LayerElement::SivfObject(sivf_object) => {
-                    // println!("layer.render.fold.SivfObject:");
+                    println!("layer.render.fold.SivfObject: {:?}", sivf_object);
                     let render_time_start = chrono::Local::now();
                     let canvas_child = sivf_object.render(image_sizes, render_type);
                     let render_time_end = chrono::Local::now();

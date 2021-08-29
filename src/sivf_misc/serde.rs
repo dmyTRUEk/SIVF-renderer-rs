@@ -252,8 +252,7 @@ fn deserialize_to_metric_units(value: &Value) -> MetricUnit {
     }
     impl ExtensionToF64 for Value {
         fn to_f64(&self) -> f64 {
-            // *self.clone().as_float().unwrap_or(self.as_int().unwrap() as f64)
-            self.clone().as_f64().unwrap_or(self.as_i64().unwrap() as f64)
+            self.as_f64().unwrap_or(self.as_i64().unwrap() as f64)
         }
     }
     impl ExtensionToF64 for evalexpr::Value {

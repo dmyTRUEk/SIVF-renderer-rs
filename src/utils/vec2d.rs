@@ -35,24 +35,22 @@ impl<T: Copy> Vec2d<T> {
 
 }
 
-impl<T> Vec2d<T>
-where
-    T: Copy + Mul<Output=T> + Add<Output=T> + PartialOrd
-{
+impl Vec2d<f64> {
 
-    pub fn len2(&self) -> T {
+    pub fn len2(&self) -> f64 {
+        // self.x.powi(2) + self.y.powi(2)
         self.x*self.x + self.y*self.y
     }
 
-    pub fn is_inside_circle(&self, radius2: T) -> bool {
+    pub fn is_inside_circle(&self, radius2: f64) -> bool {
         self.len2() < radius2
     }
 
-    pub fn is_inside_rectangle(&self, vec_min: Vec2d<T>, vec_max: Vec2d<T>) -> bool {
+    pub fn is_inside_rectangle(&self, vec_min: Self, vec_max: Self) -> bool {
         (vec_min.x <= self.x && self.x <= vec_max.x) && (vec_min.y <= self.y && self.y <= vec_max.y)
     }
 
-    pub fn is_inside_triangle(&self, p1: Vec2d<T>, p2: Vec2d<T>, p3: Vec2d<T>) -> bool {
+    pub fn is_inside_triangle(&self, p1: Self, p2: Self, p3: Self) -> bool {
         todo!()
     }
 
