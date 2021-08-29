@@ -1,10 +1,7 @@
 //! SIVF Layer
 
-use std::fmt::{self, Display};
-use std::str::FromStr;
-
 use crate::sivf_objects::sivf_any_object::SivfObject;
-use crate::sivf_misc::blend_types::{BlendTypes, BlendType};
+use crate::sivf_misc::blend_types::BlendTypes;
 use crate::sivf_misc::canvas::Canvas;
 use crate::utils::sizes::ImageSizes;
 use crate::sivf_misc::trait_render::RenderType;
@@ -28,8 +25,8 @@ impl Layer {
     //     Layer { elements: vec![] }
     // }
 
+    /// child.all(sivf_object) have [.render()] is guaranteed by [SivfObject]
     pub fn from(children: Vec<LayerElement>) -> Self {
-        /// child.all(sivf_object) have [.render()] is guaranteed by [SivfObject]
         Layer { elements: children }
     }
 

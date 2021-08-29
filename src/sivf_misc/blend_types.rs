@@ -10,7 +10,7 @@ pub enum BlendType {
     Add,
     Max,
     Min,
-    AddOverflow,
+    // AddOverflow,
     Avg,
 
     // TODO: add other?:

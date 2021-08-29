@@ -1,5 +1,7 @@
 //! SIVF Keywords and Consts
 
+#![allow(unused)]
+
 
 
 // Global const:

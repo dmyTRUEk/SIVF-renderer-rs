@@ -1,11 +1,9 @@
 //! SIVF Canvas
 
 use image::ImageBuffer;
-use itertools::Itertools;
 
 use crate::sivf_misc::blend_types::{BlendTypes, blend_colors};
 use crate::sivf_misc::trait_render::RenderType;
-// use crate::utils::array2d::Array2d;
 use crate::utils::array2d_flat::Array2d;
 use crate::utils::color::{Color, TRANSPARENT};
 use crate::utils::sizes::{ImageSizes, Sizes};
@@ -45,7 +43,9 @@ impl Canvas {
                     }
                 }
             }
-            _ => { todo!() }
+            RenderType::Cpu(n_cores) => todo!(),
+            RenderType::CpuBest => todo!(),
+            RenderType::Gpu => todo!(),
         }
     }
 

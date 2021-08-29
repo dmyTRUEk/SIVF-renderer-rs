@@ -1,6 +1,7 @@
 //! `String` extensions
 
-use regex::{Regex, RegexBuilder};
+// use regex::Regex;
+use regex::RegexBuilder;
 
 
 

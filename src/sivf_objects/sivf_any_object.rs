@@ -37,9 +37,6 @@ impl SivfObject {
                 square.render(image_sizes, render_type)
             }
 
-            _ => {
-                panic!("dont know how to render this Sivf Object: {:?}", *self);
-            }
         }
     }
 

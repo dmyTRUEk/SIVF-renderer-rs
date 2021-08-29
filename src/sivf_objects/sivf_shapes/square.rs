@@ -51,7 +51,9 @@ impl TraitRender for Square {
                     }
                 }
             }
-            _ => { todo!() }
+            RenderType::Cpu(n_cores) => todo!(),
+            RenderType::CpuBest => todo!(),
+            RenderType::Gpu => todo!(),
         }
         canvas
     }

@@ -1,7 +1,5 @@
 //! Color
 
-use std::num::ParseIntError;
-
 
 
 #[derive(Clone, Copy, Debug, PartialEq)]
