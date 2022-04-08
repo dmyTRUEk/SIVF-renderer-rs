@@ -5,9 +5,8 @@ image_sizes: [1080, 1080]
 // image_sizes: [4320, 4320]
 
 root_layer:
-  - layer:
-    - square1:
-        xy: [0, 0]
-        side: "100%"
-        color: ff000000
+  - square:
+      xy: [0, 0]
+      side: "100%"
+      color: ff000000
 
