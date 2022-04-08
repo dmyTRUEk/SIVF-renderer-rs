@@ -1,11 +1,13 @@
+// just black square
+
 image_sizes: [1080, 1080]
 // image_sizes: [2160, 2160]
 // image_sizes: [4320, 4320]
 
-image:
-  - layer_main:
+root_layer:
+  - layer:
     - square1:
         xy: [0, 0]
-        side: "k*100%"
+        side: "100%"
         color: ff000000
 
