@@ -19,14 +19,13 @@ pub struct Square {
 
 impl Square {
 
-    pub fn new(position: Vec2d<MetricUnit>, side: MetricUnit, color: Color, inverted: bool) -> Self {
+    pub const fn new(position: Vec2d<MetricUnit>, side: MetricUnit, color: Color, inverted: bool) -> Self {
         Square { position, side, color, inverted }
     }
 
 }
 
 impl TraitRender for Square {
-
     fn render(&self, image_sizes: ImageSizes, render_type: RenderType) -> Canvas {
         let mut canvas: Canvas = Canvas::new(image_sizes);
         let position: Vec2d<f64> = Vec2d::new(
@@ -58,3 +57,4 @@ impl TraitRender for Square {
         canvas
     }
 }
+

@@ -62,18 +62,18 @@ fn main() {
 
     // get cli args
     let args_all: Vec<String> = env::args().collect();
-    // println!("args_all = {:?}", args_all);
+    // println!("args_all = {args_all:?}");
 
     // remove first cli arg (which is just path to this binary)
     let args: Vec<String> = (&args_all[1..]).to_vec();
-    // println!("args = {:?}", args);
+    // println!("args = {args:?}");
 
     let (options, file_paths) = args.to_vec().separate(|v| v.starts_with('-'));
-    // println!("options = {:?}", options);
-    // println!("file_paths = {:?}", file_paths);
+    // println!("options = {options:?}");
+    // println!("file_paths = {file_paths:?}");
 
     if options.contains_("-h") || options.contains_("--help")  {
-        println!("{}", HELP_STR.to_string().trim_empty_lines().trim_lines_by_first_line());
+        println!("{help}", help=HELP_STR.to_string().trim_empty_lines().trim_lines_by_first_line());
         return;
     }
 
@@ -99,7 +99,7 @@ fn main() {
     // TODO LATER: make it parallel, so many pictures at the same time can render
     //   or make render it self parallel, so image will be renderer faster
     for file_input_path in file_paths {
-        print!(r#"Reading file "{}"... "#, file_input_path);
+        print!(r#"Reading file "{file_input_path}"... "#);
         flush();
         // TODO: instead of [match] try to use [unwrap_or_else()]
         let sivf_file_content: String = match File::open(&file_input_path) {
@@ -109,12 +109,12 @@ fn main() {
                 file_content
             }
             Err(_) => {
-                println!(r#"ERROR: Can't open file "{}", skipping it"#, file_input_path);
+                println!(r#"ERROR: Can't open file "{file_input_path}", skipping it"#);
                 continue;
             }
         };
         println!("OK");
-        // println!("file content = \n{}", sivf_file_content);
+        // println!("file content = \n{sivf_file_content}");
 
         print!("Removing comments... ");
         flush();
@@ -126,14 +126,14 @@ fn main() {
             }
         };
         println!("OK");
-        // println!("file content without comments = \n{}", sivf_file_content);
+        // println!("file content without comments = \n{sivf_file_content}");
 
         print!("Parsing file to YAML... ");
         flush();
         let value: serde_yaml::Value = match serde_yaml::from_str(&sivf_file_content) {
             Ok(v) => { v }
             Err(e) => {
-                println!(r#"ERROR: Cant parse file: "{}""#, e);
+                println!(r#"ERROR: Cant parse file: "{e}""#);
                 continue;
             }
         };
@@ -142,7 +142,7 @@ fn main() {
         print!("Parsing YAML to SIVF struct... ");
         flush();
         let sivf_struct: SivfStruct = SivfStruct::from(&value);
-        // println!("Parse result:\n{:#?}", sivf_struct);
+        // println!("Parse result:\n{sivf_struct:#?}");
         println!("OK");
 
         print!("Rendering... ");
@@ -151,8 +151,8 @@ fn main() {
         let canvas = sivf_struct.render(render_type);
         let render_time_end = chrono::Local::now();
         let render_time = render_time_end - render_time_start;
-        print!("finished in {}s {}ms. ", render_time.num_seconds(), render_time.num_milliseconds() % 1000);
-        // println!("Canvas result:\n{:?}", canvas);
+        print!("finished in {s}s {ms}ms. ", s=render_time.num_seconds(), ms=render_time.num_milliseconds() % 1000);
+        // println!("Canvas result:\n{canvas:?}");
         println!("OK");
 
         // todo!("remove this todo");
@@ -165,15 +165,15 @@ fn main() {
         let image_sizes: ImageSizes = sivf_struct.image_sizes;
         // TODO LATER: separate this into function
         let file_output_name = format!(
-            "img_{}__{}x{}.png",
-            render_time_start.to_my_format(),
-            image_sizes.w,
-            image_sizes.h
+            "img_{t}__{w}x{h}.png",
+            t=render_time_start.to_my_format(),
+            w=image_sizes.w,
+            h=image_sizes.h
         );
         // TODO: file_path_output
         let file_output_path: String = file_output_name;
-        // println!("file_name = {}", file_name);
-        print!(r#"Saving image as "{}"... "#, file_output_path);
+        // println!("file_name = {file_name}");
+        print!(r#"Saving image as "{file_output_path}"... "#);
         flush();
         image_buffer.save(file_output_path).unwrap();
         println!("OK");

@@ -1,0 +1,11 @@
+image_sizes: [1080, 1080]
+// image_sizes: [2160, 2160]
+// image_sizes: [4320, 4320]
+
+image:
+  - layer_main:
+    - square1:
+        xy: [0, 0]
+        side: "k*100%"
+        color: ff000000
+

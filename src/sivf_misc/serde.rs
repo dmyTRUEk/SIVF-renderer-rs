@@ -26,38 +26,25 @@ const SHOW_DESERIALIZATION_PROGRESS: bool = false;
 pub fn deserialize_to_sivf_struct(value: &Value) -> SivfStruct {
     if SHOW_DESERIALIZATION_PROGRESS {
         println!("------------------------------------------------ deserializing to SIVF STRUCT:");
-        println!("{:#?}", value);
+        println!("{value:#?}");
     }
-    match value {
-        value if value.get(KW_IMAGE_SIZES).is_none() => {
-            panic!("{} not found in root", KW_IMAGE_SIZES)
-        }
-        value if value.get(KW_COLOR_MODEL).is_none() => {
-            panic!("{} not found in root", KW_COLOR_MODEL)
-        }
-        value if value.get(KW_ROOT_LAYER).is_none() => {
-            panic!("{} not found in root", KW_ROOT_LAYER)
-        }
-        value if value.get(KW_IMAGE_SIZES).is_some()
-            && value.get(KW_COLOR_MODEL).is_some()
-            && value.get(KW_ROOT_LAYER).is_some()
-        => {
-            let image_sizes = value.get(KW_IMAGE_SIZES).unwrap();
-            let color_model = value.get(KW_COLOR_MODEL).unwrap();
-            let root_layer_value = value.get(KW_ROOT_LAYER).unwrap();
-            let layer_element: LayerElement = deserialize_to_layer_element(root_layer_value);
-            let sivf_object: SivfObject = if let LayerElement::SivfObject(sivf_object) = layer_element { sivf_object } else { panic!() };
-            let root_layer: Layer = if let SivfObject::Layer(layer) = sivf_object { layer } else { panic!() };
-            SivfStruct {
-                image_sizes: ImageSizes::new(
-                    image_sizes.as_sequence().unwrap().get(0).unwrap().as_u64().unwrap() as usize,
-                    image_sizes.as_sequence().unwrap().get(1).unwrap().as_u64().unwrap() as usize,
-                ),
-                color_model: ColorModel::from(color_model.as_str().unwrap()),
-                root_layer
-            }
-        }
-        _ => { panic!() }
+    if value.get(KW_IMAGE_SIZES).is_none() { panic!("{KW_IMAGE_SIZES} not found in root") }
+    if value.get(KW_COLOR_MODEL).is_none() { panic!("{KW_COLOR_MODEL} not found in root") }
+    if value.get(KW_ROOT_LAYER).is_none() { panic!("{KW_ROOT_LAYER} not found in root") }
+
+    let image_sizes = value.get(KW_IMAGE_SIZES).unwrap();
+    let color_model = value.get(KW_COLOR_MODEL).unwrap();
+    let root_layer_value = value.get(KW_ROOT_LAYER).unwrap();
+    let layer_element: LayerElement = deserialize_to_layer_element(root_layer_value);
+    let sivf_object: SivfObject = if let LayerElement::SivfObject(sivf_object) = layer_element { sivf_object } else { panic!() };
+    let root_layer: Layer = if let SivfObject::Layer(layer) = sivf_object { layer } else { panic!() };
+    SivfStruct {
+        image_sizes: ImageSizes::new(
+            image_sizes.as_sequence().unwrap().get(0).unwrap().as_u64().unwrap() as usize,
+            image_sizes.as_sequence().unwrap().get(1).unwrap().as_u64().unwrap() as usize,
+        ),
+        color_model: ColorModel::from(color_model.as_str().unwrap()),
+        root_layer
     }
 }
 
@@ -82,7 +69,7 @@ impl ExtensionToValue for String {
 fn deserialize_to_layer_element(value: &Value) -> LayerElement {
     if SHOW_DESERIALIZATION_PROGRESS {
         println!("------------------------- deserializing to SIVF OBJECT:");
-        println!("{:#?}", value);
+        println!("{value:#?}");
     }
     match value {
         value if value.is_sequence() => {
@@ -90,7 +77,7 @@ fn deserialize_to_layer_element(value: &Value) -> LayerElement {
             let layer_elements: Vec<LayerElement> = array.iter().fold(vec![],
             |mut acc, el| {
                 // println!("-------------");
-                // println!("{:#?}", el);
+                // println!("{el:#?}");
                 let layer_element: LayerElement = deserialize_to_layer_element(el);
                 acc.push(layer_element);
                 acc
@@ -124,14 +111,14 @@ fn deserialize_to_layer_element(value: &Value) -> LayerElement {
                 _ => {
                     // TODO: create list of all KW and search for similar, and if so, show it
                     println!("------");
-                    println!("found unknown structure: {:#?}", map);
+                    println!("found unknown structure: {map:#?}");
                     let unknown_thing_name = map.iter().next().unwrap().0.as_str().unwrap();
-                    todo!("{}", unknown_thing_name)
+                    todo!("{unknown_thing_name}")
                 }
             }
         }
         _ => {
-            panic!("unknown option: {:#?}", value)
+            panic!("unknown option: {value:#?}")
         }
     }
 
@@ -142,7 +129,7 @@ fn deserialize_to_layer_element(value: &Value) -> LayerElement {
 fn deserialize_to_circle(value: &Value) -> Circle {
     if SHOW_DESERIALIZATION_PROGRESS {
         println!("-------- deserializing to CIRCLE:");
-        println!("{:#?}", value);
+        println!("{value:#?}");
     }
     match value {
         value if value.is_mapping() => {
@@ -164,7 +151,7 @@ fn deserialize_to_circle(value: &Value) -> Circle {
 fn deserialize_to_square(value: &Value) -> Square {
     if SHOW_DESERIALIZATION_PROGRESS {
         println!("-------- deserializing to SQUARE:");
-        println!("{:#?}", value);
+        println!("{value:#?}");
     }
     match value {
         value if value.is_mapping() => {
@@ -186,7 +173,7 @@ fn deserialize_to_square(value: &Value) -> Square {
 fn deserialize_to_blend_types(value: &Value) -> BlendTypes {
     if SHOW_DESERIALIZATION_PROGRESS {
         println!("-------- deserializing to BLEND TYPES:");
-        println!("{:#?}", value);
+        println!("{value:#?}");
     }
 
     trait ExtensionToBlendType {
@@ -225,7 +212,7 @@ fn deserialize_to_blend_types(value: &Value) -> BlendTypes {
 fn deserialize_to_vec2d_metric_unit(value: &Value) -> Vec2d<MetricUnit> {
     if SHOW_DESERIALIZATION_PROGRESS {
         println!("-------- deserializing to POSITION:");
-        println!("{:#?}", value);
+        println!("{value:#?}");
     }
     match value {
         value if value.is_sequence() => {
@@ -245,7 +232,7 @@ fn deserialize_to_vec2d_metric_unit(value: &Value) -> Vec2d<MetricUnit> {
 fn deserialize_to_metric_units(value: &Value) -> MetricUnit {
     if SHOW_DESERIALIZATION_PROGRESS {
         println!("-------- deserializing to METRIC UNITS:");
-        println!("{:#?}", value);
+        println!("{value:#?}");
     }
     trait ExtensionToF64 {
         fn to_f64(&self) -> f64;
@@ -292,7 +279,7 @@ fn deserialize_to_metric_units(value: &Value) -> MetricUnit {
 fn deserialize_to_color(value: &Value) -> Color {
     if SHOW_DESERIALIZATION_PROGRESS {
         println!("-------- deserializing to METRIC UNITS:");
-        println!("{:#?}", value);
+        println!("{value:#?}");
     }
     match value {
         value if value.is_string() => {

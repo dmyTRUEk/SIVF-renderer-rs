@@ -54,16 +54,16 @@ impl Layer {
                 LayerElement::BlendTypes(blend_types) => {
                     // println!("layer.render.fold.BlendTypes:");
                     acc.blend_types = *blend_types;
-                    // println!("acc = {:?}", acc);
+                    // println!("acc = {acc:?}");
                     acc
                 }
                 LayerElement::SivfObject(sivf_object) => {
-                    println!("layer.render.fold.SivfObject: {:?}", sivf_object);
+                    println!("layer.render.fold.SivfObject: {sivf_object:?}");
                     let render_time_start = chrono::Local::now();
                     let canvas_child = sivf_object.render(image_sizes, render_type);
                     let render_time_end = chrono::Local::now();
                     let render_time = render_time_end - render_time_start;
-                    println!("finished render in {}s {}ms. ", render_time.num_seconds(), render_time.num_milliseconds() % 1000);
+                    println!("finished render in {s}s {ms}ms. ", s=render_time.num_seconds(), ms=render_time.num_milliseconds() % 1000);
 
                     let blend_types: BlendTypes = acc.blend_types;
 
@@ -71,8 +71,8 @@ impl Layer {
                     acc.canvas.blend_with(&canvas_child, &blend_types, &render_type);
                     let render_time_end = chrono::Local::now();
                     let render_time = render_time_end - render_time_start;
-                    println!("finished blend  in {}s {}ms. ", render_time.num_seconds(), render_time.num_milliseconds() % 1000);
-                    // println!("acc = {:?}", acc);
+                    println!("finished blend  in {s}s {ms}ms. ", s=render_time.num_seconds(), ms=render_time.num_milliseconds() % 1000);
+                    // println!("acc = {acc:?}");
                     acc
                 }
             }
@@ -115,7 +115,7 @@ impl Layer {
 //         let s = "";
 //         // let s: Vec<LayerElement> = Deserialize::deserialize(deserializer)?;
 //         let s: Vec<LayerElement> = deserializer.deserialize_string(MyVisitor)?.elements;
-//         println!("s = {:#?}", s);
+//         println!("s = {s:#?}");
 //         Ok(vec![])
 //     }
 //
@@ -157,7 +157,7 @@ impl Layer {
 //     //     M: MapAccess<'de>
 //     // {
 //     //     let tmp = Deserialize::deserialize(de::value::MapAccessDeserializer::new(visitor))?;
-//     //     println!("tmp = {:#?}", tmp);
+//     //     println!("tmp = {tmp:#?}");
 //     //     // TODO:
 //     //     Ok(VecLayerElements{ elements: vec![] })
 //     // }

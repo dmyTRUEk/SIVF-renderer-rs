@@ -72,15 +72,15 @@ impl ExtensionSplitAndKeep for String {
     fn split_and_keep(&self, func: impl Fn(char) -> bool) -> Vec<&str> {
         if self == "" { return vec![]; }
         let res: Vec<&str> = self.split_inclusive(func).collect::<Vec<&str>>();
-        // println!("res = {:#?}", res);
+        // println!("res = {res:#?}");
         let res_len = res.len();
         let mut res2: Vec<&str> = vec![];
         for i in 0..res_len-1 {
-            // println!("res[i] = {:#?}", res[i]);
+            // println!("res[i] = {res_i:#?}", res_i=res[i]);
             let (lhs, rhs) = res[i].split_at(res[i].len()-1);
             if lhs != "" { res2.push(lhs); }
             if rhs != "" { res2.push(rhs); }
-            // println!("res2 = {:#?}", res2.clone());
+            // println!("res2 = {res2:#?}", res2=res2.clone());
         }
         res2.push(res[res_len-1]);
         res2

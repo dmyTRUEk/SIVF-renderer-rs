@@ -114,7 +114,7 @@ mod tests {
             vec![9, 10, 11],
         ];
         let array2d_flat: Array2d<i32> = Array2d::from(elements);
-        println!("{:#?}", array2d_flat);
+        println!("{array2d_flat:#?}");
 
         assert_eq!(0, array2d_flat[(0, 0)]);
         assert_eq!(1, array2d_flat[(1, 0)]);

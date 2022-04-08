@@ -23,7 +23,7 @@ impl ExtensionDateTimeLocalToMyFormat for DateTime<Local> {
 
 // fn get_date_time_my_format_string() -> String {
 //     let dt_now = Local::now();
-//     // println!("Time now is {}", dt_now);
+//     // println!("Time now is {dt_now}");
 //     let year  : u32 = dt_now.format("%Y").to_string().parse().unwrap();
 //     let month : u32 = dt_now.format("%m").to_string().parse().unwrap();
 //     let day   : u32 = dt_now.format("%d").to_string().parse().unwrap();

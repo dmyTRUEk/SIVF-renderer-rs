@@ -2,8 +2,8 @@
 //!
 //! ```
 //! let (even, odd) = vec![1, 2, 3, 4, 5].separate(|v| v % 2 == 0).collect();
-//! println!("{}", even);   // 2, 4
-//! println!("{}", odd);    // 1, 3, 5
+//! println!("{even}");   // 2, 4
+//! println!("{odd}");    // 1, 3, 5
 //! ```
 
 
