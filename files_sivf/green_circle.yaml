@@ -1,8 +1,10 @@
+// green circle
+
 image_sizes: [1080, 1080]
 
 root_layer:
   - circle:
       xy: [0, 0]
       r: "50%"
-      color: ffff0000
+      color: ff00ff00
 

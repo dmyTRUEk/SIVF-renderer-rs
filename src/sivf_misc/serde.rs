@@ -267,17 +267,16 @@ fn deserialize_to_metric_units(value: &Value) -> MetricUnit {
             MetricUnit::Pixels(number)
         }
         value if value.is_string() => {
-            let str = value.as_str().unwrap().trim();
-            if str.ends_with('%') {
-                let percents_str = &str[0..str.len()-1];
-                // TODO:
-                // assert!(str.count('%') == 1 && str.ends_with('%'));
+            let s: &str = value.as_str().unwrap().trim();
+            if s.ends_with('%') {
+                assert!(s.chars().filter(|&c| c == '%').count() == 1);
+                let percents_str = &s[0..s.len()-1];
                 // todo!("eval")
-                let percents_number = eval(percents_str).unwrap();
-                MetricUnit::Percents(percents_number.to_f64())
+                let percents_number: f64 = eval(percents_str).unwrap().to_f64();
+                MetricUnit::Percents(percents_number)
             }
             else {
-                let result = eval(str).unwrap();
+                let result = eval(s).unwrap();
                 MetricUnit::Pixels(result.to_f64())
             }
         }
@@ -297,9 +296,9 @@ fn deserialize_to_color(value: &Value) -> Color {
     }
     match value {
         value if value.is_string() => {
-            let str = value.as_str().unwrap();
-            assert_eq!(8, str.len());
-            Color::from(str)
+            let s = value.as_str().unwrap();
+            assert_eq!(8, s.len());
+            Color::from(s)
         }
         _ => { panic!() }
     }

@@ -1,0 +1,12 @@
+// blue triangle
+
+image_sizes: [1080, 1080]
+
+root_layer:
+  - circle:
+      xy: [0, 0]
+      p1: ["-sqrt(3)/2*100%", "-1/2*100%"]
+      p2: ["-sqrt(3)/2*100%", "+1/2*100%"]
+      p3: ["0", "+sqrt(3)/2*100%"]
+      color: ff0000ff
+

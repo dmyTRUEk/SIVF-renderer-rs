@@ -3,10 +3,10 @@
 use crate::sivf_misc::canvas::Canvas;
 use crate::sivf_misc::metric_units::{MetricUnit, ExtensionToPixels};
 use crate::sivf_misc::render::{Render, RenderType};
-use crate::utils::vec2d::Vec2d;
+use crate::utils::extensions::usize::ExtensionIndices;
 use crate::utils::color::{Color, TRANSPARENT};
 use crate::utils::sizes::ImageSizes;
-use crate::utils::extensions::usize::ExtensionIndices;
+use crate::utils::vec2d::Vec2d;
 
 
 
@@ -20,51 +20,46 @@ pub struct Triangle {
 }
 
 impl Triangle {
-
     pub const fn new(
         p1: Vec2d<MetricUnit>,
         p2: Vec2d<MetricUnit>,
         p3: Vec2d<MetricUnit>,
-        radius: MetricUnit,
         color: Color,
         inverted: bool
     ) -> Self {
         Triangle { p1, p2, p3, color, inverted }
     }
-
 }
 
 impl Render for Triangle {
-
     fn render(&self, image_sizes: ImageSizes, render_type: RenderType) -> Canvas {
-        todo!();
-        // let mut canvas: Canvas = Canvas::new(image_sizes);
-        // let position: Vec2d<f64> = Vec2d::new(
-        //     self.position.x.to_pixels(image_sizes.w),
-        //     -self.position.y.to_pixels(image_sizes.h)   // minus here because math and array coords Y are inverted
-        // );
-        // let shift: Vec2d<f64> =
-        //     - Vec2d::new(image_sizes.w as f64, image_sizes.h as f64) / 2.0_f64
-        //     - position
-        //     + Vec2d::new(0.5_f64, 0.5_f64);
-        // // TODO LATER: think about this - - - - - - - - - - - - - - - >  !W!
-        // let radius2: f64 = self.radius.to_pixels(image_sizes.w).powi(2);
-        // match render_type {
-        //     RenderType::Cpu1 => {
-        //         for h in image_sizes.h.indices() {
-        //             for w in image_sizes.w.indices() {
-        //                 let (x, y): (f64, f64) = (w as f64, h as f64);
-        //                 let is_inside_figure: bool = (Vec2d::new(x, y)+shift).is_inside_circle(radius2);
-        //                 canvas.pixels[(w, h)] = if is_inside_figure ^ self.inverted { self.color } else { TRANSPARENT };
-        //             }
-        //         }
-        //     }
-        //     RenderType::Cpu(_n_cores) => todo!(),
-        //     RenderType::CpuBest => todo!(),
-        //     RenderType::Gpu => todo!(),
-        // }
-        // canvas
+        let mut canvas: Canvas = Canvas::new(image_sizes);
+        let (wmax, hmax): (usize, usize) = (image_sizes.w, image_sizes.h);
+        let shift: Vec2d<f64> =
+            - Vec2d::new(wmax as f64, hmax as f64) / 2.0_f64
+            + Vec2d::new(0.5_f64, 0.5_f64);
+        let (p1, p2, p3): (Vec2d<f64>, Vec2d<f64>, Vec2d<f64>) = (
+            Vec2d::new(self.p1.x.to_pixels(wmax), self.p1.y.to_pixels(hmax)),
+            Vec2d::new(self.p2.x.to_pixels(wmax), self.p2.y.to_pixels(hmax)),
+            Vec2d::new(self.p3.x.to_pixels(wmax), self.p3.y.to_pixels(hmax))
+        );
+        match render_type {
+            RenderType::Cpu1 => {
+                for h in hmax.indices() {
+                    for w in wmax.indices() {
+                        let pos: Vec2d<f64> = Vec2d::new(w as f64, h as f64);
+                        let is_inside_figure: bool = (pos+shift).is_inside_triangle(p1, p2, p3);
+                        let need_to_draw: bool = is_inside_figure ^ self.inverted;
+                        let color: Color = if need_to_draw { self.color } else { TRANSPARENT };
+                        canvas.pixels[(w, h)] = color;
+                    }
+                }
+            }
+            RenderType::Cpu(_n_cores) => todo!(),
+            RenderType::CpuBest => todo!(),
+            RenderType::Gpu => todo!(),
+        }
+        canvas
     }
-
 }
 

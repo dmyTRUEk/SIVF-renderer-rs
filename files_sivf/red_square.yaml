@@ -1,4 +1,4 @@
-// just black square
+// red square
 
 image_sizes: [1080, 1080]
 // image_sizes: [2160, 2160]
@@ -8,5 +8,5 @@ root_layer:
   - square:
       xy: [0, 0]
       side: "100%"
-      color: ff000000
+      color: ffff0000
 
