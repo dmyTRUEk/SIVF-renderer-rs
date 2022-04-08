@@ -1,5 +1,6 @@
 # TODO:
 - ? "smt" -> `smt`
+- write rendering tests
 
 
 
