@@ -2,7 +2,7 @@
 
 use crate::sivf_misc::canvas::Canvas;
 use crate::sivf_misc::metric_units::{MetricUnit, ExtensionToPixels};
-use crate::sivf_misc::trait_render::{TraitRender, RenderType};
+use crate::sivf_misc::render::{Render, RenderType};
 use crate::utils::vec2d::Vec2d;
 use crate::utils::color::{Color, TRANSPARENT};
 use crate::utils::sizes::ImageSizes;
@@ -20,13 +20,18 @@ pub struct Circle {
 
 impl Circle {
 
-    pub const fn new(position: Vec2d<MetricUnit>, radius: MetricUnit, color: Color, inverted: bool) -> Self {
+    pub const fn new(
+        position: Vec2d<MetricUnit>,
+        radius: MetricUnit,
+        color: Color,
+        inverted: bool
+    ) -> Self {
         Circle { position, radius, color, inverted }
     }
 
 }
 
-impl TraitRender for Circle {
+impl Render for Circle {
 
     fn render(&self, image_sizes: ImageSizes, render_type: RenderType) -> Canvas {
         let mut canvas: Canvas = Canvas::new(image_sizes);

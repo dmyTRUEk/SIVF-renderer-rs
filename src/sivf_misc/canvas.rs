@@ -3,7 +3,7 @@
 use image::ImageBuffer;
 
 use crate::sivf_misc::blend_types::{BlendTypes, blend_colors};
-use crate::sivf_misc::trait_render::RenderType;
+use crate::sivf_misc::render::RenderType;
 use crate::utils::array2d_flat::Array2d;
 use crate::utils::color::{Color, TRANSPARENT};
 use crate::utils::sizes::{ImageSizes, Sizes};

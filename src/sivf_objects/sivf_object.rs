@@ -5,7 +5,7 @@ use crate::sivf_objects::shapes::circle::Circle;
 use crate::sivf_objects::shapes::square::Square;
 use crate::utils::sizes::ImageSizes;
 use crate::sivf_misc::canvas::Canvas;
-use crate::sivf_misc::trait_render::{RenderType, TraitRender};
+use crate::sivf_misc::render::{RenderType, Render};
 
 
 
@@ -21,9 +21,9 @@ pub enum SivfObject {
 
 }
 
-impl SivfObject {
+impl Render for SivfObject {
 
-    pub fn render(&self, image_sizes: ImageSizes, render_type: RenderType) -> Canvas {
+    fn render(&self, image_sizes: ImageSizes, render_type: RenderType) -> Canvas {
         match self {
             SivfObject::Layer(layer) => {
                 layer.render(image_sizes, render_type)
@@ -36,7 +36,6 @@ impl SivfObject {
             SivfObject::Square(square) => {
                 square.render(image_sizes, render_type)
             }
-
         }
     }
 

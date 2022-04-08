@@ -2,7 +2,7 @@
 
 use crate::sivf_misc::canvas::Canvas;
 use crate::sivf_misc::metric_units::{MetricUnit, ExtensionToPixels};
-use crate::sivf_misc::trait_render::{TraitRender, RenderType};
+use crate::sivf_misc::render::{Render, RenderType};
 use crate::utils::vec2d::Vec2d;
 use crate::utils::color::{Color, TRANSPARENT};
 use crate::utils::sizes::ImageSizes;
@@ -19,13 +19,18 @@ pub struct Square {
 
 impl Square {
 
-    pub const fn new(position: Vec2d<MetricUnit>, side: MetricUnit, color: Color, inverted: bool) -> Self {
+    pub const fn new(
+        position: Vec2d<MetricUnit>,
+        side: MetricUnit,
+        color: Color,
+        inverted: bool
+    ) -> Self {
         Square { position, side, color, inverted }
     }
 
 }
 
-impl TraitRender for Square {
+impl Render for Square {
     fn render(&self, image_sizes: ImageSizes, render_type: RenderType) -> Canvas {
         let mut canvas: Canvas = Canvas::new(image_sizes);
         let position: Vec2d<f64> = Vec2d::new(

@@ -47,8 +47,8 @@ use crate::utils::extensions::string::{ExtensionTrimEmptyLines, ExtensionTrimLin
 use crate::utils::functionals::separate::ExtensionSeparate;
 use crate::utils::sizes::ImageSizes;
 use crate::utils::io::flush;
+use crate::sivf_misc::render::RenderType;
 use crate::sivf_misc::sivf_struct::SivfStruct;
-use crate::sivf_misc::trait_render::RenderType;
 use crate::utils::extensions::vec::ExtensionContains;
 
 

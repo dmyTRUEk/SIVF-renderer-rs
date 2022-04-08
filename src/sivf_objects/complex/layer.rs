@@ -4,7 +4,7 @@ use crate::sivf_objects::sivf_object::SivfObject;
 use crate::sivf_misc::blend_types::BlendTypes;
 use crate::sivf_misc::canvas::Canvas;
 use crate::utils::sizes::ImageSizes;
-use crate::sivf_misc::trait_render::RenderType;
+use crate::sivf_misc::render::{RenderType, Render};
 
 
 
@@ -43,7 +43,12 @@ impl Layer {
     //     self.elements.clone()
     // }
 
-    pub fn render(&self, image_sizes: ImageSizes, render_type: RenderType) -> Canvas {
+}
+
+
+
+impl Render for Layer {
+    fn render(&self, image_sizes: ImageSizes, render_type: RenderType) -> Canvas {
         #[derive(Clone, Debug)]
         struct RenderingState { pub canvas: Canvas, pub blend_types: BlendTypes }
         // TODO LATER: try different approaches and measure times:
@@ -60,6 +65,7 @@ impl Layer {
                 }
                 LayerElement::SivfObject(sivf_object) => {
                     println!("layer.render.fold.SivfObject: {sivf_object:?}");
+                    // TODO?: rewrite using `measure_time`
                     let render_time_start = chrono::Local::now();
                     let canvas_child = sivf_object.render(image_sizes, render_type);
                     let render_time_end = chrono::Local::now();
@@ -68,6 +74,7 @@ impl Layer {
 
                     let blend_types: BlendTypes = acc.blend_types;
 
+                    // TODO?: rewrite using `measure_time`
                     let render_time_start = chrono::Local::now();
                     acc.canvas.blend_with(&canvas_child, &blend_types, &render_type);
                     let render_time_end = chrono::Local::now();
@@ -79,6 +86,5 @@ impl Layer {
             }
         ).canvas
     }
-
 }
 

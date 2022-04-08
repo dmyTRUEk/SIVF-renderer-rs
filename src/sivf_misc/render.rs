@@ -5,7 +5,7 @@ use crate::utils::sizes::ImageSizes;
 
 
 
-pub trait TraitRender {
+pub trait Render {
     fn render(&self, image_sizes: ImageSizes, render_type: RenderType) -> Canvas;
 }
 
