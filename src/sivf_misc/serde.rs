@@ -8,9 +8,9 @@ use crate::sivf_misc::keywords_and_consts::*;
 use crate::sivf_misc::metric_units::MetricUnit;
 use crate::sivf_misc::sivf_struct::SivfStruct;
 use crate::sivf_objects::sivf_object::SivfObject;
-use crate::sivf_objects::sivf_complex::layer::{Layer, LayerElement};
-use crate::sivf_objects::sivf_shapes::circle::Circle;
-use crate::sivf_objects::sivf_shapes::square::Square;
+use crate::sivf_objects::complex::layer::{Layer, LayerElement};
+use crate::sivf_objects::shapes::circle::Circle;
+use crate::sivf_objects::shapes::square::Square;
 use crate::utils::color::{ARGB, ColorModel, Color};
 use crate::utils::sizes::ImageSizes;
 use crate::utils::vec2d::Vec2d;
@@ -316,8 +316,8 @@ mod tests {
     use crate::utils::vec2d::Vec2d;
     use crate::sivf_misc::blend_types::{BlendTypes, BlendType};
     use crate::sivf_misc::metric_units::MetricUnit;
-    use crate::sivf_objects::sivf_complex::layer::{Layer, LayerElement};
-    use crate::sivf_objects::sivf_shapes::circle::Circle;
+    use crate::sivf_objects::complex::layer::{Layer, LayerElement};
+    use crate::sivf_objects::shapes::circle::Circle;
 
     // TODO: write a lot of tests
 
@@ -389,3 +389,4 @@ mod tests {
     }
 
 }
+

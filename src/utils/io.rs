@@ -23,3 +23,4 @@ pub fn wait_for_enter() {
 pub fn flush() {
     stdout().flush().unwrap();
 }
+

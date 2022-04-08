@@ -10,3 +10,4 @@ impl<T, E> AliasResultIntoOption<T> for Result<T, E> {
         self.ok()
     }
 }
+

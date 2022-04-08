@@ -64,3 +64,4 @@ pub const KW_SQUARE: &str = "square";
 pub const KW_SQUARE_SIDE: &str = "side";
 
 pub const KW_TRIANGLE: &str = "triangle";
+

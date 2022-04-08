@@ -1,4 +1,4 @@
-//! SIVF Circle
+//! SIVF Triangle
 
 use crate::sivf_misc::canvas::Canvas;
 use crate::sivf_misc::metric_units::{MetricUnit, ExtensionToPixels};
@@ -58,3 +58,4 @@ impl TraitRender for Circle {
     }
 
 }
+

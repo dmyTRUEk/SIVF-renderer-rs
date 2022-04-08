@@ -5,7 +5,7 @@
 
     bad_style,
     const_err,
-    dead_code,
+    // dead_code,
     improper_ctypes,
     non_shorthand_field_patterns,
     no_mangle_generic_items,
@@ -14,7 +14,7 @@
     patterns_in_fns_without_body,
     private_in_public,
     unconditional_recursion,
-    unused,
+    // unused,
     unused_allocation,
     unused_comparisons,
     unused_parens,

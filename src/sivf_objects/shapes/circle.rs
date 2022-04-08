@@ -58,3 +58,4 @@ impl TraitRender for Circle {
     }
 
 }
+

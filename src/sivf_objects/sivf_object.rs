@@ -1,8 +1,8 @@
 //! used for array of SIVF items
 
-use crate::sivf_objects::sivf_complex::layer::Layer;
-use crate::sivf_objects::sivf_shapes::circle::Circle;
-use crate::sivf_objects::sivf_shapes::square::Square;
+use crate::sivf_objects::complex::layer::Layer;
+use crate::sivf_objects::shapes::circle::Circle;
+use crate::sivf_objects::shapes::square::Square;
 use crate::utils::sizes::ImageSizes;
 use crate::sivf_misc::canvas::Canvas;
 use crate::sivf_misc::trait_render::{RenderType, TraitRender};
@@ -41,3 +41,4 @@ impl SivfObject {
     }
 
 }
+

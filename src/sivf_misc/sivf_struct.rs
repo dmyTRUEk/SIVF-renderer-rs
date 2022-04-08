@@ -1,6 +1,6 @@
 //! SIVF Struct
 
-use crate::sivf_objects::sivf_complex::layer::Layer;
+use crate::sivf_objects::complex::layer::Layer;
 use crate::sivf_misc::canvas::Canvas;
 use crate::sivf_misc::serde::deserialize_to_sivf_struct;
 use crate::sivf_misc::trait_render::RenderType;
@@ -29,3 +29,4 @@ impl SivfStruct {
     }
 
 }
+

@@ -16,3 +16,4 @@ pub enum RenderType {
     CpuBest,    // detect all cores/threads and use them all
     Gpu,        // use GPU
 }
+

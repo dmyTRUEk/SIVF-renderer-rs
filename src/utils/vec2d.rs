@@ -120,3 +120,4 @@ impl<T: Copy + Mul<f64, Output=T>> Mul<f64> for Vec2d<T> {
         }
     }
 }
+

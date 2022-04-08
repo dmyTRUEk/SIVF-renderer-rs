@@ -1,5 +1,6 @@
 //! SIVF objects: Complex + Shapes
 
-pub mod sivf_complex;
+pub mod complex;
+pub mod shapes;
 pub mod sivf_object;
-pub mod sivf_shapes;
+
