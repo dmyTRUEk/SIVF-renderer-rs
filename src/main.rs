@@ -5,7 +5,7 @@
 
     bad_style,
     const_err,
-    // dead_code,
+    dead_code,
     improper_ctypes,
     non_shorthand_field_patterns,
     no_mangle_generic_items,
@@ -14,7 +14,7 @@
     patterns_in_fns_without_body,
     private_in_public,
     unconditional_recursion,
-    // unused,
+    unused,
     unused_allocation,
     unused_comparisons,
     unused_parens,
@@ -36,9 +36,6 @@ use std::env;
 use std::fs::File;
 use std::io::Read;
 
-// use image::{ImageBuffer, Rgba};
-// use serde_yaml::Value;
-
 mod help;
 mod sivf_misc;
 mod sivf_objects;
@@ -56,7 +53,7 @@ use crate::utils::extensions::vec::ExtensionContains;
 
 
 
-// TODO: rewrite whole main using only functionals
+// TODO?: rewrite whole main using only functionals
 fn main() {
     println!();
 

@@ -95,7 +95,7 @@ fn deserialize_to_layer_element(value: &Value) -> LayerElement {
         value if value.is_mapping() => {
             let map = value.as_mapping().unwrap();
 
-            let key_layer   : &Value = &KW_LAYER.to_value();
+            let _key_layer   : &Value = &KW_LAYER.to_value();
             let key_blending: &Value = &KW_BLENDING.to_value();
             let key_circle  : &Value = &KW_CIRCLE.to_value();
             let key_square  : &Value = &KW_SQUARE.to_value();
@@ -106,6 +106,7 @@ fn deserialize_to_layer_element(value: &Value) -> LayerElement {
                     let blend_types: BlendTypes = deserialize_to_blend_types(value);
                     LayerElement::BlendTypes(blend_types)
                 }
+                // TODO: does it belongs here?
                 // map if map.contains_key(key_layer) => {
                 //     let value = map.get(key_layer).unwrap();
                 //     let layer: LayerElement = deserialize_to_layer_element(value);
