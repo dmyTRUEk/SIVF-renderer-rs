@@ -1,14 +1,14 @@
 # TODO:
-- `"smt"` -> `\`smt\``
-- const fn
+- ? "smt" -> `smt`
 
-- add cli option for render variant: cpu, gpu, ...
-- create extension macro:
+
+
+## Later:
+- ? create extension macro:
+
   ```
   extension! {
-      fn String.multiply(times: u32) -> String {
-          ...
-      }
+      fn String.multiply(times: u32) -> String { ... }
   }
   ```
   results into:
@@ -17,8 +17,7 @@
       fn multiply(&self, times: u32) -> String;
   }
   impl ExtensionMultiply for String {
-      fn multiply(times: u32) -> String {
-          ...
-      }
+      fn multiply(times: u32) -> String { ... }
   }
   ```
+
