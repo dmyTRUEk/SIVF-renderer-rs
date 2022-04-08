@@ -7,7 +7,7 @@ use crate::sivf_misc::blend_types::{BlendTypes, BlendType};
 use crate::sivf_misc::keywords_and_consts::*;
 use crate::sivf_misc::metric_units::MetricUnit;
 use crate::sivf_misc::sivf_struct::SivfStruct;
-use crate::sivf_objects::sivf_any_object::SivfObject;
+use crate::sivf_objects::sivf_object::SivfObject;
 use crate::sivf_objects::sivf_complex::layer::{Layer, LayerElement};
 use crate::sivf_objects::sivf_shapes::circle::Circle;
 use crate::sivf_objects::sivf_shapes::square::Square;

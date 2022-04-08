@@ -14,8 +14,8 @@ pub enum ColorModel {
 
 impl ColorModel {
 
-    pub fn from(str: &str) -> Self {
-        match str {
+    pub fn from(s: &str) -> Self {
+        match s {
             ARGB => {
                 ColorModel::ARGB
             }
@@ -38,7 +38,7 @@ pub struct Color {
 
 impl Color {
 
-    pub fn new(a: u8, r: u8, g: u8, b: u8) -> Self {
+    pub const fn new(a: u8, r: u8, g: u8, b: u8) -> Self {
         Color { a, r, g, b }
     }
 

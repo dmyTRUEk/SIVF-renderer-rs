@@ -26,7 +26,7 @@ impl<T: Copy> Array2d<T> {
     pub fn width(&self)  -> usize { self.sizes.w }
     pub fn height(&self) -> usize { self.sizes.h }
 
-    pub fn new(sizes: Sizes<usize>, fill: T) -> Self {
+    pub const fn new(sizes: Sizes<usize>, fill: T) -> Self {
         Array2d {
             sizes,
             elements: vec![vec![fill; sizes.w]; sizes.h]

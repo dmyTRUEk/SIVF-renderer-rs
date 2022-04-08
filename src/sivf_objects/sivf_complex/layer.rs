@@ -1,6 +1,6 @@
 //! SIVF Layer
 
-use crate::sivf_objects::sivf_any_object::SivfObject;
+use crate::sivf_objects::sivf_object::SivfObject;
 use crate::sivf_misc::blend_types::BlendTypes;
 use crate::sivf_misc::canvas::Canvas;
 use crate::utils::sizes::ImageSizes;
@@ -21,7 +21,7 @@ pub enum LayerElement {
 
 impl Layer {
 
-    // pub fn new() -> Self {
+    // pub const fn new() -> Self {
     //     /// child.all(sivf_object) have [.render()] is guaranteed by [SivfObject]
     //     Layer { elements: vec![] }
     // }

@@ -20,7 +20,7 @@ pub struct Circle {
 
 impl Circle {
 
-    pub fn new(position: Vec2d<MetricUnit>, radius: MetricUnit, color: Color, inverted: bool) -> Self {
+    pub const fn new(position: Vec2d<MetricUnit>, radius: MetricUnit, color: Color, inverted: bool) -> Self {
         Circle { position, radius, color, inverted }
     }
 
