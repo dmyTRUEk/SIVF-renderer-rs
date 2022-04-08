@@ -1,4 +1,6 @@
 # TODO:
+- `"smt"` -> `\`smt\``
+- const fn
 
 - add cli option for render variant: cpu, gpu, ...
 - create extension macro:
