@@ -1,5 +1,7 @@
 //! Utils for `io`, `string`, ...
 //!
+//! # Import example:
+//!
 //! ```
 //! mod utils;
 //! use utils::your_needed_util;

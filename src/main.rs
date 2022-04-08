@@ -53,7 +53,6 @@ use crate::utils::extensions::vec::ExtensionContains;
 
 
 
-// TODO?: rewrite whole main using only functionals
 fn main() {
     println!();
 
@@ -87,7 +86,7 @@ fn main() {
     };
 
     if file_paths.is_empty() {
-        // TODO: ? then ask user for file to render
+        // TODO LATER: then ask user for file to render
         println!("No files to render was provided.");
         println!("Exiting...");
         return;
@@ -98,7 +97,7 @@ fn main() {
     for file_input_path in file_paths {
         print!(r#"Reading file "{file_input_path}"... "#);
         flush();
-        // TODO: instead of [match] try to use [unwrap_or_else()]
+        // TODO?: instead of [match] try to use [unwrap_or_else()]
         let sivf_file_content: String = match File::open(&file_input_path) {
             Ok(mut file) => {
                 let mut file_content = String::new();
@@ -115,6 +114,7 @@ fn main() {
 
         print!("Removing comments... ");
         flush();
+        // TODO?: instead of [match] try to use [unwrap_or_else()]
         let sivf_file_content: String = match sivf_file_content.remove_comments() {
             Ok(v) => { v }
             Err(_) => {
@@ -127,6 +127,7 @@ fn main() {
 
         print!("Parsing file to YAML... ");
         flush();
+        // TODO?: instead of [match] try to use [unwrap_or_else()]
         let value: serde_yaml::Value = match serde_yaml::from_str(&sivf_file_content) {
             Ok(v) => { v }
             Err(e) => {
@@ -151,8 +152,6 @@ fn main() {
         print!("finished in {s}s {ms}ms. ", s=render_time.num_seconds(), ms=render_time.num_milliseconds() % 1000);
         // println!("Canvas result:\n{canvas:?}");
         println!("OK");
-
-        // todo!("remove this todo");
 
         print!("Converting rendered array to image... ");
         flush();
@@ -181,3 +180,4 @@ fn main() {
 
     println!("\nProgram finished successfully!");
 }
+

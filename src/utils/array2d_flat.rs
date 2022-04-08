@@ -7,15 +7,13 @@ use crate::utils::extensions::vec::ExtensionFlatten;
 
 
 
-/// This structure mustnt be used outside implementation.
-/// For creating `Array2d` use `Array2d::new()` instead.
 #[derive(Clone, Debug, PartialEq)]
 pub struct Array2d<T: Copy> {
     sizes: Sizes<usize>,
     // TODO: rewrite [elements] in flat structure and do measurements: flat vs nested(2d)
     elements: Vec<T>,
 }
-// TODO: ? make iter:
+// TODO?: make iter:
 //   ```
 //   let array2d = Array2d::new(...);
 //   for (w, h, item) in array2d.iter() {

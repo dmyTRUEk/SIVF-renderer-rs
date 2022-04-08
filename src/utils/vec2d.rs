@@ -16,8 +16,8 @@ impl<T: Copy> Vec2d<T> {
         Vec2d { x, y }
     }
 
-    pub fn from_tuple(xy: (T, T)) -> Vec2d<T> {
-        Vec2d { x: xy.0, y: xy.1 }
+    pub fn from_tuple((x, y): (T, T)) -> Vec2d<T> {
+        Vec2d { x, y }
     }
 
     pub fn to_vec2d<R: Copy + TryFrom<T>>(&self) -> Vec2d<R> {

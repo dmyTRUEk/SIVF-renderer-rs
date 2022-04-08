@@ -16,7 +16,7 @@ impl<T: Clone> ExtensionFlatten<T> for Vec<Vec<T>> {
 
 
 pub trait ExtensionContains<T> {
-    // TODO LATER: remove _
+    // TODO LATER: remove `_`
     fn contains_(&self, el: T) -> bool;
 }
 

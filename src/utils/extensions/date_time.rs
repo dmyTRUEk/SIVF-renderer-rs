@@ -1,6 +1,7 @@
 //! Date and Time extensions
 
-use chrono::{ DateTime, Local };
+use std::time::Instant;
+use chrono::{DateTime, Local};
 
 
 
@@ -17,6 +18,25 @@ impl ExtensionDateTimeLocalToMyFormat for DateTime<Local> {
         let second: u32 = self.format("%S").to_string().parse().unwrap();
         format!("{:04}_{:02}_{:02}__{:02}_{:02}_{:02}", year, month, day, hour, minute, second)
     }
+}
+
+
+
+/// Measure seconds elapsed for given code
+///
+/// # Example:
+///
+/// ```
+/// let time = measure_time(|| {
+///     sleep(Duration::from_secs(1));
+/// });
+/// println!("time = {time:.3}");   // approximately `1.000`
+/// ```
+pub fn measure_time(mut f: impl FnMut()) -> f64 {
+    let start = Instant::now();
+    f();
+    let end = Instant::now();
+    (end - start).as_nanos() as f64 / 1_000_000_000_f64
 }
 
 

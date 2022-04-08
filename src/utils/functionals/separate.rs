@@ -1,5 +1,7 @@
 //! Separate iterable by rule
 //!
+//! # Example:
+//!
 //! ```
 //! let (even, odd) = vec![1, 2, 3, 4, 5].separate(|v| v % 2 == 0).collect();
 //! println!("{even}");   // 2, 4
@@ -21,11 +23,11 @@ where
     T: Clone,
     F: Clone + Fn(T) -> bool,
 {
-    fn separate(&self, f: F) -> (Vec<T>, Vec<T>) {
+    fn separate(&self, predicate: F) -> (Vec<T>, Vec<T>) {
         self.iter().fold(
             (vec![], vec![]),
             |mut acc, el| {
-                if f(el.clone()) { acc.0.push(el.clone()) } else { acc.1.push(el.clone()) }
+                if predicate(el.clone()) { acc.0.push(el.clone()) } else { acc.1.push(el.clone()) }
                 acc
             }
         )
@@ -98,7 +100,8 @@ mod tests {
         let items: Vec<i32> = vec![1, 2, 3, 4, 5];
         let expected: (Vec<i32>, Vec<i32>) = (vec![2, 4], vec![1, 3, 5]);
         let actual  : (Vec<i32>, Vec<i32>) = items.separate(|v| v % 2 == 0);
-        assert_eq!(expected, actual);
+        assert_eq!(expected.0, actual.0);
+        assert_eq!(expected.1, actual.1);
     }
 
     // #[test]
