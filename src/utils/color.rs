@@ -2,6 +2,9 @@
 
 
 
+pub const ARGB: &str = "ARGB";
+pub const RGBA: &str = "RGBA";
+
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum ColorModel {
     ARGB,
@@ -13,10 +16,10 @@ impl ColorModel {
 
     pub fn from(str: &str) -> Self {
         match str {
-            str if str == "ARGB" => {
+            ARGB => {
                 ColorModel::ARGB
             }
-            str if str == "RGBA" => {
+            RGBA => {
                 ColorModel::RGBA
             }
             _ => { panic!() }

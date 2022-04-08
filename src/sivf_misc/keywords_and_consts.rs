@@ -11,7 +11,7 @@ pub const KW_FALSE: &str = "false";
 // Root properties:
 pub const KW_IMAGE_SIZES: &str = "image_sizes";
 pub const KW_COLOR_MODEL: &str = "color_model";
-pub const KW_ROOT_LAYER: &str = "root_layer";
+pub const KW_ROOT_LAYER: &str = "root_layer";   // TODO: get rid of it
 pub const KW_VARS: &str = "vars";
 
 // Blending and blending types:

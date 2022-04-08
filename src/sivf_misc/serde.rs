@@ -11,7 +11,7 @@ use crate::sivf_objects::sivf_any_object::SivfObject;
 use crate::sivf_objects::sivf_complex::layer::{Layer, LayerElement};
 use crate::sivf_objects::sivf_shapes::circle::Circle;
 use crate::sivf_objects::sivf_shapes::square::Square;
-use crate::utils::color::{ColorModel, Color};
+use crate::utils::color::{ARGB, ColorModel, Color};
 use crate::utils::sizes::ImageSizes;
 use crate::utils::vec2d::Vec2d;
 
@@ -29,21 +29,28 @@ pub fn deserialize_to_sivf_struct(value: &Value) -> SivfStruct {
         println!("{value:#?}");
     }
     if value.get(KW_IMAGE_SIZES).is_none() { panic!("{KW_IMAGE_SIZES} not found in root") }
-    if value.get(KW_COLOR_MODEL).is_none() { panic!("{KW_COLOR_MODEL} not found in root") }
-    if value.get(KW_ROOT_LAYER).is_none() { panic!("{KW_ROOT_LAYER} not found in root") }
+    // if value.get(KW_COLOR_MODEL).is_none() { panic!("{KW_COLOR_MODEL} not found in root") }
+    // if value.get(KW_ROOT_LAYER).is_none() { panic!("{KW_ROOT_LAYER} not found in root") }
 
-    let image_sizes = value.get(KW_IMAGE_SIZES).unwrap();
-    let color_model = value.get(KW_COLOR_MODEL).unwrap();
+    let image_sizes: &Value = value.get(KW_IMAGE_SIZES).unwrap();
+    let (w, h): (usize, usize) = (
+        image_sizes.as_sequence().unwrap().get(0).unwrap().as_u64().unwrap() as usize,
+        image_sizes.as_sequence().unwrap().get(1).unwrap().as_u64().unwrap() as usize
+    );
+
+    let argb_value: &Value = &ARGB.to_value();
+    let color_model_value: &Value = value.get(KW_COLOR_MODEL).unwrap_or(argb_value);
+    let color_model_str: &str = color_model_value.as_str().unwrap();
+
+    // TODO: rewrite, so it works for list of layers
     let root_layer_value = value.get(KW_ROOT_LAYER).unwrap();
     let layer_element: LayerElement = deserialize_to_layer_element(root_layer_value);
     let sivf_object: SivfObject = if let LayerElement::SivfObject(sivf_object) = layer_element { sivf_object } else { panic!() };
     let root_layer: Layer = if let SivfObject::Layer(layer) = sivf_object { layer } else { panic!() };
+
     SivfStruct {
-        image_sizes: ImageSizes::new(
-            image_sizes.as_sequence().unwrap().get(0).unwrap().as_u64().unwrap() as usize,
-            image_sizes.as_sequence().unwrap().get(1).unwrap().as_u64().unwrap() as usize,
-        ),
-        color_model: ColorModel::from(color_model.as_str().unwrap()),
+        image_sizes: ImageSizes::new(w, h),
+        color_model: ColorModel::from(color_model_str),
         root_layer
     }
 }
