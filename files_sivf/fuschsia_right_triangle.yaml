@@ -1,0 +1,11 @@
+// fuchsia right triangle
+
+image_sizes: [1080, 1080]
+
+root_layer:
+  - triangle:
+      p1: ["-(sqrt(3)/4)*10%", "-(1/4)*10%"]
+      p2: ["+(sqrt(3)/4)*10%", "-(1/4)*10%"]
+      p3: ["0", "(1/2)*10%"]
+      color: ffff00ff
+

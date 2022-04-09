@@ -1,17 +1,19 @@
 //! Convert json/yaml to sivf struct
 
-use evalexpr::eval;
 use serde_yaml::Value;
 
 use crate::sivf_misc::blend_types::{BlendTypes, BlendType};
 use crate::sivf_misc::keywords_and_consts::*;
 use crate::sivf_misc::metric_units::MetricUnit;
 use crate::sivf_misc::sivf_struct::SivfStruct;
+use crate::sivf_objects::shapes::triangle::Triangle;
 use crate::sivf_objects::sivf_object::SivfObject;
 use crate::sivf_objects::complex::layer::{Layer, LayerElement};
 use crate::sivf_objects::shapes::circle::Circle;
 use crate::sivf_objects::shapes::square::Square;
 use crate::utils::color::{ARGB, ColorModel, Color};
+use crate::utils::extensions::str::ExtensionCountChars;
+use crate::utils::simple_expr_eval::eval_expr;
 use crate::utils::sizes::ImageSizes;
 use crate::utils::vec2d::Vec2d;
 
@@ -45,7 +47,9 @@ pub fn deserialize_to_sivf_struct(value: &Value) -> SivfStruct {
     // TODO: rewrite, so it works for list of layers
     let root_layer_value = value.get(KW_ROOT_LAYER).unwrap();
     let layer_element: LayerElement = deserialize_to_layer_element(root_layer_value);
-    let sivf_object: SivfObject = if let LayerElement::SivfObject(sivf_object) = layer_element { sivf_object } else { panic!() };
+    let sivf_object: SivfObject =
+        if let LayerElement::SivfObject(sivf_object) =
+            layer_element { sivf_object } else { panic!() };
     let root_layer: Layer = if let SivfObject::Layer(layer) = sivf_object { layer } else { panic!() };
 
     SivfStruct {
@@ -95,10 +99,11 @@ fn deserialize_to_layer_element(value: &Value) -> LayerElement {
         value if value.is_mapping() => {
             let map = value.as_mapping().unwrap();
 
-            let _key_layer   : &Value = &KW_LAYER.to_value();
+            let _key_layer  : &Value = &KW_LAYER.to_value();
             let key_blending: &Value = &KW_BLENDING.to_value();
             let key_circle  : &Value = &KW_CIRCLE.to_value();
             let key_square  : &Value = &KW_SQUARE.to_value();
+            let key_triangle: &Value = &KW_TRIANGLE.to_value();
 
             match map {
                 map if map.contains_key(key_blending) => {
@@ -121,6 +126,11 @@ fn deserialize_to_layer_element(value: &Value) -> LayerElement {
                     let value = map.get(key_square).unwrap();
                     let square: Square = deserialize_to_square(value);
                     LayerElement::SivfObject(SivfObject::Square(square))
+                }
+                map if map.contains_key(key_triangle) => {
+                    let value = map.get(key_triangle).unwrap();
+                    let triangle: Triangle = deserialize_to_triangle(value);
+                    LayerElement::SivfObject(SivfObject::Triangle(triangle))
                 }
                 _ => {
                     // TODO: create list of all KW and search for similar, and if so, show it
@@ -174,6 +184,29 @@ fn deserialize_to_square(value: &Value) -> Square {
             Square::new(
                 deserialize_to_vec2d_metric_unit(map.get(&KW_XY.to_value()).unwrap()),
                 deserialize_to_metric_units(map.get(&KW_SQUARE_SIDE.to_value()).unwrap()),
+                deserialize_to_color(map.get(&KW_COLOR.to_value()).unwrap()),
+                map.get(&KW_INVERSE.to_value()).unwrap_or(&value_false).as_bool().unwrap()
+            )
+        }
+        _ => { panic!() }
+    }
+}
+
+
+
+fn deserialize_to_triangle(value: &Value) -> Triangle {
+    if SHOW_DESERIALIZATION_PROGRESS {
+        println!("-------- deserializing to TRIANGLE:");
+        println!("{value:#?}");
+    }
+    match value {
+        value if value.is_mapping() => {
+            let map = value.as_mapping().unwrap();
+            let value_false = Value::Bool(false);
+            Triangle::new(
+                deserialize_to_vec2d_metric_unit(map.get(&KW_TRIANGLE_P1.to_value()).unwrap()),
+                deserialize_to_vec2d_metric_unit(map.get(&KW_TRIANGLE_P2.to_value()).unwrap()),
+                deserialize_to_vec2d_metric_unit(map.get(&KW_TRIANGLE_P3.to_value()).unwrap()),
                 deserialize_to_color(map.get(&KW_COLOR.to_value()).unwrap()),
                 map.get(&KW_INVERSE.to_value()).unwrap_or(&value_false).as_bool().unwrap()
             )
@@ -256,35 +289,27 @@ fn deserialize_to_metric_units(value: &Value) -> MetricUnit {
             self.as_f64().unwrap_or(self.as_i64().unwrap() as f64)
         }
     }
-    impl ExtensionToF64 for evalexpr::Value {
-        fn to_f64(&self) -> f64 {
-            self.as_float().unwrap_or(self.as_int().unwrap() as f64)
-        }
-    }
     match value {
         value if value.is_number() => {
-            let number = value.to_f64();
+            let number: f64 = value.to_f64();
             MetricUnit::Pixels(number)
         }
         value if value.is_string() => {
             let s: &str = value.as_str().unwrap().trim();
             if s.ends_with('%') {
-                assert!(s.chars().filter(|&c| c == '%').count() == 1);
-                let percents_str = &s[0..s.len()-1];
+                assert!(s.count_chars('%') == 1);
+                let percents_str: &str = &s[0..s.len()-1];
                 // todo!("eval")
-                let percents_number: f64 = eval(percents_str).unwrap().to_f64();
+                let percents_number: f64 = eval_expr(percents_str);
                 MetricUnit::Percents(percents_number)
             }
             else {
-                let result = eval(s).unwrap();
-                MetricUnit::Pixels(result.to_f64())
+                let result: f64 = eval_expr(s);
+                MetricUnit::Pixels(result)
             }
         }
-        _ => {
-            panic!()
-        }
+        _ => { panic!() }
     }
-    // Err("".to_string())
 }
 
 
@@ -323,7 +348,7 @@ mod tests {
     #[test]
     fn minimal() {
         {
-            let str: String = r#"
+            let s: String = r#"
                 image_sizes: [3840, 2160]
                 color_model: ARGB
                 root_layer:
@@ -336,11 +361,11 @@ mod tests {
                     LayerElement::BlendTypes(BlendTypes::from(BlendType::Overlap, BlendType::Overlap)),
                 ])
             };
-            let actual: SivfStruct = SivfStruct::from(&serde_yaml::from_str(&str).unwrap());
+            let actual: SivfStruct = SivfStruct::from(&serde_yaml::from_str(&s).unwrap());
             assert_eq!(expected, actual);
         }
         {
-            let str: String = r#"
+            let s: String = r#"
                 image_sizes: [3840, 2160]
                 color_model: RGBA
                 root_layer:
@@ -353,14 +378,14 @@ mod tests {
                     LayerElement::BlendTypes(BlendTypes::from(BlendType::Overlap, BlendType::Overlap)),
                 ])
             };
-            let actual: SivfStruct = SivfStruct::from(&serde_yaml::from_str(&str).unwrap());
+            let actual: SivfStruct = SivfStruct::from(&serde_yaml::from_str(&s).unwrap());
             assert_eq!(expected, actual);
         }
     }
 
     #[test]
     fn circle() {
-        let str: String = r#"
+        let s: String = r#"
             image_sizes: [3840, 2160]
             color_model: ARGB
             root_layer:
@@ -383,7 +408,7 @@ mod tests {
                 ))),
             ])
         };
-        let actual: SivfStruct = SivfStruct::from(&serde_yaml::from_str(&str).unwrap());
+        let actual: SivfStruct = SivfStruct::from(&serde_yaml::from_str(&s).unwrap());
         assert_eq!(expected, actual);
     }
 

@@ -19,7 +19,6 @@ pub struct Circle {
 }
 
 impl Circle {
-
     pub const fn new(
         position: Vec2d<MetricUnit>,
         radius: MetricUnit,
@@ -28,11 +27,9 @@ impl Circle {
     ) -> Self {
         Circle { position, radius, color, inverted }
     }
-
 }
 
 impl Render for Circle {
-
     fn render(&self, image_sizes: ImageSizes, render_type: RenderType) -> Canvas {
         let mut canvas: Canvas = Canvas::new(image_sizes);
         let (wmax, hmax): (usize, usize) = (image_sizes.w, image_sizes.h);
@@ -44,16 +41,16 @@ impl Render for Circle {
             - Vec2d::new(wmax as f64, hmax as f64) / 2.0_f64
             - position
             + Vec2d::new(0.5_f64, 0.5_f64);
-        // TODO LATER: think about this - - - - - - - - - - - - - - - >  !W!
-        let radius2: f64 = self.radius.to_pixels(wmax).powi(2);
+        // TODO LATER: think: use w or h?
+        let radius2: f64 = self.radius.to_pixels(hmax).powi(2);
         match render_type {
             RenderType::Cpu1 => {
                 for h in hmax.indices() {
                     for w in wmax.indices() {
                         let pos: Vec2d<f64> = Vec2d::new(w as f64, h as f64);
                         let is_inside_figure: bool = (pos+shift).is_inside_circle(radius2);
-                        let need_to_draw: bool = is_inside_figure ^ self.inverted;
-                        let color: Color = if need_to_draw { self.color } else { TRANSPARENT };
+                        let is_draw_required: bool = is_inside_figure ^ self.inverted;
+                        let color: Color = if is_draw_required { self.color } else { TRANSPARENT };
                         canvas.pixels[(w, h)] = color;
                     }
                 }
@@ -64,6 +61,5 @@ impl Render for Circle {
         }
         canvas
     }
-
 }
 

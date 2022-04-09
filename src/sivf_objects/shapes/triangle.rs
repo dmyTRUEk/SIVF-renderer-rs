@@ -39,9 +39,9 @@ impl Render for Triangle {
             - Vec2d::new(wmax as f64, hmax as f64) / 2.0_f64
             + Vec2d::new(0.5_f64, 0.5_f64);
         let (p1, p2, p3): (Vec2d<f64>, Vec2d<f64>, Vec2d<f64>) = (
-            Vec2d::new(self.p1.x.to_pixels(wmax), self.p1.y.to_pixels(hmax)),
-            Vec2d::new(self.p2.x.to_pixels(wmax), self.p2.y.to_pixels(hmax)),
-            Vec2d::new(self.p3.x.to_pixels(wmax), self.p3.y.to_pixels(hmax))
+            Vec2d::new(self.p1.x.to_pixels(wmax), -self.p1.y.to_pixels(hmax)),
+            Vec2d::new(self.p2.x.to_pixels(wmax), -self.p2.y.to_pixels(hmax)),
+            Vec2d::new(self.p3.x.to_pixels(wmax), -self.p3.y.to_pixels(hmax))
         );
         match render_type {
             RenderType::Cpu1 => {
@@ -49,8 +49,8 @@ impl Render for Triangle {
                     for w in wmax.indices() {
                         let pos: Vec2d<f64> = Vec2d::new(w as f64, h as f64);
                         let is_inside_figure: bool = (pos+shift).is_inside_triangle(p1, p2, p3);
-                        let need_to_draw: bool = is_inside_figure ^ self.inverted;
-                        let color: Color = if need_to_draw { self.color } else { TRANSPARENT };
+                        let is_draw_required: bool = is_inside_figure ^ self.inverted;
+                        let color: Color = if is_draw_required { self.color } else { TRANSPARENT };
                         canvas.pixels[(w, h)] = color;
                     }
                 }

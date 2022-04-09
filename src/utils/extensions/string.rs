@@ -128,6 +128,15 @@ impl ExtensionRemoveCLikeComments for String {
 
 
 
+pub trait ExtensionToStr {
+    fn to_str(&self) -> &str;
+}
+impl ExtensionToStr for String {
+    fn to_str(&self) -> &str { &self }
+}
+
+
+
 #[cfg(test)]
 mod tests {
     use super::*;

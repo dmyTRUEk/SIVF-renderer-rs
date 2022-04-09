@@ -18,7 +18,6 @@ pub struct Square {
 }
 
 impl Square {
-
     pub const fn new(
         position: Vec2d<MetricUnit>,
         side: MetricUnit,
@@ -27,7 +26,6 @@ impl Square {
     ) -> Self {
         Square { position, side, color, inverted }
     }
-
 }
 
 impl Render for Square {
@@ -42,8 +40,8 @@ impl Render for Square {
             - Vec2d::new(wmax as f64, hmax as f64) / 2.0_f64
             - position
             + Vec2d::new(0.5_f64, 0.5_f64);
-        // TODO LATER: think about this - - - - - - - - - - - - - - - >  !W!
-        let side: f64 = self.side.to_pixels(wmax);
+        // TODO LATER: think: use w or h?
+        let side: f64 = self.side.to_pixels(hmax);
         let vec_min: Vec2d<f64> = -Vec2d::new(side, side) / 2.0_f64;
         let vec_max: Vec2d<f64> =  Vec2d::new(side, side) / 2.0_f64;
         match render_type {
@@ -52,8 +50,8 @@ impl Render for Square {
                     for w in wmax.indices() {
                         let pos: Vec2d<f64> = Vec2d::new(w as f64, h as f64);
                         let is_inside_figure: bool = (pos+shift).is_inside_rectangle(vec_min, vec_max);
-                        let need_to_draw: bool = is_inside_figure ^ self.inverted;
-                        let color: Color = if need_to_draw { self.color } else { TRANSPARENT };
+                        let is_draw_required: bool = is_inside_figure ^ self.inverted;
+                        let color: Color = if is_draw_required { self.color } else { TRANSPARENT };
                         canvas.pixels[(w, h)] = color;
                     }
                 }
