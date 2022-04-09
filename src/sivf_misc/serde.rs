@@ -396,7 +396,7 @@ mod tests {
                 image_sizes: [3840, 2160]
                 color_model: ARGB
                 root_layer:
-                    - blending: [overlap, overlap]
+                  - blending: [overlap, overlap]
             "#.to_string();
             let expected: SivfStruct = SivfStruct {
                 image_sizes: ImageSizes::new(3840, 2160),
@@ -413,7 +413,7 @@ mod tests {
                 image_sizes: [3840, 2160]
                 color_model: RGBA
                 root_layer:
-                    - blending: [overlap, overlap]
+                  - blending: [overlap, overlap]
             "#.to_string();
             let expected: SivfStruct = SivfStruct {
                 image_sizes: ImageSizes::new(3840, 2160),
@@ -433,11 +433,11 @@ mod tests {
             image_sizes: [3840, 2160]
             color_model: ARGB
             root_layer:
-                - blending: [overlap, overlap]
-                - circle:
-                    xy: [0, 0]
-                    r: 1984
-                    color: ff112233
+              - blending: [overlap, overlap]
+              - circle:
+                  xy: [0, 0]
+                  r: 1984
+                  color: ff112233
         "#.to_string();
         let expected: SivfStruct = SivfStruct {
             image_sizes: ImageSizes::new(3840, 2160),
@@ -447,6 +447,66 @@ mod tests {
                 LayerElement::SivfObject(SivfObject::Circle(Circle::new(
                     Vec2d::new(MetricUnit::Pixels(0.0), MetricUnit::Pixels(0.0)),
                     MetricUnit::Pixels(1984.0),
+                    Color::new(0xff, 0x11, 0x22, 0x33),
+                    false
+                ))),
+            ])
+        };
+        let actual: SivfStruct = SivfStruct::from(&serde_yaml::from_str(&s).unwrap());
+        assert_eq!(expected, actual);
+    }
+
+    #[test]
+    fn square() {
+        let s: String = r#"
+            image_sizes: [3840, 2160]
+            color_model: ARGB
+            root_layer:
+              - blending: [overlap, overlap]
+              - square:
+                  xy: [0, 0]
+                  side: 2022
+                  color: ff112233
+        "#.to_string();
+        let expected: SivfStruct = SivfStruct {
+            image_sizes: ImageSizes::new(3840, 2160),
+            color_model: ColorModel::ARGB,
+            root_layer: Layer::from(vec![
+                LayerElement::BlendTypes(BlendTypes::from(BlendType::Overlap, BlendType::Overlap)),
+                LayerElement::SivfObject(SivfObject::Square(Square::new(
+                    Vec2d::new(MetricUnit::Pixels(0.0), MetricUnit::Pixels(0.0)),
+                    MetricUnit::Pixels(2022.0),
+                    Color::new(0xff, 0x11, 0x22, 0x33),
+                    false
+                ))),
+            ])
+        };
+        let actual: SivfStruct = SivfStruct::from(&serde_yaml::from_str(&s).unwrap());
+        assert_eq!(expected, actual);
+    }
+
+    #[test]
+    fn triangle() {
+        let s: String = r#"
+            image_sizes: [3840, 2160]
+            color_model: ARGB
+            root_layer:
+              - blending: [overlap, overlap]
+              - triangle:
+                  p1: [-10, -99]
+                  p2: [27, "67%"]
+                  p3: ["43%", 83]
+                  color: ff112233
+        "#.to_string();
+        let expected: SivfStruct = SivfStruct {
+            image_sizes: ImageSizes::new(3840, 2160),
+            color_model: ColorModel::ARGB,
+            root_layer: Layer::from(vec![
+                LayerElement::BlendTypes(BlendTypes::from(BlendType::Overlap, BlendType::Overlap)),
+                LayerElement::SivfObject(SivfObject::Triangle(Triangle::new(
+                    Vec2d::new(MetricUnit::Pixels(-10.0), MetricUnit::Pixels(-99.0)),
+                    Vec2d::new(MetricUnit::Pixels(27.0), MetricUnit::Percents(67.0)),
+                    Vec2d::new(MetricUnit::Percents(43.0), MetricUnit::Pixels(83.0)),
                     Color::new(0xff, 0x11, 0x22, 0x33),
                     false
                 ))),
