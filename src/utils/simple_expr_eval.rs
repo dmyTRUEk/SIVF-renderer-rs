@@ -120,33 +120,86 @@ const FUNCS: [&str; 4] = [
     RANDOM,
 ];
 
+static mut IND: usize = 0;
+fn make_ind() -> String { "    ".repeat(unsafe { IND }) }
+
 pub fn eval_expr(expr: &str) -> f64 {
+    let ind: String = make_ind();
+    println!("{ind}----STARTING EVAL_EXPR with expr = {expr:?}");
+    unsafe {
+        IND += 1;
+    }
+    let ind: String = make_ind();
+
+    let expr: &str = expr.trim();
     let expr: &str = expr.trim_start_matches('+');
+    let expr: &str = expr.trim();
+    let res: f64 = 
     if !FUNCS.iter().any(|func_name| expr.contains(func_name)) {
         // simple case
-        // println!("eval_expr.first : expr = {expr:?}");
+        println!("{ind}eval_expr -> SIMPLE");
+        println!("{ind}expr = {expr:?}");
+        let expr: &str = &expr.replace("/", "*1.0/");
+        println!("{ind}expr = {expr:?}");
         eval(expr).unwrap().to_f64()
     }
     else {
-        // println!("eval_expr.second: expr = {expr:?}");
-        let evaling_func: String = FUNCS.iter()
+        println!("{ind}eval_expr -> COMPLEX");
+        println!("{ind}expr = {expr:?}");
+        let evaling_func: (usize, String) = FUNCS.iter()
             .filter_map(|fname| expr.find_substr(fname))
             .min_by_key(|fpos_fname| fpos_fname.0)
-            .unwrap().1;
-        let brackets_insides: &str = expr.extract_from_brackets().unwrap();
-        // println!("brackets_insides = {brackets_insides}");
-        let brackets_insides_res: f64 = eval_expr(brackets_insides);
-        let func_res: f64 = match evaling_func.to_str() {
-            SQRT => { brackets_insides_res.sqrt() }
-            SIN => { brackets_insides_res.sin() }
-            COS => { brackets_insides_res.cos() }
-            RANDOM => { todo!() }
-            _ => { panic!() }
-        };
-        let expr: &str = &expr.replacen(&evaling_func, "", 1);
-        let expr: &str = &expr.replacen(&format!("{LB}{brackets_insides}{RB}"), func_res.to_string().to_str(), 1);
-        eval_expr(expr)
+            .unwrap();
+        if expr.starts_with(LB) && expr.ends_with(RB) {
+            println!("{ind}--CASE 0: `(…)`");
+            eval_expr(&expr[1..expr.len()-1])
+        }
+        else if expr.find(LB).unwrap() < evaling_func.0 {
+            println!("{ind}--CASE 1: `…(…func(…)…)…`");
+            let brackets_insides: &str = expr.extract_from_brackets().unwrap();
+            println!("{ind}brackets_insides = {brackets_insides}");
+            let brackets_insides_res: f64 = eval_expr(brackets_insides);
+            println!("{ind}expr: {expr:?}");
+            let br_bounds: (usize, usize) = expr.bracket_bouns().unwrap();
+            let expr: &str = &format!(
+                "{l}{fres}{r}",
+                l = expr[..br_bounds.0].to_string(),
+                fres = brackets_insides_res.to_string(),
+                r = expr[br_bounds.1+1..].to_string()
+            );
+            println!("{ind}expr after 'replace': {expr:?}");
+            eval_expr(expr)
+        }
+        else {
+            println!("{ind}--CASE 2: `…func(…)`");
+            let brackets_insides: &str = expr.extract_from_brackets().unwrap();
+            println!("{ind}brackets_insides = {brackets_insides}");
+            let brackets_insides_res: f64 = eval_expr(brackets_insides);
+            let func_res: f64 = match evaling_func.1.to_str() {
+                SQRT => { brackets_insides_res.sqrt() }
+                SIN => { brackets_insides_res.sin() }
+                COS => { brackets_insides_res.cos() }
+                RANDOM => { todo!() }
+                _ => { panic!() }
+            };
+            println!("{ind}func_res: {func_res}");
+            println!("{ind}expr: {expr:?}");
+            let expr: &str = &format!(
+                "{l}{fres}{r}",
+                l = expr[..evaling_func.0].to_string(),
+                fres = func_res.to_string(),
+                r = expr[evaling_func.0+evaling_func.1.len()+1+brackets_insides.len()+1..].to_string()
+            );
+            println!("{ind}expr after 'replace': {expr:?}");
+            eval_expr(expr)
+        }
+    };
+    unsafe {
+        IND -= 1;
     }
+    let ind: String = make_ind();
+    println!("{ind}----ENDING EVAL_EXPR with res = {res}");
+    res
 }
 
 
@@ -155,6 +208,8 @@ pub fn eval_expr(expr: &str) -> f64 {
 
 #[cfg(test)]
 mod tests {
+    use crate::utils::simple_expr_eval::ExtensionFindSubstr;
+
     use super::{LB, RB, ExtensionBracketBounds, ExtensionExtractFromBrackets, eval_expr};
 
     #[test]
@@ -190,6 +245,13 @@ mod tests {
             let res2: Option<(usize, usize)> = s.bracket_bouns();
             assert_eq!(ans, res1);
             assert_eq!(ans, res2);
+        }
+        {
+            //            "01234567890123456789"
+            let s: &str = "ab(()def(()))hi(())j";
+            let ans: Option<(usize, usize)> = Some((2_usize, 12_usize));
+            let res: Option<(usize, usize)> = s.bracket_bouns();
+            assert_eq!(ans, res);
         }
         // TODO: write tests with nested brackets
     }
@@ -242,53 +304,49 @@ mod tests {
 
     #[test]
     fn eval_expr_() {
-        {
-            let s: &str = "sqrt(0)";
-            let ans: f64 = 0.0;
-            let res: f64 = eval_expr(s);
-            assert_eq!(ans, res);
-        }
-        {
-            let s: &str = "sqrt(1)";
-            let ans: f64 = 1.0;
-            let res: f64 = eval_expr(s);
-            assert_eq!(ans, res);
-        }
-        {
-            let s: &str = "sqrt(4)";
-            let ans: f64 = 2.0;
-            let res: f64 = eval_expr(s);
-            assert_eq!(ans, res);
-        }
-        {
-            let s: &str = "sqrt(9)";
-            let ans: f64 = 3.0;
-            let res: f64 = eval_expr(s);
-            assert_eq!(ans, res);
-        }
-        {
-            let s: &str = "sqrt(16)";
-            let ans: f64 = 4.0;
-            let res: f64 = eval_expr(s);
-            assert_eq!(ans, res);
-        }
-        {
-            let s: &str = "sqrt(100)";
-            let ans: f64 = 10.0;
-            let res: f64 = eval_expr(s);
-            assert_eq!(ans, res);
-        }
-        {
-            let s: &str = "sqrt(2)";
-            let ans: f64 = 1.4142135623730951;
-            let res: f64 = eval_expr(s);
-            assert_eq!(ans, res);
-        }
-        {
-            let s: &str = "sqrt(2)+sqrt(3)";
-            let ans: f64 = 3.1462643699419726;
-            let res: f64 = eval_expr(s);
-            assert_eq!(ans, res);
+        let test_cases: Vec<(f64, &str)> = vec![
+            (0.0, "0"),
+            (1.0, "1"),
+            (145.237, "145.237"),
+
+            (0.0, "(0)"),
+            (1.0, "(1)"),
+            (145.237, "(145.237)"),
+            (145.237, "(((((145.237)))))"),
+
+            (5.0, "(1/2)*10"),
+
+            (0.0, "sqrt(0)"),
+            (1.0, "sqrt(1)"),
+            (2.0, "sqrt(4)"),
+            (3.0, "sqrt(9)"),
+            (4.0, "sqrt(16)"),
+            (10.0, "sqrt(100)"),
+            (1.4142135623730951, "sqrt(2)"),
+
+            (0.0, "(sqrt(0))"),
+            (1.0, "(sqrt(1))"),
+            (2.0, "(sqrt(4))"),
+            (3.0, "(sqrt(9))"),
+            (4.0, "(sqrt(16))"),
+            (10.0, "(sqrt(100))"),
+            (1.4142135623730951, "(sqrt(2))"),
+
+            (2.0, "(((((((((((sqrt(4))))))))))))"),
+
+            (3.1462643699419726, "sqrt(2)+sqrt(3)"),
+            (8.122417494872465 , "sqrt(2)+3*sqrt(5)"),
+
+            (3.1462643699419726, "(sqrt(2)+sqrt(3))"),
+            (8.122417494872465 , "(sqrt(2)+3*sqrt(5))"),
+
+            (8.122417494872465 , "((((((((((((((((sqrt(2)+3*sqrt(5)))))))))))))))))"),
+
+            ( 43.30127018922193, "(sqrt(3)/4)*100"),
+            (-43.30127018922193, "-(sqrt(3)/4)*100"),
+        ];
+        for test_case in test_cases {
+            assert_eq!(test_case.0, eval_expr(test_case.1));
         }
         {
             let angles: [f64; 13] = [0.0, 1.0, 5.0, 10.0, 20.0, 30.0, 40.0, 42.145, 45.0, 60.0, 70.0, 80.0, 90.0];
@@ -296,6 +354,18 @@ mod tests {
                 assert_eq!(angle.sin(), eval_expr(&format!("sin({angle})")));
                 assert_eq!(angle.cos(), eval_expr(&format!("cos({angle})")));
             }
+        }
+    }
+
+    #[test]
+    fn find_substr() {
+        let test_cases: Vec<(Option<(usize, String)>, &str, &str)> = vec![
+            (None, "abcdef", "xyz"),
+            (Some((3, "def".to_string())), "abcdefgh", "def"),
+        ];
+        // todo: write map, so dont write .to_string every time
+        for test_case in test_cases {
+            assert_eq!(test_case.0, test_case.1.find_substr(test_case.2));
         }
     }
 }

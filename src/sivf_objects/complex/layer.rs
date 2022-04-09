@@ -64,7 +64,7 @@ impl Render for Layer {
                     acc
                 }
                 LayerElement::SivfObject(sivf_object) => {
-                    println!("layer.render.fold.SivfObject: {sivf_object:?}");
+                    println!("layer.render.fold.SivfObject: {sivf_object:#?}");
                     // TODO?: rewrite using `measure_time`
                     let render_time_start = chrono::Local::now();
                     let canvas_child = sivf_object.render(image_sizes, render_type);

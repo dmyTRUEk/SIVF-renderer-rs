@@ -19,8 +19,8 @@ use crate::utils::vec2d::Vec2d;
 
 
 
-// const SHOW_DESERIALIZATION_PROGRESS: bool = true;
-const SHOW_DESERIALIZATION_PROGRESS: bool = false;
+const SHOW_DESERIALIZATION_PROGRESS: bool = true;
+// const SHOW_DESERIALIZATION_PROGRESS: bool = false;
 
 
 
@@ -289,7 +289,7 @@ fn deserialize_to_metric_units(value: &Value) -> MetricUnit {
             self.as_f64().unwrap_or(self.as_i64().unwrap() as f64)
         }
     }
-    match value {
+    let res = match value {
         value if value.is_number() => {
             let number: f64 = value.to_f64();
             MetricUnit::Pixels(number)
@@ -299,7 +299,9 @@ fn deserialize_to_metric_units(value: &Value) -> MetricUnit {
             if s.ends_with('%') {
                 assert!(s.count_chars('%') == 1);
                 let percents_str: &str = &s[0..s.len()-1];
-                // todo!("eval")
+                if SHOW_DESERIALIZATION_PROGRESS {
+                    println!("----- STARTING EVAL: `{percents_str}`");
+                }
                 let percents_number: f64 = eval_expr(percents_str);
                 MetricUnit::Percents(percents_number)
             }
@@ -309,7 +311,11 @@ fn deserialize_to_metric_units(value: &Value) -> MetricUnit {
             }
         }
         _ => { panic!() }
+    };
+    if SHOW_DESERIALIZATION_PROGRESS {
+        println!("res: {res:?}");
     }
+    res
 }
 
 
@@ -319,14 +325,18 @@ fn deserialize_to_color(value: &Value) -> Color {
         println!("-------- deserializing to METRIC UNITS:");
         println!("{value:#?}");
     }
-    match value {
+    let res = match value {
         value if value.is_string() => {
             let s = value.as_str().unwrap();
             assert_eq!(8, s.len());
             Color::from(s)
         }
         _ => { panic!() }
+    };
+    if SHOW_DESERIALIZATION_PROGRESS {
+        println!("res: {res:?}");
     }
+    res
 }
 
 
@@ -344,6 +354,112 @@ mod tests {
     use crate::sivf_objects::shapes::circle::Circle;
 
     // TODO: write a lot of tests
+
+    #[test]
+    fn deserialize_to_metric_units_pixels() {
+        {
+            let s: String = "0".to_string();
+            assert_eq!(
+                MetricUnit::Pixels(0.0),
+                deserialize_to_metric_units(&s.to_value())
+            );
+        }
+        {
+            let s: String = "7".to_string();
+            assert_eq!(
+                MetricUnit::Pixels(7.0),
+                deserialize_to_metric_units(&s.to_value())
+            );
+        }
+        {
+            let s: String = "7.654".to_string();
+            assert_eq!(
+                MetricUnit::Pixels(7.654),
+                deserialize_to_metric_units(&s.to_value())
+            );
+        }
+        {
+            let s: String = "1.2+3.5".to_string();
+            assert_eq!(
+                MetricUnit::Pixels(4.7),
+                deserialize_to_metric_units(&s.to_value())
+            );
+        }
+        {
+            let s: String = "sqrt(2)".to_string();
+            assert_eq!(
+                MetricUnit::Pixels(1.4142135623730951),
+                deserialize_to_metric_units(&s.to_value())
+            );
+        }
+        {
+            let s: String = "sqrt(2)+3*sqrt(5)".to_string();
+            assert_eq!(
+                MetricUnit::Pixels(8.122417494872465),
+                deserialize_to_metric_units(&s.to_value())
+            );
+        }
+    }
+
+    #[test]
+    fn deserialize_to_metric_units_percents() {
+        {
+            let s: String = "0%".to_string();
+            assert_eq!(
+                MetricUnit::Percents(0.0),
+                deserialize_to_metric_units(&s.to_value())
+            );
+        }
+        {
+            let s: String = "7%".to_string();
+            assert_eq!(
+                MetricUnit::Percents(7.0),
+                deserialize_to_metric_units(&s.to_value())
+            );
+        }
+        {
+            let s: String = "7.654%".to_string();
+            assert_eq!(
+                MetricUnit::Percents(7.654),
+                deserialize_to_metric_units(&s.to_value())
+            );
+        }
+        {
+            let s: String = "(1.2+3.5)%".to_string();
+            assert_eq!(
+                MetricUnit::Percents(4.7),
+                deserialize_to_metric_units(&s.to_value())
+            );
+        }
+        {
+            let s: String = "sqrt(2)%".to_string();
+            assert_eq!(
+                MetricUnit::Percents(1.4142135623730951),
+                deserialize_to_metric_units(&s.to_value())
+            );
+        }
+        {
+            let s: String = "sqrt(2)+3*sqrt(5)%".to_string();
+            assert_eq!(
+                MetricUnit::Percents(8.122417494872465),
+                deserialize_to_metric_units(&s.to_value())
+            );
+        }
+        {
+            let s: String = "(sqrt(2)+3*sqrt(5))%".to_string();
+            assert_eq!(
+                MetricUnit::Percents(8.122417494872465),
+                deserialize_to_metric_units(&s.to_value())
+            );
+        }
+        {
+            let s: String = "(((((((((sqrt(2)+3*sqrt(5))))))))))%".to_string();
+            assert_eq!(
+                MetricUnit::Percents(8.122417494872465),
+                deserialize_to_metric_units(&s.to_value())
+            );
+        }
+    }
 
     #[test]
     fn minimal() {

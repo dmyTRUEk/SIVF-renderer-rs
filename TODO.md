@@ -1,4 +1,5 @@
 # TODO:
+- rewrite tests using cycle and array of (ans, input)
 - ? "smt" -> `smt`
 - write rendering tests
 
