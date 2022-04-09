@@ -16,7 +16,9 @@ impl ExtensionDateTimeLocalToMyFormat for DateTime<Local> {
         let hour  : u32 = self.format("%H").to_string().parse().unwrap();
         let minute: u32 = self.format("%M").to_string().parse().unwrap();
         let second: u32 = self.format("%S").to_string().parse().unwrap();
-        format!("{:04}_{:02}_{:02}__{:02}_{:02}_{:02}", year, month, day, hour, minute, second)
+        let ms    : u32 = self.format("%3f").to_string().parse().unwrap();
+        format!("{year:04}_{month:02}_{day:02}__{hour:02}_{minute:02}_{second:02}_{ms:03}")
+        // self.format("%Y_%m_%d__%H_%M_%S_%3f").to_string()
     }
 }
 

@@ -46,6 +46,17 @@ impl ExtensionContains<String> for Vec<&str> {
 
 
 
+pub trait ExtensionCollectToVec<I: Iterator> {
+    fn collect_vec(self) -> Vec<<I as Iterator>::Item>;
+}
+impl<I: Iterator> ExtensionCollectToVec<I> for I {
+    fn collect_vec(self) -> Vec<<I as Iterator>::Item> {
+        self.collect::<Vec<_>>()
+    }
+}
+
+
+
 #[cfg(test)]
 mod tests {
     use super::*;

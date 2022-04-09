@@ -15,11 +15,11 @@ panic = "abort"
 
 [dependencies]
 chrono = "*"
-clap = "*"
+#clap = "*"
 #derive_more = "*"
 evalexpr = "*"
 image = "*"
-itertools = "*"
+#itertools = "*"
 regex = "*"
 serde_yaml = "*"
 #serde = "*"

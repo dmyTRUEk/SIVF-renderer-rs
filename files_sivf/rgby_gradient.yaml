@@ -1,0 +1,17 @@
+// red green blue yellow gradient
+
+image_sizes: [1080, 1080]
+// image_sizes: [2160, 2160]
+// image_sizes: [4320, 4320]
+
+root_layer:
+  - gradient:
+      color: ff000000
+      fading: false
+      points: [
+        ["-50%", "-50%"], ffff0000, "40%",
+        ["-50%", "+50%"], ff00ff00, "40%",
+        ["+50%", "-50%"], ff0000ff, "40%",
+        ["+50%", "+50%"], ffffff00, "40%",
+      ]
+

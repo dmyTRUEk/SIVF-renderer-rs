@@ -6,13 +6,15 @@ use crate::sivf_misc::blend_types::{BlendTypes, BlendType};
 use crate::sivf_misc::keywords_and_consts::*;
 use crate::sivf_misc::metric_units::MetricUnit;
 use crate::sivf_misc::sivf_struct::SivfStruct;
+use crate::sivf_objects::complex::gradient::{Gradient, GradientPoint};
 use crate::sivf_objects::complex::layer::{Layer, LayerElement};
 use crate::sivf_objects::shapes::circle::Circle;
 use crate::sivf_objects::shapes::square::Square;
 use crate::sivf_objects::shapes::triangle::Triangle;
 use crate::sivf_objects::sivf_object::SivfObject;
-use crate::utils::color::{ARGB, ColorModel, Color};
+use crate::utils::color::{ARGB, Color, ColorModel};
 use crate::utils::extensions::str::ExtensionCountChars;
+use crate::utils::extensions::vec::ExtensionCollectToVec;
 use crate::utils::simple_expr_eval::eval_expr;
 use crate::utils::sizes::ImageSizes;
 use crate::utils::vec2d::Vec2d;
@@ -100,6 +102,7 @@ fn deserialize_to_layer_element(value: &Value) -> LayerElement {
             let map = value.as_mapping().unwrap();
 
             let _key_layer  : &Value = &KW_LAYER.to_value();
+            let key_gradient: &Value = &KW_GRADIENT.to_value();
             let key_blending: &Value = &KW_BLENDING.to_value();
             let key_circle  : &Value = &KW_CIRCLE.to_value();
             let key_square  : &Value = &KW_SQUARE.to_value();
@@ -132,6 +135,11 @@ fn deserialize_to_layer_element(value: &Value) -> LayerElement {
                     let triangle: Triangle = deserialize_to_triangle(value);
                     LayerElement::SivfObject(SivfObject::Triangle(triangle))
                 }
+                map if map.contains_key(key_gradient) => {
+                    let value = map.get(key_gradient).unwrap();
+                    let gradient: Gradient = deserialize_to_gradient(value);
+                    LayerElement::SivfObject(SivfObject::Gradient(gradient))
+                }
                 _ => {
                     // TODO: create list of all KW and search for similar, and if so, show it
                     println!("------");
@@ -150,69 +158,27 @@ fn deserialize_to_layer_element(value: &Value) -> LayerElement {
 
 
 
-fn deserialize_to_circle(value: &Value) -> Circle {
+const VALUE_TRUE : &Value = &Value::Bool(true);
+const VALUE_FALSE: &Value = &Value::Bool(false);
+
+
+fn deserialize_to_color(value: &Value) -> Color {
     if SHOW_DESERIALIZATION_PROGRESS {
-        println!("-------- deserializing to CIRCLE:");
+        println!("-------- deserializing to METRIC UNITS:");
         println!("{value:#?}");
     }
-    match value {
-        value if value.is_mapping() => {
-            let map = value.as_mapping().unwrap();
-            let value_false = Value::Bool(false);
-            Circle::new(
-                deserialize_to_vec2d_metric_unit(map.get(&KW_XY.to_value()).unwrap()),
-                deserialize_to_metric_units(map.get(&KW_CIRCLE_RADIUS.to_value()).unwrap()),
-                deserialize_to_color(map.get(&KW_COLOR.to_value()).unwrap()),
-                map.get(&KW_INVERSE.to_value()).unwrap_or(&value_false).as_bool().unwrap()
-            )
+    let res = match value {
+        value if value.is_string() => {
+            let s = value.as_str().unwrap();
+            assert_eq!(8, s.len());
+            Color::from(s)
         }
         _ => { panic!() }
-    }
-}
-
-
-
-fn deserialize_to_square(value: &Value) -> Square {
+    };
     if SHOW_DESERIALIZATION_PROGRESS {
-        println!("-------- deserializing to SQUARE:");
-        println!("{value:#?}");
+        println!("res: {res:?}");
     }
-    match value {
-        value if value.is_mapping() => {
-            let map = value.as_mapping().unwrap();
-            let value_false = Value::Bool(false);
-            Square::new(
-                deserialize_to_vec2d_metric_unit(map.get(&KW_XY.to_value()).unwrap()),
-                deserialize_to_metric_units(map.get(&KW_SQUARE_SIDE.to_value()).unwrap()),
-                deserialize_to_color(map.get(&KW_COLOR.to_value()).unwrap()),
-                map.get(&KW_INVERSE.to_value()).unwrap_or(&value_false).as_bool().unwrap()
-            )
-        }
-        _ => { panic!() }
-    }
-}
-
-
-
-fn deserialize_to_triangle(value: &Value) -> Triangle {
-    if SHOW_DESERIALIZATION_PROGRESS {
-        println!("-------- deserializing to TRIANGLE:");
-        println!("{value:#?}");
-    }
-    match value {
-        value if value.is_mapping() => {
-            let map = value.as_mapping().unwrap();
-            let value_false = Value::Bool(false);
-            Triangle::new(
-                deserialize_to_vec2d_metric_unit(map.get(&KW_TRIANGLE_P1.to_value()).unwrap()),
-                deserialize_to_vec2d_metric_unit(map.get(&KW_TRIANGLE_P2.to_value()).unwrap()),
-                deserialize_to_vec2d_metric_unit(map.get(&KW_TRIANGLE_P3.to_value()).unwrap()),
-                deserialize_to_color(map.get(&KW_COLOR.to_value()).unwrap()),
-                map.get(&KW_INVERSE.to_value()).unwrap_or(&value_false).as_bool().unwrap()
-            )
-        }
-        _ => { panic!() }
-    }
+    res
 }
 
 
@@ -222,7 +188,6 @@ fn deserialize_to_blend_types(value: &Value) -> BlendTypes {
         println!("-------- deserializing to BLEND TYPES:");
         println!("{value:#?}");
     }
-
     trait ExtensionToBlendType {
         fn to_blend_type(&self) -> BlendType;
     }
@@ -238,7 +203,6 @@ fn deserialize_to_blend_types(value: &Value) -> BlendTypes {
             }
         }
     }
-
     match value {
         value if value.is_sequence() => {
             let array = value.as_sequence().unwrap();
@@ -248,35 +212,13 @@ fn deserialize_to_blend_types(value: &Value) -> BlendTypes {
                 array.get(1).unwrap().as_str().unwrap().to_blend_type()
             )
         }
-        _ => {
-            panic!()
-        }
-    }
-}
-
-
-
-fn deserialize_to_vec2d_metric_unit(value: &Value) -> Vec2d<MetricUnit> {
-    if SHOW_DESERIALIZATION_PROGRESS {
-        println!("-------- deserializing to POSITION:");
-        println!("{value:#?}");
-    }
-    match value {
-        value if value.is_sequence() => {
-            let array = value.as_sequence().unwrap();
-            assert_eq!(None, array.get(2));
-            Vec2d::new(
-                deserialize_to_metric_units(array.get(0).unwrap()),
-                deserialize_to_metric_units(array.get(1).unwrap()),
-            )
-        }
         _ => { panic!() }
     }
 }
 
 
 
-fn deserialize_to_metric_units(value: &Value) -> MetricUnit {
+fn deserialize_to_metric_unit(value: &Value) -> MetricUnit {
     if SHOW_DESERIALIZATION_PROGRESS {
         println!("-------- deserializing to METRIC UNITS:");
         println!("{value:#?}");
@@ -320,23 +262,119 @@ fn deserialize_to_metric_units(value: &Value) -> MetricUnit {
 
 
 
-fn deserialize_to_color(value: &Value) -> Color {
+fn deserialize_to_vec2d_metric_unit(value: &Value) -> Vec2d<MetricUnit> {
     if SHOW_DESERIALIZATION_PROGRESS {
-        println!("-------- deserializing to METRIC UNITS:");
+        println!("-------- deserializing to POSITION:");
         println!("{value:#?}");
     }
-    let res = match value {
-        value if value.is_string() => {
-            let s = value.as_str().unwrap();
-            assert_eq!(8, s.len());
-            Color::from(s)
+    match value {
+        value if value.is_sequence() => {
+            let array = value.as_sequence().unwrap();
+            assert_eq!(None, array.get(2));
+            Vec2d::new(
+                deserialize_to_metric_unit(array.get(0).unwrap()),
+                deserialize_to_metric_unit(array.get(1).unwrap()),
+            )
         }
         _ => { panic!() }
-    };
-    if SHOW_DESERIALIZATION_PROGRESS {
-        println!("res: {res:?}");
     }
-    res
+}
+
+
+
+fn deserialize_to_circle(value: &Value) -> Circle {
+    if SHOW_DESERIALIZATION_PROGRESS {
+        println!("-------- deserializing to CIRCLE:");
+        println!("{value:#?}");
+    }
+    match value {
+        value if value.is_mapping() => {
+            let map = value.as_mapping().unwrap();
+            Circle::new(
+                deserialize_to_vec2d_metric_unit(map.get(&KW_XY.to_value()).unwrap()),
+                deserialize_to_metric_unit(map.get(&KW_CIRCLE_RADIUS.to_value()).unwrap()),
+                deserialize_to_color(map.get(&KW_COLOR.to_value()).unwrap()),
+                map.get(&KW_INVERSE.to_value()).unwrap_or(&VALUE_FALSE).as_bool().unwrap()
+            )
+        }
+        _ => { panic!() }
+    }
+}
+
+
+
+fn deserialize_to_square(value: &Value) -> Square {
+    if SHOW_DESERIALIZATION_PROGRESS {
+        println!("-------- deserializing to SQUARE:");
+        println!("{value:#?}");
+    }
+    match value {
+        value if value.is_mapping() => {
+            let map = value.as_mapping().unwrap();
+            Square::new(
+                deserialize_to_vec2d_metric_unit(map.get(&KW_XY.to_value()).unwrap()),
+                deserialize_to_metric_unit(map.get(&KW_SQUARE_SIDE.to_value()).unwrap()),
+                deserialize_to_color(map.get(&KW_COLOR.to_value()).unwrap()),
+                map.get(&KW_INVERSE.to_value()).unwrap_or(&VALUE_FALSE).as_bool().unwrap()
+            )
+        }
+        _ => { panic!() }
+    }
+}
+
+
+
+fn deserialize_to_triangle(value: &Value) -> Triangle {
+    if SHOW_DESERIALIZATION_PROGRESS {
+        println!("-------- deserializing to TRIANGLE:");
+        println!("{value:#?}");
+    }
+    match value {
+        value if value.is_mapping() => {
+            let map = value.as_mapping().unwrap();
+            Triangle::new(
+                deserialize_to_vec2d_metric_unit(map.get(&KW_TRIANGLE_P1.to_value()).unwrap()),
+                deserialize_to_vec2d_metric_unit(map.get(&KW_TRIANGLE_P2.to_value()).unwrap()),
+                deserialize_to_vec2d_metric_unit(map.get(&KW_TRIANGLE_P3.to_value()).unwrap()),
+                deserialize_to_color(map.get(&KW_COLOR.to_value()).unwrap()),
+                map.get(&KW_INVERSE.to_value()).unwrap_or(&VALUE_FALSE).as_bool().unwrap()
+            )
+        }
+        _ => { panic!() }
+    }
+}
+
+
+
+fn deserialize_to_gradient(value: &Value) -> Gradient {
+    if SHOW_DESERIALIZATION_PROGRESS {
+        println!("-------- deserializing to TRIANGLE:");
+        println!("{value:#?}");
+    }
+    match value {
+        value if value.is_mapping() => {
+            let map = value.as_mapping().unwrap();
+            let points: Vec<GradientPoint<MetricUnit>> =
+                map.get(&KW_GRADIENT_POINTS.to_value()).unwrap()
+                .as_sequence().unwrap()
+                .chunks_exact(3).collect_vec()
+                // TODO: assert remainder is zero
+                .iter()
+                .map(|p|(
+                    deserialize_to_vec2d_metric_unit(&p[0]),
+                    deserialize_to_color(&p[1]),
+                    deserialize_to_metric_unit(&p[2])
+                ))
+                .map(|(pos, color, sigma)| GradientPoint::new(pos, sigma, color))
+                .collect();
+            Gradient::new(
+                points,
+                deserialize_to_color(map.get(&KW_COLOR.to_value()).unwrap()),
+                map.get(&KW_GRADIENT_IS_FADING.to_value()).unwrap_or(&VALUE_TRUE).as_bool().unwrap()
+            )
+        }
+        _ => { panic!() }
+    }
 }
 
 
@@ -368,7 +406,7 @@ mod tests {
             (MetricUnit::Pixels(8.122417494872465), "((((((((((sqrt(((((2))))))))+((((3))))*sqrt(((((5))))))))))))"),
         ];
         for (ans, input) in test_cases {
-            assert_eq!(ans, deserialize_to_metric_units(&input.to_value()));
+            assert_eq!(ans, deserialize_to_metric_unit(&input.to_value()));
         }
     }
 
@@ -385,7 +423,7 @@ mod tests {
             (MetricUnit::Percents(8.122417494872465), "((((((((((sqrt(((((2))))))))+((((3))))*sqrt(((((5))))))))))))%"),
         ];
         for (ans, input) in test_cases {
-            assert_eq!(ans, deserialize_to_metric_units(&input.to_value()));
+            assert_eq!(ans, deserialize_to_metric_unit(&input.to_value()));
         }
     }
 

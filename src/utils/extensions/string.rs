@@ -1,7 +1,9 @@
 //! `String` extensions
 
 // use regex::Regex;
-use regex::RegexBuilder;
+use regex::Regex;
+
+use crate::utils::extensions::vec::ExtensionCollectToVec;
 
 
 
@@ -71,7 +73,7 @@ pub trait ExtensionSplitAndKeep {
 impl ExtensionSplitAndKeep for String {
     fn split_and_keep(&self, func: impl Fn(char) -> bool) -> Vec<&str> {
         if self == "" { return vec![]; }
-        let res: Vec<&str> = self.split_inclusive(func).collect::<Vec<&str>>();
+        let res: Vec<&str> = self.split_inclusive(func).collect_vec();
         // println!("res = {res:#?}");
         let res_len = res.len();
         let mut res2: Vec<&str> = vec![];
@@ -110,18 +112,12 @@ impl ExtensionRemoveCLikeComments for String {
     }
 
     fn remove_comments_oneline(&self) -> String {
-        // TODO: maybe [RegexBuilder] -> [Regex] and remove [.build], for shorter code
-        let re = RegexBuilder::new(r" *//.*?(\n|\z)")
-            .build()
-            .unwrap();
+        let re = Regex::new(r" *//.*?(\n|\z)").unwrap();
         re.replace_all(self, "").to_string()
     }
 
     fn remove_comments_multiline(&self) -> String {
-        // TODO: maybe [RegexBuilder] -> [Regex] and remove [.build], for shorter code
-        let re = RegexBuilder::new(r" */\*(.|\n)*?\*/(\n|\z)")
-            .build()
-            .unwrap();
+        let re = Regex::new(r" */\*(.|\n)*?\*/(\n|\z)").unwrap();
         re.replace_all(self, "").to_string()
     }
 }
