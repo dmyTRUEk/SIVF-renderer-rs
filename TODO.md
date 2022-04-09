@@ -1,8 +1,10 @@
 # TODO:
+- impl `combine`
 - write output file to folder same as input file
 - add `-o` option for output folder
 - ? "smt" -> `smt`
 - write rendering tests
+- rewrite tests using cycle
 
 
 
