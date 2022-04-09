@@ -1,4 +1,5 @@
 # SIVF renderer (rust implementation)
+SIVF - SImple Vector Format
 
 
 
@@ -62,3 +63,4 @@ file:///path_to_sivf_renderer_rs/target/doc/sivf_renderer_rs/index.html
 ### Libs:
 - [Image lib examples](https://github.com/image-rs/image/tree/master/examples)
 - [Derive More](https://docs.rs/derive_more/0.99.16/derive_more/index.html)
+
