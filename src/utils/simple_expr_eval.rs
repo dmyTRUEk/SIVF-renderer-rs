@@ -125,7 +125,7 @@ fn make_ind() -> String { "    ".repeat(unsafe { IND }) }
 
 pub fn eval_expr(expr: &str) -> f64 {
     let ind: String = make_ind();
-    println!("{ind}----STARTING EVAL_EXPR with expr = {expr:?}");
+    println!("{ind}----STARTING EVALEXPR with expr = {expr:?}");
     unsafe {
         IND += 1;
     }
@@ -137,20 +137,22 @@ pub fn eval_expr(expr: &str) -> f64 {
     let res: f64 = 
     if !FUNCS.iter().any(|func_name| expr.contains(func_name)) {
         // simple case
-        println!("{ind}eval_expr -> SIMPLE");
+        println!("{ind}evalexpr -> SIMPLE");
         println!("{ind}expr = {expr:?}");
         let expr: &str = &expr.replace("/", "*1.0/");
         println!("{ind}expr = {expr:?}");
         eval(expr).unwrap().to_f64()
     }
     else {
-        println!("{ind}eval_expr -> COMPLEX");
+        // complex case
+        println!("{ind}evalexpr -> COMPLEX");
         println!("{ind}expr = {expr:?}");
         let evaling_func: (usize, String) = FUNCS.iter()
             .filter_map(|fname| expr.find_substr(fname))
             .min_by_key(|fpos_fname| fpos_fname.0)
             .unwrap();
-        if expr.starts_with(LB) && expr.ends_with(RB) {
+        // if expr.starts_with(LB) && expr.ends_with(RB) {
+        if expr.bracket_bouns() == Some((0, expr.len())) {
             println!("{ind}--CASE 0: `(…)`");
             eval_expr(&expr[1..expr.len()-1])
         }
@@ -198,7 +200,7 @@ pub fn eval_expr(expr: &str) -> f64 {
         IND -= 1;
     }
     let ind: String = make_ind();
-    println!("{ind}----ENDING EVAL_EXPR with res = {res}");
+    println!("{ind}----ENDING EVALEXPR with res = {res}");
     res
 }
 
@@ -210,95 +212,42 @@ pub fn eval_expr(expr: &str) -> f64 {
 mod tests {
     use crate::utils::simple_expr_eval::ExtensionFindSubstr;
 
-    use super::{LB, RB, ExtensionBracketBounds, ExtensionExtractFromBrackets, eval_expr};
+    use super::{eval_expr, ExtensionBracketBounds, ExtensionExtractFromBrackets};
 
     #[test]
     fn bracket_bouns() {
-        {
-            let s: &str = "";
-            assert_eq!(
-                None,
-                s.bracket_bouns()
-            );
+        let test_cases: Vec<(Option<(usize, usize)>, &str)> = vec![
+            (None, ""),
+            (None, "abc"),
+            (Some((0, 1)), "()"),
+            (Some((0, 4)), "(abc)"),
+            (Some((2, 6)), "ab(def)hij"),
+            (Some((2, 12)), "ab(()def(()))hi(())j"),
+            (Some((0, 8)), "(((abc)))def"),
+            (Some((0, 8)), "(((abc)))def(((ghi)))"),
+            (Some((0, 8)), "(((abc)))(def)(((ghi)))"),
+        ];
+        for (ans, input) in test_cases {
+            assert_eq!(ans, input.bracket_bouns());
         }
-        {
-            let s: &str = "()";
-            let ans : Option<(usize, usize)> = Some((0_usize, 1_usize));
-            let res1: Option<(usize, usize)> = Some((s.find(LB).unwrap(), s.find(RB).unwrap()));
-            let res2: Option<(usize, usize)> = s.bracket_bouns();
-            assert_eq!(ans, res1);
-            assert_eq!(ans, res2);
-        }
-        {
-            let s: &str = "(abc)";
-            let ans : Option<(usize, usize)> = Some((0_usize, 4_usize));
-            let res1: Option<(usize, usize)> = Some((s.find(LB).unwrap(), s.find(RB).unwrap()));
-            let res2: Option<(usize, usize)> = s.bracket_bouns();
-            assert_eq!(ans, res1);
-            assert_eq!(ans, res2);
-        }
-        {
-            //            "0123456789"
-            let s: &str = "ab(def)hij";
-            let ans : Option<(usize, usize)> = Some((2_usize, 6_usize));
-            let res1: Option<(usize, usize)> = Some((s.find(LB).unwrap(), s.find(RB).unwrap()));
-            let res2: Option<(usize, usize)> = s.bracket_bouns();
-            assert_eq!(ans, res1);
-            assert_eq!(ans, res2);
-        }
-        {
-            //            "01234567890123456789"
-            let s: &str = "ab(()def(()))hi(())j";
-            let ans: Option<(usize, usize)> = Some((2_usize, 12_usize));
-            let res: Option<(usize, usize)> = s.bracket_bouns();
-            assert_eq!(ans, res);
-        }
-        // TODO: write tests with nested brackets
     }
 
     #[test]
     fn extract_from_brackets() {
-        {
-            let s: &str = "";
-            let ans: Option<&str> = None;
-            let res: Option<&str> = s.extract_from_brackets();
-            assert_eq!(ans, res);
-        }
-        {
-            let s: &str = "()";
-            let ans: Option<&str> = Some("");
-            let res: Option<&str> = s.extract_from_brackets();
-            assert_eq!(ans, res);
-        }
-        {
-            let s: &str = "(abc)";
-            let ans: Option<&str> = Some("abc");
-            let res: Option<&str> = s.extract_from_brackets();
-            assert_eq!(ans, res);
-        }
-        {
-            let s: &str = "ab(def)hij";
-            let ans: Option<&str> = Some("def");
-            let res: Option<&str> = s.extract_from_brackets();
-            assert_eq!(ans, res);
-        }
-        {
-            let s: &str = "a(b(def)hi)j";
-            let ans: Option<&str> = Some("b(def)hi");
-            let res: Option<&str> = s.extract_from_brackets();
-            assert_eq!(ans, res);
-        }
-        {
-            let s: &str = "a(b()(def)hi(()))()j";
-            let ans: Option<&str> = Some("b()(def)hi(())");
-            let res: Option<&str> = s.extract_from_brackets();
-            assert_eq!(ans, res);
-        }
-        {
-            let s: &str = "ab()(def)hi(())()j";
-            let ans: Option<&str> = Some("");
-            let res: Option<&str> = s.extract_from_brackets();
-            assert_eq!(ans, res);
+        let test_cases: Vec<(Option<&str>, &str)> = vec![
+            (None, ""),
+            (Some(""), "()"),
+            (Some("abc"), "(abc)"),
+            (Some("def"), "ab(def)hij"),
+            (Some("b(def)hi"), "a(b(def)hi)j"),
+            (Some("b()(def)hi(())"), "a(b()(def)hi(()))()j"),
+            (Some(""), "ab()(def)hi(())()j"),
+            (Some("((abc))"), "(((abc)))"),
+            (Some("((abc))"), "(((abc)))+(def)"),
+            (Some("((abc))"), "(((abc)))+(((def)))"),
+        ];
+        for (ans, input) in test_cases {
+            assert_eq!(ans, input.extract_from_brackets());
         }
     }
 
@@ -340,13 +289,14 @@ mod tests {
             (3.1462643699419726, "(sqrt(2)+sqrt(3))"),
             (8.122417494872465 , "(sqrt(2)+3*sqrt(5))"),
 
-            (8.122417494872465 , "((((((((((((((((sqrt(2)+3*sqrt(5)))))))))))))))))"),
+            (8.122417494872465 , "(((sqrt(2)+3*sqrt(5))))"),
+            (8.122417494872465 , "((((((sqrt(2))))+(((3)))*(((sqrt(5)))))))"),
 
             ( 43.30127018922193, "(sqrt(3)/4)*100"),
             (-43.30127018922193, "-(sqrt(3)/4)*100"),
         ];
-        for test_case in test_cases {
-            assert_eq!(test_case.0, eval_expr(test_case.1));
+        for (ans, input) in test_cases {
+            assert_eq!(ans, eval_expr(input));
         }
         {
             let angles: [f64; 13] = [0.0, 1.0, 5.0, 10.0, 20.0, 30.0, 40.0, 42.145, 45.0, 60.0, 70.0, 80.0, 90.0];
@@ -364,8 +314,11 @@ mod tests {
             (Some((3, "def".to_string())), "abcdefgh", "def"),
         ];
         // todo: write map, so dont write .to_string every time
-        for test_case in test_cases {
-            assert_eq!(test_case.0, test_case.1.find_substr(test_case.2));
+        for (ans, input1, input2) in test_cases {
+            if let Some(ans) = ans.clone() {
+                assert_eq!(ans.0, input1.find(input2).unwrap());
+            }
+            assert_eq!(ans, input1.find_substr(input2));
         }
     }
 }

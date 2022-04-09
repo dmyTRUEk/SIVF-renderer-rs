@@ -353,111 +353,39 @@ mod tests {
     use crate::sivf_objects::complex::layer::{Layer, LayerElement};
     use crate::sivf_objects::shapes::circle::Circle;
 
-    // TODO: write a lot of tests
+    // TODO: write A LOT of tests
 
     #[test]
     fn deserialize_to_metric_units_pixels() {
-        {
-            let s: String = "0".to_string();
-            assert_eq!(
-                MetricUnit::Pixels(0.0),
-                deserialize_to_metric_units(&s.to_value())
-            );
-        }
-        {
-            let s: String = "7".to_string();
-            assert_eq!(
-                MetricUnit::Pixels(7.0),
-                deserialize_to_metric_units(&s.to_value())
-            );
-        }
-        {
-            let s: String = "7.654".to_string();
-            assert_eq!(
-                MetricUnit::Pixels(7.654),
-                deserialize_to_metric_units(&s.to_value())
-            );
-        }
-        {
-            let s: String = "1.2+3.5".to_string();
-            assert_eq!(
-                MetricUnit::Pixels(4.7),
-                deserialize_to_metric_units(&s.to_value())
-            );
-        }
-        {
-            let s: String = "sqrt(2)".to_string();
-            assert_eq!(
-                MetricUnit::Pixels(1.4142135623730951),
-                deserialize_to_metric_units(&s.to_value())
-            );
-        }
-        {
-            let s: String = "sqrt(2)+3*sqrt(5)".to_string();
-            assert_eq!(
-                MetricUnit::Pixels(8.122417494872465),
-                deserialize_to_metric_units(&s.to_value())
-            );
+        let test_cases: Vec<(MetricUnit, &str)> = vec![
+            (MetricUnit::Pixels(0.0), "0"),
+            (MetricUnit::Pixels(7.0), "7"),
+            (MetricUnit::Pixels(7.645), "7.645"),
+            (MetricUnit::Pixels(4.7), "1.2+3.5"),
+            (MetricUnit::Pixels(1.4142135623730951), "sqrt(2)"),
+            (MetricUnit::Pixels(8.122417494872465), "sqrt(2)+3*sqrt(5)"),
+            (MetricUnit::Pixels(8.122417494872465), "(sqrt(2)+3*sqrt(5))"),
+            (MetricUnit::Pixels(8.122417494872465), "((((((((((sqrt(((((2))))))))+((((3))))*sqrt(((((5))))))))))))"),
+        ];
+        for (ans, input) in test_cases {
+            assert_eq!(ans, deserialize_to_metric_units(&input.to_value()));
         }
     }
 
     #[test]
     fn deserialize_to_metric_units_percents() {
-        {
-            let s: String = "0%".to_string();
-            assert_eq!(
-                MetricUnit::Percents(0.0),
-                deserialize_to_metric_units(&s.to_value())
-            );
-        }
-        {
-            let s: String = "7%".to_string();
-            assert_eq!(
-                MetricUnit::Percents(7.0),
-                deserialize_to_metric_units(&s.to_value())
-            );
-        }
-        {
-            let s: String = "7.654%".to_string();
-            assert_eq!(
-                MetricUnit::Percents(7.654),
-                deserialize_to_metric_units(&s.to_value())
-            );
-        }
-        {
-            let s: String = "(1.2+3.5)%".to_string();
-            assert_eq!(
-                MetricUnit::Percents(4.7),
-                deserialize_to_metric_units(&s.to_value())
-            );
-        }
-        {
-            let s: String = "sqrt(2)%".to_string();
-            assert_eq!(
-                MetricUnit::Percents(1.4142135623730951),
-                deserialize_to_metric_units(&s.to_value())
-            );
-        }
-        {
-            let s: String = "sqrt(2)+3*sqrt(5)%".to_string();
-            assert_eq!(
-                MetricUnit::Percents(8.122417494872465),
-                deserialize_to_metric_units(&s.to_value())
-            );
-        }
-        {
-            let s: String = "(sqrt(2)+3*sqrt(5))%".to_string();
-            assert_eq!(
-                MetricUnit::Percents(8.122417494872465),
-                deserialize_to_metric_units(&s.to_value())
-            );
-        }
-        {
-            let s: String = "(((((((((sqrt(2)+3*sqrt(5))))))))))%".to_string();
-            assert_eq!(
-                MetricUnit::Percents(8.122417494872465),
-                deserialize_to_metric_units(&s.to_value())
-            );
+        let test_cases: Vec<(MetricUnit, &str)> = vec![
+            (MetricUnit::Percents(0.0), "0%"),
+            (MetricUnit::Percents(7.0), "7%"),
+            (MetricUnit::Percents(7.654), "7.654%"),
+            (MetricUnit::Percents(4.7), "(1.2+3.5)%"),
+            (MetricUnit::Percents(1.4142135623730951), "sqrt(2)%"),
+            (MetricUnit::Percents(8.122417494872465), "sqrt(2)+3*sqrt(5)%"),
+            (MetricUnit::Percents(8.122417494872465), "(sqrt(2)+3*sqrt(5))%"),
+            (MetricUnit::Percents(8.122417494872465), "((((((((((sqrt(((((2))))))))+((((3))))*sqrt(((((5))))))))))))%"),
+        ];
+        for (ans, input) in test_cases {
+            assert_eq!(ans, deserialize_to_metric_units(&input.to_value()));
         }
     }
 
