@@ -1,5 +1,6 @@
 # TODO:
-- rewrite tests using cycle and array of (ans, input)
+- write output file to folder same as input file
+- add `-o` option for output folder
 - ? "smt" -> `smt`
 - write rendering tests
 
