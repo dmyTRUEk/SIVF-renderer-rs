@@ -120,48 +120,29 @@ const FUNCS: [&str; 4] = [
     RANDOM,
 ];
 
-static mut IND: usize = 0;
-fn make_ind() -> String { "    ".repeat(unsafe { IND }) }
-
 pub fn eval_expr(expr: &str) -> f64 {
-    let ind: String = make_ind();
-    println!("{ind}----STARTING EVALEXPR with expr = {expr:?}");
-    unsafe {
-        IND += 1;
-    }
-    let ind: String = make_ind();
-
     let expr: &str = expr.trim();
     let expr: &str = expr.trim_start_matches('+');
     let expr: &str = expr.trim();
-    let res: f64 = 
     if !FUNCS.iter().any(|func_name| expr.contains(func_name)) {
-        // simple case
-        println!("{ind}evalexpr -> SIMPLE");
-        println!("{ind}expr = {expr:?}");
+        // simple case: eval from evalexpr can handle it
         let expr: &str = &expr.replace("/", "*1.0/");
-        println!("{ind}expr = {expr:?}");
         eval(expr).unwrap().to_f64()
     }
     else {
-        // complex case
-        println!("{ind}evalexpr -> COMPLEX");
-        println!("{ind}expr = {expr:?}");
+        // complex case: we have to handle it by ourself
         let evaling_func: (usize, String) = FUNCS.iter()
             .filter_map(|fname| expr.find_substr(fname))
             .min_by_key(|fpos_fname| fpos_fname.0)
             .unwrap();
-        // if expr.starts_with(LB) && expr.ends_with(RB) {
         if expr.bracket_bouns() == Some((0, expr.len())) {
-            println!("{ind}--CASE 0: `(…)`");
+            // case `(…)`
             eval_expr(&expr[1..expr.len()-1])
         }
         else if expr.find(LB).unwrap() < evaling_func.0 {
-            println!("{ind}--CASE 1: `…(…func(…)…)…`");
+            // case `…(…func(…)…)…`
             let brackets_insides: &str = expr.extract_from_brackets().unwrap();
-            println!("{ind}brackets_insides = {brackets_insides}");
             let brackets_insides_res: f64 = eval_expr(brackets_insides);
-            println!("{ind}expr: {expr:?}");
             let br_bounds: (usize, usize) = expr.bracket_bouns().unwrap();
             let expr: &str = &format!(
                 "{l}{fres}{r}",
@@ -169,13 +150,11 @@ pub fn eval_expr(expr: &str) -> f64 {
                 fres = brackets_insides_res.to_string(),
                 r = expr[br_bounds.1+1..].to_string()
             );
-            println!("{ind}expr after 'replace': {expr:?}");
             eval_expr(expr)
         }
         else {
-            println!("{ind}--CASE 2: `…func(…)`");
+            // case `…func(…)`
             let brackets_insides: &str = expr.extract_from_brackets().unwrap();
-            println!("{ind}brackets_insides = {brackets_insides}");
             let brackets_insides_res: f64 = eval_expr(brackets_insides);
             let func_res: f64 = match evaling_func.1.to_str() {
                 SQRT => { brackets_insides_res.sqrt() }
@@ -184,24 +163,15 @@ pub fn eval_expr(expr: &str) -> f64 {
                 RANDOM => { todo!() }
                 _ => { panic!() }
             };
-            println!("{ind}func_res: {func_res}");
-            println!("{ind}expr: {expr:?}");
             let expr: &str = &format!(
                 "{l}{fres}{r}",
                 l = expr[..evaling_func.0].to_string(),
                 fres = func_res.to_string(),
                 r = expr[evaling_func.0+evaling_func.1.len()+1+brackets_insides.len()+1..].to_string()
             );
-            println!("{ind}expr after 'replace': {expr:?}");
             eval_expr(expr)
         }
-    };
-    unsafe {
-        IND -= 1;
     }
-    let ind: String = make_ind();
-    println!("{ind}----ENDING EVALEXPR with res = {res}");
-    res
 }
 
 
