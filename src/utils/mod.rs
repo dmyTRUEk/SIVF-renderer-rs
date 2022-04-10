@@ -18,6 +18,7 @@ pub mod functionals;
 pub mod array2d_flat;
 pub mod color;
 pub mod io;
+pub mod random;
 pub mod simple_expr_eval;
 pub mod sizes;
 pub mod vec2d;

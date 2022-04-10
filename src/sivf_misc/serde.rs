@@ -13,7 +13,7 @@ use crate::sivf_objects::shapes::square::Square;
 use crate::sivf_objects::shapes::triangle::Triangle;
 use crate::sivf_objects::sivf_object::SivfObject;
 use crate::utils::color::{ARGB, Color, ColorModel};
-use crate::utils::extensions::str::ExtensionCountChars;
+use crate::utils::extensions::str::{ExtensionCountChars, ExtensionsSplitOutsideBrackets};
 use crate::utils::extensions::vec::ExtensionCollectToVec;
 use crate::utils::simple_expr_eval::eval_expr;
 use crate::utils::sizes::ImageSizes;
@@ -81,7 +81,7 @@ impl ExtensionToValue for String {
 
 fn deserialize_to_layer_element(value: &Value) -> LayerElement {
     if SHOW_DESERIALIZATION_PROGRESS {
-        println!("------------------------- deserializing to SIVF OBJECT:");
+        println!("------------------------- deserializing to LAYER ELEMENT:");
         println!("{value:#?}");
     }
     match value {
@@ -164,14 +164,26 @@ const VALUE_FALSE: &Value = &Value::Bool(false);
 
 fn deserialize_to_color(value: &Value) -> Color {
     if SHOW_DESERIALIZATION_PROGRESS {
-        println!("-------- deserializing to METRIC UNITS:");
+        println!("-------- deserializing to COLOR:");
         println!("{value:#?}");
     }
     let res = match value {
         value if value.is_string() => {
-            let s = value.as_str().unwrap();
-            assert_eq!(8, s.len());
-            Color::from(s)
+            let s: &str = value.as_str().unwrap();
+            if s.count_chars(',') == 0 {
+                assert_eq!(8, s.len());
+                Color::from(s)
+            }
+            else {
+                let parts: Vec<String> = s.split_outside_brackets(',', '(', ')');
+                assert_eq!(4, parts.len());
+                Color::new(
+                    (eval_expr(&parts[0])).max(0_f64).min(255_f64) as u8,
+                    (eval_expr(&parts[1])).max(0_f64).min(255_f64) as u8,
+                    (eval_expr(&parts[2])).max(0_f64).min(255_f64) as u8,
+                    (eval_expr(&parts[3])).max(0_f64).min(255_f64) as u8,
+                )
+            }
         }
         _ => { panic!() }
     };
@@ -264,7 +276,7 @@ fn deserialize_to_metric_unit(value: &Value) -> MetricUnit {
 
 fn deserialize_to_vec2d_metric_unit(value: &Value) -> Vec2d<MetricUnit> {
     if SHOW_DESERIALIZATION_PROGRESS {
-        println!("-------- deserializing to POSITION:");
+        println!("-------- deserializing to POSITION (Vec2d MetricUnit):");
         println!("{value:#?}");
     }
     match value {
@@ -348,7 +360,7 @@ fn deserialize_to_triangle(value: &Value) -> Triangle {
 
 fn deserialize_to_gradient(value: &Value) -> Gradient {
     if SHOW_DESERIALIZATION_PROGRESS {
-        println!("-------- deserializing to TRIANGLE:");
+        println!("-------- deserializing to GRADIENT:");
         println!("{value:#?}");
     }
     match value {

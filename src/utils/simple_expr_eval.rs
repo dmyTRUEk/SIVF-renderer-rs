@@ -2,7 +2,7 @@
 
 use evalexpr::eval;
 
-use crate::utils::extensions::str::ExtensionCountChars;
+use crate::utils::{extensions::{str::ExtensionCountChars, vec::ExtensionCollectToVec}, random::random};
 
 
 
@@ -155,12 +155,19 @@ pub fn eval_expr(expr: &str) -> f64 {
         else {
             // case `…func(…)`
             let brackets_insides: &str = expr.extract_from_brackets().unwrap();
-            let brackets_insides_res: f64 = eval_expr(brackets_insides);
             let func_res: f64 = match evaling_func.1.to_str() {
-                SQRT => { brackets_insides_res.sqrt() }
-                SIN => { brackets_insides_res.sin() }
-                COS => { brackets_insides_res.cos() }
-                RANDOM => { todo!() }
+                SQRT => { eval_expr(brackets_insides).sqrt() }
+                SIN => { eval_expr(brackets_insides).sin() }
+                COS => { eval_expr(brackets_insides).cos() }
+                RANDOM => {
+                    assert_eq!(1, brackets_insides.count_chars(','));
+                    let minmax = brackets_insides.splitn(2, ',').collect_vec();
+                    let (min, max): (f64, f64) = (
+                        eval_expr(minmax[0]),
+                        eval_expr(minmax[1])
+                    );
+                    random(min, max)
+                }
                 _ => { panic!() }
             };
             let expr: &str = &format!(
