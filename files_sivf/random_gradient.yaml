@@ -1,7 +1,6 @@
 // random pos and color gradient
 
-image_sizes: [50, 50]
-// image_sizes: [1080, 1080]
+image_sizes: [1080, 1080]
 // image_sizes: [2160, 2160]
 // image_sizes: [4320, 4320]
 
