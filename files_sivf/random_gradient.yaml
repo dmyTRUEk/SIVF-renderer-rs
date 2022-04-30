@@ -9,9 +9,9 @@ root_layer:
       color: ff000000
       fading: false
       points: [
-        ["random(-50, 50)%", "random(-50, 50)%"], "255,random(0,255),random(0,255),random(0,255)", "20%",
-        ["random(-50, 50)%", "random(-50, 50)%"], "255,random(0,255),random(0,255),random(0,255)", "20%",
-        ["random(-50, 50)%", "random(-50, 50)%"], "255,random(0,255),random(0,255),random(0,255)", "20%",
-        ["random(-50, 50)%", "random(-50, 50)%"], "255,random(0,255),random(0,255),random(0,255)", "20%",
+        ["random(-50, 50)%", "random(-50, 50)%"], "255,random(0,255),random(0,255),random(0,255)", "random(20,40)%",
+        ["random(-50, 50)%", "random(-50, 50)%"], "255,random(0,255),random(0,255),random(0,255)", "random(20,40)%",
+        ["random(-50, 50)%", "random(-50, 50)%"], "255,random(0,255),random(0,255),random(0,255)", "random(20,40)%",
+        // ["random(-50, 50)%", "random(-50, 50)%"], "255,random(0,255),random(0,255),random(0,255)", "random(20,40)%",
       ]
 
