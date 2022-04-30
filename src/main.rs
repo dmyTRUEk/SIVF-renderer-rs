@@ -35,6 +35,7 @@
 use std::env;
 use std::fs::File;
 use std::io::Read;
+use std::path::Path;
 
 mod help;
 mod sivf_misc;
@@ -98,11 +99,15 @@ fn main() {
         print!(r#"Reading file "{file_input_path}"... "#);
         flush();
         // TODO?: instead of [match] try to use [unwrap_or_else()]
-        let sivf_file_content: String = match File::open(&file_input_path) {
+        let (file_content, file_input_folder): (String, &Path) = match File::open(&file_input_path) {
             Ok(mut file) => {
                 let mut file_content = String::new();
                 file.read_to_string(&mut file_content).unwrap();
-                file_content
+
+                let file_input_folder: &Path = Path::new(&file_input_path)
+                    .parent().unwrap_or(Path::new("."));
+
+                (file_content, file_input_folder)
             }
             Err(_) => {
                 println!(r#"ERROR: Can't open file "{file_input_path}", skipping it"#);
@@ -110,12 +115,12 @@ fn main() {
             }
         };
         println!("OK");
-        // println!("file content = \n{sivf_file_content}");
+        // println!("file content = \n{file_content}");
 
         print!("Removing comments... ");
         flush();
         // TODO?: instead of [match] try to use [unwrap_or_else()]
-        let sivf_file_content: String = match sivf_file_content.remove_comments() {
+        let file_content: String = match file_content.remove_comments() {
             Ok(v) => { v }
             Err(_) => {
                 println!("ERROR: Can't remove comments, skipping this file");
@@ -123,12 +128,12 @@ fn main() {
             }
         };
         println!("OK");
-        // println!("file content without comments = \n{sivf_file_content}");
+        // println!("file content without comments = \n{file_content}");
 
         print!("Parsing file to YAML... ");
         flush();
         // TODO?: instead of [match] try to use [unwrap_or_else()]
-        let value: serde_yaml::Value = match serde_yaml::from_str(&sivf_file_content) {
+        let value: serde_yaml::Value = match serde_yaml::from_str(&file_content) {
             Ok(v) => { v }
             Err(e) => {
                 println!(r#"ERROR: Cant parse file: "{e}""#);
@@ -161,7 +166,8 @@ fn main() {
         let image_sizes: ImageSizes = sivf_struct.image_sizes;
         // TODO LATER: separate this into function
         let file_output_name = format!(
-            "img_{t}__{w}x{h}.png",
+            "{f}/img_{t}__{w}x{h}.png",
+            f=file_input_folder.to_str().unwrap(),
             t=render_time_start.to_my_format(),
             w=image_sizes.w,
             h=image_sizes.h
