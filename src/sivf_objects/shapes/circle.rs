@@ -56,7 +56,7 @@ impl Render for Circle {
                 }
             }
             RenderType::Cpu(_n_cores) => todo!(),
-            RenderType::CpuBest => todo!(),
+            RenderType::CpuMax => todo!(),
             RenderType::Gpu => todo!(),
         }
         canvas

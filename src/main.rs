@@ -44,13 +44,52 @@ mod utils;
 
 use crate::help::HELP_STR;
 use crate::utils::extensions::date_time::ExtensionDateTimeLocalToMyFormat;
-use crate::utils::extensions::string::{ExtensionTrimEmptyLines, ExtensionTrimLinesByFirstLine, ExtensionRemoveCLikeComments};
+use crate::utils::extensions::string::{ExtensionTrimEmptyLines, ExtensionTrimLinesByFirstLine, ExtensionRemoveCLikeComments, ExtensionToStr};
 use crate::utils::functionals::separate::ExtensionSeparate;
 use crate::utils::sizes::ImageSizes;
 use crate::utils::io::flush;
 use crate::sivf_misc::render::RenderType;
 use crate::sivf_misc::sivf_struct::SivfStruct;
-use crate::utils::extensions::vec::ExtensionContains;
+use crate::utils::extensions::vec::{ExtensionContains, ExtensionContainsStartsWith, ExtensionFindStartsWith};
+
+
+
+// CLI Options:
+const CLIO_HELP: [&str; 2] = ["-h", "--help"];
+const CLIO_OUTPUT_FOLDER: [&str; 2] = ["-o", "--output"];
+const CLIO_RENDER_CPU   : [&str; 2] = ["-r=cpu", "--render=cpu"];
+const CLIO_RENDER_CPU1  : [&str; 2] = ["-r=cpu1", "--render=cpu1"];
+const CLIO_RENDER_CPUMAX: [&str; 2] = ["-r=cpumax", "--render=cpumax"];
+const CLIO_RENDER_GPU   : [&str; 2] = ["-r=gpu", "--render=gpu"];
+
+
+
+fn eval_render_type(options: &Vec<String>) -> RenderType {
+    match options {
+        options if options.iter().find(|el| CLIO_RENDER_CPU1.contains(&el.to_str())).is_some() => {
+            RenderType::Cpu1
+        }
+        options if options.iter().find(|el| CLIO_RENDER_CPU.contains(&el.to_str())).is_some() => {
+            let option_render: &String = options.iter().find(|el| CLIO_RENDER_CPU.contains(&el.to_str())).unwrap();
+            let option_render_start: String = options.iter()
+                .find_starts_with(CLIO_RENDER_CPU)
+                .unwrap();
+            RenderType::Cpu(
+                option_render[option_render_start.len()..].parse().unwrap()
+            )
+        }
+        options if options.iter().find(|el| CLIO_RENDER_CPUMAX.contains(&el.to_str())).is_some() => {
+            RenderType::CpuMax
+        }
+        options if options.iter().find(|el| CLIO_RENDER_GPU.contains(&el.to_str())).is_some() => {
+            RenderType::Gpu
+        }
+        _ => {
+            // TODO LATER: change it for better
+            RenderType::Cpu1
+        }
+    }
+}
 
 
 
@@ -65,26 +104,24 @@ fn main() {
     let args: Vec<String> = (&args_all[1..]).to_vec();
     // println!("args = {args:?}");
 
-    let (options, file_paths) = args.to_vec().separate(|v| v.starts_with('-'));
+    let (options, file_paths): (Vec<String>, Vec<String>) = args.to_vec().separate(|v| v.starts_with('-'));
     // println!("options = {options:?}");
     // println!("file_paths = {file_paths:?}");
 
-    if options.contains_("-h") || options.contains_("--help")  {
+    if options.contains_(CLIO_HELP[0]) || options.contains_(CLIO_HELP[1])  {
         println!("{help}", help=HELP_STR.to_string().trim_empty_lines().trim_lines_by_first_line());
         return;
     }
 
+    if options.contains_starts_with(CLIO_OUTPUT_FOLDER[0]) {
+        todo!()
+    }
+
     // TODO LATER
-    // let show_log: bool = options.contains_("-l") || options.contains_("--log=1");
-    // let show_progress: bool = options.contains_("-p") || options.contains_("--progress=1");
-    let render_type: RenderType = match options {
-        option if option.contains_("-r=cpu1") || options.contains_("--render=cpu1") => { RenderType::Cpu1 }
-        // TODO
-        option if option.contains_("-r=cpu8") || options.contains_("--render=cpu8") => { RenderType::Cpu(8) }
-        option if option.contains_("-r=cpubest") || options.contains_("--render=cpubest") => { RenderType::CpuBest }
-        option if option.contains_("-r=gpu") || options.contains_("--render=gpu") => { RenderType::Gpu }
-        _ => { RenderType::Cpu1 }
-    };
+    // let show_log: bool = options.contains_("-l") || options.contains_("--log");
+    // let show_progress: bool = options.contains_("-p") || options.contains_("--show-progress");
+    let render_type: RenderType = eval_render_type(&options);
+    println!("Starting with render type: {render_type:?}");
 
     if file_paths.is_empty() {
         // TODO LATER: then ask user for file to render

@@ -13,7 +13,7 @@ pub trait Render {
 pub enum RenderType {
     Cpu1,       // use only one CPU core (simplest variant)
     Cpu(u32),   // use specified amount of threads
-    CpuBest,    // detect all cores/threads and use them all
+    CpuMax,     // detect all cores/threads and use them all
     Gpu,        // use GPU
 }
 

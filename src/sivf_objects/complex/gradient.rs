@@ -118,7 +118,7 @@ impl Render for Gradient {
                 }
             }
             RenderType::Cpu(_n_cores) => todo!(),
-            RenderType::CpuBest => todo!(),
+            RenderType::CpuMax => todo!(),
             RenderType::Gpu => todo!(),
         }
         canvas
