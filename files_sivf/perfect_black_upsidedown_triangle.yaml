@@ -1,0 +1,15 @@
+// perfact black upsidedown triangle
+
+// image_sizes: [2, 2]
+// image_sizes: [1080, 1080]
+// image_sizes: [2160, 2160]
+// image_sizes: [4320, 4320]
+image_sizes: [8192, 8192]
+
+root_layer:
+  - triangle:
+      p1: ["-0.5*(sqrt(3)/4)*100%", "0.5*(1/4)*100%"]
+      p2: ["+0.5*(sqrt(3)/4)*100%", "0.5*(1/4)*100%"]
+      p3: ["0", "-0.5*(1/2)*100%"]
+      color: ff000000
+
