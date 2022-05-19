@@ -1,0 +1,10 @@
+// grey rectangle
+
+image_sizes: [1000, 1000]
+
+root_layer:
+  - square:
+      xy: [0, 0]
+      side: "100%"
+      color: ff888888
+
