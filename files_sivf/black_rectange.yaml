@@ -1,12 +1,12 @@
 // black rectangle
 
-canvas_wh: [1920, 1080]
-// canvas_wh: [3840, 2160]
-// canvas_wh: [7680, 4320]
+image_sizes: [1920, 1080]
+// image_sizes: [3840, 2160]
+// image_sizes: [7680, 4320]
 
 root_layer:
   - rectangle:
       xy: [0, 0]
-      wh: ["100%", "100%"]
+      wh: ["50%", "50%"]
       color: ff000000
 

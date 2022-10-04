@@ -1,9 +1,10 @@
 //! Rectangular 2d array (flat, much faster than Vec<Vec<T>>)
 
 use std::ops::{Index, IndexMut};
-
-use crate::utils::sizes::Sizes;
-use crate::utils::extensions::vec::ExtensionFlatten;
+use crate::utils::{
+    sizes::Sizes,
+    extensions::vec::ExtensionFlatten,
+};
 
 
 

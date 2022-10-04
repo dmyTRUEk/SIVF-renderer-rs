@@ -1,8 +1,13 @@
 //! Simple Expr Eval, but with sqrt, sin, cos, etc
 
 use evalexpr::eval;
-
-use crate::utils::{extensions::{str::ExtensionCountChars, vec::ExtensionCollectToVec}, random::random};
+use crate::utils::{
+    extensions::{
+        str::ExtensionCountChars,
+        vec::ExtensionCollectToVec
+    },
+    random::random,
+};
 
 
 

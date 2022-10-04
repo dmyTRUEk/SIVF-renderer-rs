@@ -1,7 +1,9 @@
 //! Trait Render
 
-use crate::sivf_misc::canvas::Canvas;
-use crate::utils::sizes::ImageSizes;
+use crate::{
+    sivf_misc::canvas::Canvas,
+    utils::sizes::ImageSizes,
+};
 
 
 

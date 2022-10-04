@@ -2,22 +2,36 @@
 
 use serde_yaml::Value;
 
-use crate::sivf_misc::blend_types::{BlendTypes, BlendType};
-use crate::sivf_misc::keywords_and_consts::*;
-use crate::sivf_misc::metric_units::MetricUnit;
-use crate::sivf_misc::sivf_struct::SivfStruct;
-use crate::sivf_objects::complex::gradient::{Gradient, GradientPoint};
-use crate::sivf_objects::complex::layer::{Layer, LayerElement};
-use crate::sivf_objects::shapes::circle::Circle;
-use crate::sivf_objects::shapes::square::Square;
-use crate::sivf_objects::shapes::triangle::Triangle;
-use crate::sivf_objects::sivf_object::SivfObject;
-use crate::utils::color::{ARGB, Color, ColorModel};
-use crate::utils::extensions::str::{ExtensionCountChars, ExtensionsSplitOutsideBrackets};
-use crate::utils::extensions::vec::ExtensionCollectToVec;
-use crate::utils::simple_expr_eval::eval_expr;
-use crate::utils::sizes::ImageSizes;
-use crate::utils::vec2d::Vec2d;
+use crate::{
+    sivf_misc::{
+        blend_types::{BlendTypes, BlendType},
+        keywords_and_consts::*,
+        metric_units::MetricUnit,
+        sivf_struct::SivfStruct,
+    },
+    sivf_objects::{
+        complex::{
+            gradient::{Gradient, GradientPoint},
+            layer::{Layer, LayerElement},
+        },
+        shapes::{
+            circle::Circle,
+            square::Square,
+            triangle::Triangle,
+        },
+        sivf_object::SivfObject,
+    },
+    utils::{
+        color::{ARGB, Color, ColorModel},
+        extensions::{
+            str::{ExtensionCountChars, ExtensionsSplitOutsideBrackets},
+            vec::ExtensionCollectToVec,
+        },
+        simple_expr_eval::eval_expr,
+        sizes::ImageSizes,
+        vec2d::Vec2d,
+    },
+};
 
 
 

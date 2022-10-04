@@ -32,30 +32,40 @@
 
 )]
 
-use std::env;
-use std::fs::File;
-use std::io::Read;
-use std::path::Path;
+use std::{
+    env,
+    fs::File,
+    io::Read,
+    path::Path,
+};
 
 mod help;
 mod sivf_misc;
 mod sivf_objects;
 mod utils;
 
-use crate::help::HELP_STR;
-use crate::utils::extensions::date_time::ExtensionDateTimeLocalToMyFormat;
-use crate::utils::extensions::string::{ExtensionTrimEmptyLines, ExtensionTrimLinesByFirstLine, ExtensionRemoveCLikeComments, ExtensionToStr};
-use crate::utils::functionals::separate::ExtensionSeparate;
-use crate::utils::sizes::ImageSizes;
-use crate::utils::io::flush;
-use crate::sivf_misc::render::RenderType;
-use crate::sivf_misc::sivf_struct::SivfStruct;
-use crate::utils::extensions::vec::{ExtensionContains, ExtensionContainsStartsWith, ExtensionFindStartsWith};
+use crate::{
+    help::HELP_STR,
+    utils::{
+        extensions::{
+            date_time::ExtensionDateTimeLocalToMyFormat,
+            string::{ExtensionTrimEmptyLines, ExtensionTrimLinesByFirstLine, ExtensionRemoveCLikeComments, ExtensionToStr},
+            vec::{ExtensionContains, ExtensionContainsStartsWith, ExtensionFindStartsWith},
+        },
+        functionals::separate::ExtensionSeparate,
+        io::flush,
+        sizes::ImageSizes,
+    },
+    sivf_misc::{
+        render::RenderType,
+        sivf_struct::SivfStruct,
+    },
+};
 
 
 
 // CLI Options:
-const CLIO_HELP: [&str; 2] = ["-h", "--help"];
+const CLIO_HELP         : [&str; 2] = ["-h", "--help"];
 const CLIO_OUTPUT_FOLDER: [&str; 2] = ["-o", "--output"];
 const CLIO_RENDER_CPU   : [&str; 2] = ["-r=cpu", "--render=cpu"];
 const CLIO_RENDER_CPU1  : [&str; 2] = ["-r=cpu1", "--render=cpu1"];

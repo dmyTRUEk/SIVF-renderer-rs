@@ -1,7 +1,6 @@
 //! Rectangular 2d array (deprecated)
 
 use std::ops::{Index, IndexMut};
-
 use crate::utils::sizes::Sizes;
 
 

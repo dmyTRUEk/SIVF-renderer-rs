@@ -1,8 +1,6 @@
 //! `String` extensions
 
-// use regex::Regex;
 use regex::Regex;
-
 use crate::utils::extensions::vec::ExtensionCollectToVec;
 
 

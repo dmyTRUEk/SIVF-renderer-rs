@@ -2,12 +2,18 @@
 
 use image::ImageBuffer;
 
-use crate::sivf_misc::blend_types::{BlendTypes, blend_colors};
-use crate::sivf_misc::render::RenderType;
-use crate::utils::array2d_flat::Array2d;
-use crate::utils::color::{Color, TRANSPARENT};
-use crate::utils::sizes::{ImageSizes, Sizes};
-use crate::utils::extensions::usize::ExtensionIndices;
+use crate::{
+    sivf_misc::{
+        blend_types::{BlendTypes, blend_colors},
+        render::RenderType,
+    },
+    utils::{
+        array2d_flat::Array2d,
+        color::{Color, TRANSPARENT},
+        extensions::usize::ExtensionIndices,
+        sizes::{ImageSizes, Sizes},
+    },
+};
 
 
 

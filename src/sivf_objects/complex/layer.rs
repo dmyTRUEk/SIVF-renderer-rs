@@ -1,10 +1,14 @@
 //! SIVF Layer
 
-use crate::sivf_objects::sivf_object::SivfObject;
-use crate::sivf_misc::blend_types::BlendTypes;
-use crate::sivf_misc::canvas::Canvas;
-use crate::utils::sizes::ImageSizes;
-use crate::sivf_misc::render::{RenderType, Render};
+use crate::{
+    sivf_misc::{
+        blend_types::BlendTypes,
+        canvas::Canvas,
+        render::{RenderType, Render}
+    },
+    sivf_objects::sivf_object::SivfObject,
+    utils::sizes::ImageSizes,
+};
 
 
 

@@ -1,12 +1,19 @@
 //! SIVF Square
 
-use crate::sivf_misc::canvas::Canvas;
-use crate::sivf_misc::metric_units::{MetricUnit, ExtensionToPixels};
-use crate::sivf_misc::render::{Render, RenderType};
-use crate::utils::vec2d::Vec2d;
-use crate::utils::color::{Color, TRANSPARENT};
-use crate::utils::sizes::ImageSizes;
-use crate::utils::extensions::usize::ExtensionIndices;
+use crate::{
+    sivf_misc::{
+        canvas::Canvas,
+        metric_units::{MetricUnit, ExtensionToPixels},
+        render::{Render, RenderType},
+    },
+    utils::{
+        color::{Color, TRANSPARENT},
+        extensions::usize::ExtensionIndices,
+        sizes::ImageSizes,
+        vec2d::Vec2d,
+    },
+};
+
 
 
 #[derive(Clone, Debug, PartialEq)]

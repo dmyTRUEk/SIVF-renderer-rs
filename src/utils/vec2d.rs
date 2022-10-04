@@ -1,8 +1,9 @@
 //! Mathematical Vector (2 dimensional)
 
-use std::convert::TryFrom;
-use std::ops::{Neg, Sub, Add, Div, Mul};
-
+use std::{
+    convert::TryFrom,
+    ops::{Neg, Sub, Add, Div, Mul},
+};
 use crate::utils::sizes::Sizes;
 
 
