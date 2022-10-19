@@ -16,6 +16,7 @@ use crate::{
         },
         shapes::{
             circle::Circle,
+            rectangle::Rectangle,
             square::Square,
             triangle::Triangle,
         },
@@ -35,8 +36,8 @@ use crate::{
 
 
 
-// const SHOW_DESERIALIZATION_PROGRESS: bool = true;
-const SHOW_DESERIALIZATION_PROGRESS: bool = false;
+const SHOW_DESERIALIZATION_PROGRESS: bool = true;
+// const SHOW_DESERIALIZATION_PROGRESS: bool = false;
 
 
 
@@ -115,12 +116,13 @@ fn deserialize_to_layer_element(value: &Value) -> LayerElement {
         value if value.is_mapping() => {
             let map = value.as_mapping().unwrap();
 
-            let _key_layer  : &Value = &KW_LAYER.to_value();
-            let key_gradient: &Value = &KW_GRADIENT.to_value();
-            let key_blending: &Value = &KW_BLENDING.to_value();
-            let key_circle  : &Value = &KW_CIRCLE.to_value();
-            let key_square  : &Value = &KW_SQUARE.to_value();
-            let key_triangle: &Value = &KW_TRIANGLE.to_value();
+            let _key_layer   : &Value = &KW_LAYER.to_value();
+            let key_gradient : &Value = &KW_GRADIENT.to_value();
+            let key_blending : &Value = &KW_BLENDING.to_value();
+            let key_circle   : &Value = &KW_CIRCLE.to_value();
+            let key_rectangle: &Value = &KW_RECTANGLE.to_value();
+            let key_square   : &Value = &KW_SQUARE.to_value();
+            let key_triangle : &Value = &KW_TRIANGLE.to_value();
 
             match map {
                 map if map.contains_key(key_blending) => {
@@ -138,6 +140,11 @@ fn deserialize_to_layer_element(value: &Value) -> LayerElement {
                     let value = map.get(key_circle).unwrap();
                     let circle: Circle = deserialize_to_circle(value);
                     LayerElement::SivfObject(SivfObject::Circle(circle))
+                }
+                map if map.contains_key(key_rectangle) => {
+                    let value = map.get(key_rectangle).unwrap();
+                    let rectangle: Rectangle = deserialize_to_rectangle(value);
+                    LayerElement::SivfObject(SivfObject::Rectangle(rectangle))
                 }
                 map if map.contains_key(key_square) => {
                     let value = map.get(key_square).unwrap();
@@ -319,6 +326,27 @@ fn deserialize_to_circle(value: &Value) -> Circle {
             Circle::new(
                 deserialize_to_vec2d_metric_unit(map.get(&KW_XY.to_value()).unwrap()),
                 deserialize_to_metric_unit(map.get(&KW_CIRCLE_RADIUS.to_value()).unwrap()),
+                deserialize_to_color(map.get(&KW_COLOR.to_value()).unwrap()),
+                map.get(&KW_INVERSE.to_value()).unwrap_or(&VALUE_FALSE).as_bool().unwrap()
+            )
+        }
+        _ => { panic!() }
+    }
+}
+
+
+
+fn deserialize_to_rectangle(value: &Value) -> Rectangle {
+    if SHOW_DESERIALIZATION_PROGRESS {
+        println!("-------- deserializing to RECTANGLE:");
+        println!("{value:#?}");
+    }
+    match value {
+        value if value.is_mapping() => {
+            let map = value.as_mapping().unwrap();
+            Rectangle::new(
+                deserialize_to_vec2d_metric_unit(map.get(&KW_XY.to_value()).unwrap()),
+                deserialize_to_vec2d_metric_unit(map.get(&KW_RECTANGLE_WH.to_value()).unwrap()),
                 deserialize_to_color(map.get(&KW_COLOR.to_value()).unwrap()),
                 map.get(&KW_INVERSE.to_value()).unwrap_or(&VALUE_FALSE).as_bool().unwrap()
             )
@@ -511,6 +539,35 @@ mod tests {
                 LayerElement::SivfObject(SivfObject::Circle(Circle::new(
                     Vec2d::new(MetricUnit::Pixels(0.0), MetricUnit::Pixels(0.0)),
                     MetricUnit::Pixels(1984.0),
+                    Color::new(0xff, 0x11, 0x22, 0x33),
+                    false
+                ))),
+            ])
+        };
+        let actual: SivfStruct = SivfStruct::from(&serde_yaml::from_str(&s).unwrap());
+        assert_eq!(expected, actual);
+    }
+
+    #[test]
+    fn rectangle() {
+        let s: String = r#"
+            image_sizes: [3840, 2160]
+            color_model: ARGB
+            root_layer:
+              - blending: [overlap, overlap]
+              - rectangle:
+                  xy: [0, 0]
+                  wh: [2022, 1011]
+                  color: ff112233
+        "#.to_string();
+        let expected: SivfStruct = SivfStruct {
+            image_sizes: ImageSizes::new(3840, 2160),
+            color_model: ColorModel::ARGB,
+            root_layer: Layer::from(vec![
+                LayerElement::BlendTypes(BlendTypes::from(BlendType::Overlap, BlendType::Overlap)),
+                LayerElement::SivfObject(SivfObject::Rectangle(Rectangle::new(
+                    Vec2d::new(MetricUnit::Pixels(0.0), MetricUnit::Pixels(0.0)),
+                    Vec2d::new(MetricUnit::Pixels(2022.0), MetricUnit::Pixels(1011.0)),
                     Color::new(0xff, 0x11, 0x22, 0x33),
                     false
                 ))),

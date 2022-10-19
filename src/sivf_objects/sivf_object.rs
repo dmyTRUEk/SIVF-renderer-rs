@@ -3,7 +3,12 @@
 use crate::{
     sivf_objects::{
         complex::{gradient::Gradient, layer::Layer},
-        shapes::{circle::Circle, square::Square, triangle::Triangle},
+        shapes::{
+            circle::Circle,
+            rectangle::Rectangle,
+            square::Square,
+            triangle::Triangle,
+        },
     },
     sivf_misc::{
         canvas::Canvas,
@@ -22,6 +27,7 @@ pub enum SivfObject {
 
     // objects:
     Circle(Circle),
+    Rectangle(Rectangle),
     Square(Square),
     Triangle(Triangle),
 }
@@ -38,6 +44,9 @@ impl Render for SivfObject {
 
             SivfObject::Circle(circle) => {
                 circle.render(image_sizes, render_type)
+            }
+            SivfObject::Rectangle(rectangle) => {
+                rectangle.render(image_sizes, render_type)
             }
             SivfObject::Square(square) => {
                 square.render(image_sizes, render_type)

@@ -60,6 +60,9 @@ pub const KW_LAYER_DELTA_XY: &str = "delta_xy";
 pub const KW_MESH: &str = "mesh";
 pub const KW_MESH_N_XLEFT_YDOWN_XRIGHT_YUP: &str = "n_xleft_ydown_xright_yup";
 
+pub const KW_RECTANGLE: &str = "rectangle";
+pub const KW_RECTANGLE_WH: &str = "wh";
+
 pub const KW_SQUARE: &str = "square";
 pub const KW_SQUARE_SIDE: &str = "side";
 
