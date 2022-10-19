@@ -3,7 +3,7 @@
 use crate::{
     sivf_misc::{
         canvas::Canvas,
-        metric_units::{MetricUnit, ExtensionToPixels},
+        metric_units::{MetricUnit, ExtensionToPixels, Axis},
         render::{Render, RenderType},
     },
     utils::{
@@ -40,16 +40,16 @@ impl Render for Rectangle {
         let mut canvas: Canvas = Canvas::new(image_sizes);
         let (wmax, hmax): (usize, usize) = (image_sizes.w, image_sizes.h);
         let position: Vec2d<f64> = Vec2d::new(
-            self.position.x.to_pixels(wmax),
-            -self.position.y.to_pixels(hmax)   // minus here because math and array coords Y are inverted
+            self.position.x.to_pixels(image_sizes, Axis::X),
+            -self.position.y.to_pixels(image_sizes, Axis::Y)   // minus here because math and array coords Y are inverted
         );
         let shift: Vec2d<f64> =
             - Vec2d::new(wmax as f64, hmax as f64) / 2.0_f64
             - position
             + Vec2d::new(0.5_f64, 0.5_f64);
         // TODO LATER: think: use w or h?
-        let side_w: f64 = self.sizes.x.to_pixels(wmax);
-        let side_h: f64 = self.sizes.y.to_pixels(hmax);
+        let side_w: f64 = self.sizes.x.to_pixels(image_sizes, Axis::X);
+        let side_h: f64 = self.sizes.y.to_pixels(image_sizes, Axis::Y);
         let vec_min: Vec2d<f64> = -Vec2d::new(side_w, side_h) / 2.0_f64;
         let vec_max: Vec2d<f64> =  Vec2d::new(side_w, side_h) / 2.0_f64;
         match render_type {

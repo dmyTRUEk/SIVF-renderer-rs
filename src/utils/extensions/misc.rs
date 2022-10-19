@@ -18,7 +18,7 @@ impl<T, R> ExtensionMutate<R> for T {
 #[cfg(test)]
 mod tests {
     use crate::utils::extensions::misc::ExtensionMutate;
-    
+
     #[test]
     fn mutate() {
         {

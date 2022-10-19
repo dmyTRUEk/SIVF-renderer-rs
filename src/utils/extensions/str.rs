@@ -54,7 +54,7 @@ impl ExtensionsSplitOutsideBrackets for &str {
 #[cfg(test)]
 mod tests {
     use crate::utils::extensions::str::ExtensionsSplitOutsideBrackets;
-    
+
     #[test]
     fn split_outside_brackets() {
         let test_cases: Vec<_> = vec![

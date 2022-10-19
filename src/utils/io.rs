@@ -1,4 +1,4 @@
-//! This file contains Input/Output Utils 
+//! This file contains Input/Output Utils
 
 use std::io::{stdin, stdout, Write};
 

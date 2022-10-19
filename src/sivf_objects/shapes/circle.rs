@@ -3,7 +3,7 @@
 use crate::{
     sivf_misc::{
         canvas::Canvas,
-        metric_units::{MetricUnit, ExtensionToPixels},
+        metric_units::{MetricUnit, ExtensionToPixels, Axis},
         render::{Render, RenderType},
     },
     utils::{
@@ -40,15 +40,15 @@ impl Render for Circle {
         let mut canvas: Canvas = Canvas::new(image_sizes);
         let (wmax, hmax): (usize, usize) = (image_sizes.w, image_sizes.h);
         let position: Vec2d<f64> = Vec2d::new(
-            self.position.x.to_pixels(wmax),
-            -self.position.y.to_pixels(hmax)   // minus here because math and array coords Y are inverted
+            self.position.x.to_pixels(image_sizes, Axis::X),
+            -self.position.y.to_pixels(image_sizes, Axis::Y)   // minus here because math and array coords Y are inverted
         );
         let shift: Vec2d<f64> =
             - Vec2d::new(wmax as f64, hmax as f64) / 2.0_f64
             - position
             + Vec2d::new(0.5_f64, 0.5_f64);
-        // TODO LATER: think: use w or h?
-        let radius2: f64 = self.radius.to_pixels(hmax).powi(2);
+        // TODO LATER: think: use Axis:: X or Y?
+        let radius2: f64 = self.radius.to_pixels(image_sizes, Axis::Y).powi(2);
         match render_type {
             RenderType::Cpu1 => {
                 for h in hmax.indices() {

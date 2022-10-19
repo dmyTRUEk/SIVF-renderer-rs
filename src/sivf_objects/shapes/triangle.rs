@@ -3,7 +3,7 @@
 use crate::{
     sivf_misc::{
         canvas::Canvas,
-        metric_units::{MetricUnit, ExtensionToPixels},
+        metric_units::{MetricUnit, ExtensionToPixels, Axis},
         render::{Render, RenderType},
     },
     utils::{
@@ -45,9 +45,9 @@ impl Render for Triangle {
             - Vec2d::new(wmax as f64, hmax as f64) / 2.0_f64
             + Vec2d::new(0.5_f64, 0.5_f64);
         let (p1, p2, p3): (Vec2d<f64>, Vec2d<f64>, Vec2d<f64>) = (
-            Vec2d::new(self.p1.x.to_pixels(wmax), -self.p1.y.to_pixels(hmax)),
-            Vec2d::new(self.p2.x.to_pixels(wmax), -self.p2.y.to_pixels(hmax)),
-            Vec2d::new(self.p3.x.to_pixels(wmax), -self.p3.y.to_pixels(hmax))
+            Vec2d::new(self.p1.x.to_pixels(image_sizes, Axis::X), -self.p1.y.to_pixels(image_sizes, Axis::Y)),
+            Vec2d::new(self.p2.x.to_pixels(image_sizes, Axis::X), -self.p2.y.to_pixels(image_sizes, Axis::Y)),
+            Vec2d::new(self.p3.x.to_pixels(image_sizes, Axis::X), -self.p3.y.to_pixels(image_sizes, Axis::Y))
         );
         match render_type {
             RenderType::Cpu1 => {

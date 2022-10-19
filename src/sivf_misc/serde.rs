@@ -6,7 +6,7 @@ use crate::{
     sivf_misc::{
         blending::{BlendTypes, BlendType},
         keywords_and_consts::*,
-        metric_units::MetricUnit,
+        metric_units::{MetricUnit, Axis},
         sivf_struct::SivfStruct,
     },
     sivf_objects::{
@@ -189,8 +189,12 @@ fn deserialize_to_color(value: &Value) -> Color {
         println!("{value:#?}");
     }
     let res = match value {
-        value if value.is_string() => {
-            let s: &str = value.as_str().unwrap();
+        value if value.is_string() || value.is_u64() => {
+            let s: &str = &match value {
+                value if value.is_string() => { value.as_str().unwrap().to_string() }
+                value if value.is_u64() => { value.as_u64().unwrap().to_string() }
+                _ => { unimplemented!() }
+            };
             if s.count_chars(',') == 0 {
                 assert_eq!(8, s.len());
                 Color::from(s)
@@ -256,10 +260,10 @@ fn deserialize_to_metric_unit(value: &Value) -> MetricUnit {
         println!("-------- deserializing to METRIC UNITS:");
         println!("{value:#?}");
     }
-    trait ExtensionToF64 {
+    trait ExtToF64 {
         fn to_f64(&self) -> f64;
     }
-    impl ExtensionToF64 for Value {
+    impl ExtToF64 for Value {
         fn to_f64(&self) -> f64 {
             self.as_f64().unwrap_or(self.as_i64().unwrap() as f64)
         }
@@ -271,18 +275,38 @@ fn deserialize_to_metric_unit(value: &Value) -> MetricUnit {
         }
         value if value.is_string() => {
             let s: &str = value.as_str().unwrap().trim();
-            if s.ends_with('%') {
-                assert!(s.count_chars('%') == 1);
-                let percents_str: &str = &s[0..s.len()-1];
-                if SHOW_DESERIALIZATION_PROGRESS {
-                    println!("----- STARTING EVAL: `{percents_str}`");
+            match s {
+                s if s.ends_with('%') => {
+                    assert!(s.count_chars('%') == 1);
+                    let percents_str: &str = &s[0..s.len()-1];
+                    if SHOW_DESERIALIZATION_PROGRESS {
+                        println!("----- STARTING EVAL: `{percents_str}`");
+                    }
+                    let percents_number: f64 = eval_expr(percents_str);
+                    MetricUnit::Percents(percents_number, None)
                 }
-                let percents_number: f64 = eval_expr(percents_str);
-                MetricUnit::Percents(percents_number)
-            }
-            else {
-                let result: f64 = eval_expr(s);
-                MetricUnit::Pixels(result)
+                s if s.ends_with("%x") => {
+                    assert!(s.count_chars('%') == 1);
+                    let percents_str: &str = &s[0..s.len()-2];
+                    if SHOW_DESERIALIZATION_PROGRESS {
+                        println!("----- STARTING EVAL: `{percents_str}`");
+                    }
+                    let percents_number: f64 = eval_expr(percents_str);
+                    MetricUnit::Percents(percents_number, Some(Axis::X))
+                }
+                s if s.ends_with("%y") => {
+                    assert!(s.count_chars('%') == 1);
+                    let percents_str: &str = &s[0..s.len()-2];
+                    if SHOW_DESERIALIZATION_PROGRESS {
+                        println!("----- STARTING EVAL: `{percents_str}`");
+                    }
+                    let percents_number: f64 = eval_expr(percents_str);
+                    MetricUnit::Percents(percents_number, Some(Axis::Y))
+                }
+                _ => {
+                    let result: f64 = eval_expr(s);
+                    MetricUnit::Pixels(result)
+                }
             }
         }
         _ => { panic!() }
@@ -437,13 +461,21 @@ fn deserialize_to_gradient(value: &Value) -> Gradient {
 mod tests {
     use super::*;
 
-    use crate::utils::color::{ColorModel, Color};
-    use crate::utils::sizes::ImageSizes;
-    use crate::utils::vec2d::Vec2d;
-    use crate::sivf_misc::blending::{BlendTypes, BlendType};
-    use crate::sivf_misc::metric_units::MetricUnit;
-    use crate::sivf_objects::complex::layer::{Layer, LayerElement};
-    use crate::sivf_objects::shapes::circle::Circle;
+    use crate::{
+        utils::{
+            color::{ColorModel, Color},
+            sizes::ImageSizes,
+            vec2d::Vec2d,
+        },
+        sivf_misc::{
+            blending::{BlendTypes, BlendType},
+            metric_units::MetricUnit,
+        },
+        sivf_objects::{
+            complex::layer::{Layer, LayerElement},
+            shapes::circle::Circle,
+        },
+    };
 
     // TODO: write A LOT of tests
 
@@ -467,14 +499,14 @@ mod tests {
     #[test]
     fn deserialize_to_metric_units_percents() {
         let test_cases: Vec<(MetricUnit, &str)> = vec![
-            (MetricUnit::Percents(0.0), "0%"),
-            (MetricUnit::Percents(7.0), "7%"),
-            (MetricUnit::Percents(7.654), "7.654%"),
-            (MetricUnit::Percents(4.7), "(1.2+3.5)%"),
-            (MetricUnit::Percents(1.4142135623730951), "sqrt(2)%"),
-            (MetricUnit::Percents(8.122417494872465), "sqrt(2)+3*sqrt(5)%"),
-            (MetricUnit::Percents(8.122417494872465), "(sqrt(2)+3*sqrt(5))%"),
-            (MetricUnit::Percents(8.122417494872465), "((((((((((sqrt(((((2))))))))+((((3))))*sqrt(((((5))))))))))))%"),
+            (MetricUnit::Percents(0.0, None), "0%"),
+            (MetricUnit::Percents(7.0, None), "7%"),
+            (MetricUnit::Percents(7.654, None), "7.654%"),
+            (MetricUnit::Percents(4.7, None), "(1.2+3.5)%"),
+            (MetricUnit::Percents(1.4142135623730951, None), "sqrt(2)%"),
+            (MetricUnit::Percents(8.122417494872465, None), "sqrt(2)+3*sqrt(5)%"),
+            (MetricUnit::Percents(8.122417494872465, None), "(sqrt(2)+3*sqrt(5))%"),
+            (MetricUnit::Percents(8.122417494872465, None), "((((((((((sqrt(((((2))))))))+((((3))))*sqrt(((((5))))))))))))%"),
         ];
         for (ans, input) in test_cases {
             assert_eq!(ans, deserialize_to_metric_unit(&input.to_value()));
@@ -488,13 +520,13 @@ mod tests {
                 image_sizes: [3840, 2160]
                 color_model: ARGB
                 root_layer:
-                  - blending: [overlap, overlap]
+                  - blending: [overlap, add]
             "#.to_string();
             let expected: SivfStruct = SivfStruct {
                 image_sizes: ImageSizes::new(3840, 2160),
                 color_model: ColorModel::ARGB,
                 root_layer: Layer::from(vec![
-                    LayerElement::BlendTypes(BlendTypes::from(BlendType::Overlap, BlendType::Overlap)),
+                    LayerElement::BlendTypes(BlendTypes::from(BlendType::Overlap, BlendType::Add)),
                 ])
             };
             let actual: SivfStruct = SivfStruct::from(&serde_yaml::from_str(&s).unwrap());
@@ -505,13 +537,13 @@ mod tests {
                 image_sizes: [3840, 2160]
                 color_model: RGBA
                 root_layer:
-                  - blending: [overlap, overlap]
+                  - blending: [overlap, add]
             "#.to_string();
             let expected: SivfStruct = SivfStruct {
                 image_sizes: ImageSizes::new(3840, 2160),
                 color_model: ColorModel::RGBA,
                 root_layer: Layer::from(vec![
-                    LayerElement::BlendTypes(BlendTypes::from(BlendType::Overlap, BlendType::Overlap)),
+                    LayerElement::BlendTypes(BlendTypes::from(BlendType::Overlap, BlendType::Add)),
                 ])
             };
             let actual: SivfStruct = SivfStruct::from(&serde_yaml::from_str(&s).unwrap());
@@ -626,8 +658,8 @@ mod tests {
                 LayerElement::BlendTypes(BlendTypes::from(BlendType::Overlap, BlendType::Overlap)),
                 LayerElement::SivfObject(SivfObject::Triangle(Triangle::new(
                     Vec2d::new(MetricUnit::Pixels(-10.0), MetricUnit::Pixels(-99.0)),
-                    Vec2d::new(MetricUnit::Pixels(27.0), MetricUnit::Percents(67.0)),
-                    Vec2d::new(MetricUnit::Percents(43.0), MetricUnit::Pixels(83.0)),
+                    Vec2d::new(MetricUnit::Pixels(27.0), MetricUnit::Percents(67.0, None)),
+                    Vec2d::new(MetricUnit::Percents(43.0, None), MetricUnit::Pixels(83.0)),
                     Color::new(0xff, 0x11, 0x22, 0x33),
                     false
                 ))),

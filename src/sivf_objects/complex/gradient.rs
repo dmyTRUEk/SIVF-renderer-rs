@@ -3,7 +3,7 @@
 use crate::{
     sivf_misc::{
         canvas::Canvas,
-        metric_units::{MetricUnit, ExtensionToPixels},
+        metric_units::{MetricUnit, ExtensionToPixels, Axis},
         render::{Render, RenderType},
     },
     utils::{
@@ -63,8 +63,8 @@ impl Render for Gradient {
         let points: Vec<GradientPoint<f64>> = self.points.iter()
             .map(|p: &GradientPoint<MetricUnit>|
                 GradientPoint::<f64>::new(
-                    Vec2d::<f64>::new(p.pos.x.to_pixels(wmax), -p.pos.y.to_pixels(hmax)),
-                    p.sigma.to_pixels(hmax),
+                    Vec2d::<f64>::new(p.pos.x.to_pixels(image_sizes, Axis::X), -p.pos.y.to_pixels(image_sizes, Axis::Y)),
+                    p.sigma.to_pixels(image_sizes, Axis::Y),
                     p.color
                 )
             )

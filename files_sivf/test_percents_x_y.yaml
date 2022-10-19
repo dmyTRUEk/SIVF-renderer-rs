@@ -1,0 +1,22 @@
+// percents x y test
+
+image_sizes: [3000, 1000]
+
+root_layer:
+  - blending: [add, add]
+
+  - circle:
+      xy: ["-25%", 0]
+      r: "50%x"
+      color: ffff0000
+
+  - circle:
+      xy: [0, 0]
+      r: "50%"
+      color: ff00ff00
+
+  - circle:
+      xy: ["+25%", 0]
+      r: "50%y"
+      color: ff0000ff
+
