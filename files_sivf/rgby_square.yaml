@@ -1,0 +1,24 @@
+// red green blue yellow square
+
+// image_sizes: [1024, 1024]
+image_sizes: [1280, 1280] // for telegram
+// image_sizes: [2048, 2048]
+// image_sizes: [4096, 4096]
+// image_sizes: [8192, 8192]
+
+root_layer:
+  - gradient:
+      color: ff000000
+      fading: false
+      points: [
+        ["-50%", "-50%"], ffff0000, "30%",
+        ["-50%", "+50%"], ff00ff00, "30%",
+        ["+50%", "-50%"], ff0000ff, "30%",
+        ["+50%", "+50%"], ffffff00, "30%",
+      ]
+  - square:
+      inverse: true
+      color: ff000000
+      xy: [0, 0]
+      side: "50%"
+

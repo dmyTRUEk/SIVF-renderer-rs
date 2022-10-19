@@ -1,0 +1,14 @@
+// dmytruek logo bg
+
+image_sizes: [4096, 2304]
+
+root_layer:
+  - gradient:
+      color: ff000000
+      fading: true
+      points: [
+        ["-30%", "0"], ffff0000, "40%",
+        [  "0%", "0"], ff00ff00, "40%",
+        ["+30%", "0"], ff0000ff, "40%",
+      ]
+
