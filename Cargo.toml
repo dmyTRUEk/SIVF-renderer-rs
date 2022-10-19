@@ -6,23 +6,24 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [profile.release]
+opt-level = 3
 lto = "fat"
 codegen-units = 1
-opt-level = 3
 panic = "abort"
-#target-cpu = "native"
-#debuginfo = 0
+strip = "debuginfo"
+debuginfo = 0
+#target-cpu = "native" -> RUSTFLAGS='-C target-cpu=native'
 
 [dependencies]
-chrono = "*"
+chrono = "0.4.22"
+evalexpr = "8.1.0"
+image = "0.24.4"
+rand = "0.8.5"
+regex = "1.6.0"
+serde_yaml = "0.9.13"
 #clap = "*"
 #derive_more = "*"
-evalexpr = "*"
-image = "*"
 #itertools = "*"
-rand = "*"
-regex = "*"
-serde_yaml = "*"
 #serde = "*"
 #serde_derive = "*"
 #serde_json = "*"
