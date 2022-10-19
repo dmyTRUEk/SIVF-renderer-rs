@@ -4,7 +4,7 @@ use image::ImageBuffer;
 
 use crate::{
     sivf_misc::{
-        blend_types::{BlendTypes, blend_colors},
+        blending::{BlendTypes, blend_colors},
         render::RenderType,
     },
     utils::{

@@ -4,7 +4,7 @@ use serde_yaml::Value;
 
 use crate::{
     sivf_misc::{
-        blend_types::{BlendTypes, BlendType},
+        blending::{BlendTypes, BlendType},
         keywords_and_consts::*,
         metric_units::MetricUnit,
         sivf_struct::SivfStruct,
@@ -440,7 +440,7 @@ mod tests {
     use crate::utils::color::{ColorModel, Color};
     use crate::utils::sizes::ImageSizes;
     use crate::utils::vec2d::Vec2d;
-    use crate::sivf_misc::blend_types::{BlendTypes, BlendType};
+    use crate::sivf_misc::blending::{BlendTypes, BlendType};
     use crate::sivf_misc::metric_units::MetricUnit;
     use crate::sivf_objects::complex::layer::{Layer, LayerElement};
     use crate::sivf_objects::shapes::circle::Circle;

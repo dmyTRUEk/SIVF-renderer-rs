@@ -1,6 +1,6 @@
 //! Misc SIVF structs, enums and traits
 
-pub mod blend_types;
+pub mod blending;
 pub mod canvas;
 pub mod keywords_and_consts;
 pub mod metric_units;

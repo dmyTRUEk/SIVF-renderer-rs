@@ -2,7 +2,7 @@
 
 use crate::{
     sivf_misc::{
-        blend_types::BlendTypes,
+        blending::BlendTypes,
         canvas::Canvas,
         render::{RenderType, Render}
     },
