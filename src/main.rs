@@ -119,7 +119,10 @@ fn main() {
     // println!("file_paths = {file_paths:?}");
 
     if options.contains_(CLIO_HELP[0]) || options.contains_(CLIO_HELP[1])  {
-        println!("{help}", help=HELP_STR.to_string().trim_empty_lines().trim_lines_by_first_line());
+        let help_text: String = HELP_STR.to_string()
+            .trim_empty_lines()
+            .trim_lines_by_first_line();
+        println!("{help_text}");
         return;
     }
 
