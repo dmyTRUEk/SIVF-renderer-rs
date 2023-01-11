@@ -123,7 +123,7 @@ fn main() {
         return;
     }
 
-    if options.contains_starts_with(CLIO_OUTPUT_FOLDER[0]) {
+    if options.contains_starts_with(CLIO_OUTPUT_FOLDER[0]) || options.contains_starts_with(CLIO_OUTPUT_FOLDER[1]) {
         todo!()
     }
 
