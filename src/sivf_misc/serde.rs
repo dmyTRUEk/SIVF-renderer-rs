@@ -61,7 +61,7 @@ pub fn deserialize_to_sivf_struct(value: &Value) -> SivfStruct {
     let color_model_value: &Value = value.get(KW_COLOR_MODEL).unwrap_or(argb_value);
     let color_model_str: &str = color_model_value.as_str().unwrap();
 
-    // TODO: rewrite, so it works for list of layers
+    // TODO: rewrite, so it works for list of layers (without root layer?)
     let root_layer_value = value.get(KW_ROOT_LAYER).unwrap();
     let layer_element: LayerElement = deserialize_to_layer_element(root_layer_value);
     let sivf_object: SivfObject =
@@ -94,6 +94,7 @@ impl ExtensionToValue for String {
 
 
 
+// TODO(refactor): remove all `panic!` and use `Option`+`.unwrap()` instead.
 fn deserialize_to_layer_element(value: &Value) -> LayerElement {
     if SHOW_DESERIALIZATION_PROGRESS {
         println!("------------------------- deserializing to LAYER ELEMENT:");
