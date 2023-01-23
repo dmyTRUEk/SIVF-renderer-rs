@@ -4,7 +4,6 @@
 #![deny(
 
     bad_style,
-    const_err,
     // dead_code,
     improper_ctypes,
     non_shorthand_field_patterns,
@@ -22,7 +21,7 @@
 
     // LINTS:
     missing_debug_implementations,
-    missing_docs,
+    // missing_docs,
     trivial_casts,
     trivial_numeric_casts,
     unused_extern_crates,
@@ -46,6 +45,11 @@ mod utils;
 
 use crate::{
     help::HELP_STR,
+    sivf_misc::{
+        render::RenderType,
+        sivf_struct::SivfStruct,
+        sizes::ImageSizes,
+    },
     utils::{
         extensions::{
             date_time::ExtensionDateTimeLocalToMyFormat,
@@ -54,11 +58,6 @@ use crate::{
         },
         functionals::separate::ExtensionSeparate,
         io::flush,
-        sizes::ImageSizes,
-    },
-    sivf_misc::{
-        render::RenderType,
-        sivf_struct::SivfStruct,
     },
 };
 
@@ -198,8 +197,7 @@ fn main() {
         // println!("Parse result:\n{sivf_struct:#?}");
         println!("OK");
 
-        print!("Rendering... ");
-        flush();
+        println!("Rendering... ");
         let render_time_start = chrono::Local::now();
         let canvas = sivf_struct.render(render_type);
         let render_time_end = chrono::Local::now();

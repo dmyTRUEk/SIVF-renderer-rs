@@ -71,7 +71,7 @@ pub trait ExtensionSplitAndKeep {
 impl ExtensionSplitAndKeep for String {
     fn split_and_keep(&self, func: impl Fn(char) -> bool) -> Vec<&str> {
         if self == "" { return vec![]; }
-        let res: Vec<&str> = self.split_inclusive(func).collect_vec();
+        let res: Vec<&str> = self.split_inclusive(func).collect_to_vec();
         // println!("res = {res:#?}");
         let res_len = res.len();
         let mut res2: Vec<&str> = vec![];

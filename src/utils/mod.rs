@@ -10,16 +10,13 @@
 
 
 
-// other packages:
-pub mod extensions;
-pub mod functionals;
 
 // pub mod array2d;
 pub mod array2d_flat;
-pub mod color;
+pub mod extensions;
+pub mod functionals;
 pub mod io;
+pub mod macros;
 pub mod random;
-pub mod simple_expr_eval;
-pub mod sizes;
 pub mod vec2d;
 

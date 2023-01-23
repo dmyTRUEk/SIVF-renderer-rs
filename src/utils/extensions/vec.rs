@@ -5,10 +5,10 @@ use std::slice::Iter;
 
 
 pub trait ExtensionCollectToVec<I: Iterator> {
-    fn collect_vec(self) -> Vec<<I as Iterator>::Item>;
+    fn collect_to_vec(self) -> Vec<<I as Iterator>::Item>;
 }
 impl<I: Iterator> ExtensionCollectToVec<I> for I {
-    fn collect_vec(self) -> Vec<<I as Iterator>::Item> {
+    fn collect_to_vec(self) -> Vec<<I as Iterator>::Item> {
         self.collect::<Vec<_>>()
     }
 }

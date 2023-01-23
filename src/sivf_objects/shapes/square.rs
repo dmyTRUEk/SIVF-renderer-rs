@@ -3,13 +3,13 @@
 use crate::{
     sivf_misc::{
         canvas::Canvas,
+        color::{Color, TRANSPARENT},
         metric_units::{MetricUnit, ExtensionToPixels, Axis},
         render::{Render, RenderType},
+        sizes::ImageSizes,
     },
     utils::{
-        color::{Color, TRANSPARENT},
         extensions::usize::ExtensionIndices,
-        sizes::ImageSizes,
         vec2d::Vec2d,
     },
 };

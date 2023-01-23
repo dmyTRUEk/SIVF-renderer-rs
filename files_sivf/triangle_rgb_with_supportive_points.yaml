@@ -1,0 +1,36 @@
+// red green blue triangle with "supportive" points:
+
+image_sizes: [1080, 1080]
+// image_sizes: [2160, 2160]
+// image_sizes: [4320, 4320]
+
+vals:
+  - sigma: 8
+  - sigma_suppurtive: 9
+  - p1x: "-(sqrt(3)/4)*50"
+  - p1y: "-(1/4)*50"
+  - p2x: "0"
+  - p2y: "(1/2)*50"
+  - p3x: "+(sqrt(3)/4)*50"
+  - p3y: "-(1/4)*50"
+
+root_layer:
+  - gradient:
+      color: ff000000
+      fading: false
+      points: [
+        ["p1x%", "p1y%"], ffff0000, "sigma%",
+        ["p2x%", "p2y%"], ff00ff00, "sigma%",
+        ["p3x%", "p3y%"], ff0000ff, "sigma%",
+        // "supportive" points:
+        ["(p2x+p3x)/1.5%", "(p2y+p3y)/1.5%"], ff00ffff, "sigma_suppurtive%",
+        ["(p1x+p3x)/1.5%", "(p1y+p3y)/1.5%"], ffff00ff, "sigma_suppurtive%",
+        ["(p2x+p1x)/1.5%", "(p2y+p1y)/1.5%"], ffffff00, "sigma_suppurtive%",
+      ]
+  - triangle:
+      inverse: true
+      color: ff000000
+      p1: ["p1x%", "p1y%"]
+      p2: ["p2x%", "p2y%"]
+      p3: ["p3x%", "p3y%"]
+

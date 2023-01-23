@@ -5,14 +5,11 @@ use image::ImageBuffer;
 use crate::{
     sivf_misc::{
         blending::{BlendTypes, blend_colors},
-        render::RenderType,
-    },
-    utils::{
-        array2d_flat::Array2d,
         color::{Color, TRANSPARENT},
-        extensions::usize::ExtensionIndices,
+        render::RenderType,
         sizes::{ImageSizes, Sizes},
     },
+    utils::{array2d_flat::Array2d, extensions::usize::ExtensionIndices},
 };
 
 
@@ -26,7 +23,6 @@ pub struct Canvas {
 }
 
 impl Canvas {
-
     pub fn new(image_sizes: ImageSizes) -> Self {
         Canvas {
             pixels: Array2d::new(image_sizes, TRANSPARENT)
@@ -66,6 +62,5 @@ impl Canvas {
         }
         image_buffer
     }
-
 }
 

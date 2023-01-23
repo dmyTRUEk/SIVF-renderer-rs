@@ -4,10 +4,10 @@ use crate::{
     sivf_misc::{
         blending::BlendTypes,
         canvas::Canvas,
-        render::{RenderType, Render}
+        render::{RenderType, Render},
+        sizes::ImageSizes,
     },
     sivf_objects::sivf_object::SivfObject,
-    utils::sizes::ImageSizes,
 };
 
 

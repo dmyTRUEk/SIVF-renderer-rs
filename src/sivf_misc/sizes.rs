@@ -12,7 +12,6 @@ pub type ImageSizes = Sizes<usize>;
 pub type Coordinates<T> = Sizes<T>;
 
 impl<T: Copy> Sizes<T> {
-
     pub fn new(w: T, h: T) -> Self {
         Sizes { w, h }
     }
@@ -34,7 +33,6 @@ impl<T: Copy> Sizes<T> {
             y: R::try_from(self.h).ok().unwrap(),
         }
     }
-
 }
 
 

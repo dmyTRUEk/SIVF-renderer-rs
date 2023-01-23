@@ -1,13 +1,19 @@
 //! Convert json/yaml to sivf struct
 
+use std::collections::HashMap;
+
 use serde_yaml::Value;
 
 use crate::{
     sivf_misc::{
         blending::{BlendTypes, BlendType},
+        color::{ARGB, Color, ColorModel},
         keywords_and_consts::*,
         metric_units::{MetricUnit, Axis},
+        simple_expr_eval::{eval_expr, eval_expr_with_vals},
         sivf_struct::SivfStruct,
+        sizes::ImageSizes,
+        vals::Vals,
     },
     sivf_objects::{
         complex::{
@@ -23,13 +29,10 @@ use crate::{
         sivf_object::SivfObject,
     },
     utils::{
-        color::{ARGB, Color, ColorModel},
         extensions::{
             str::{ExtensionCountChars, ExtensionsSplitOutsideBrackets},
             vec::ExtensionCollectToVec,
         },
-        simple_expr_eval::eval_expr,
-        sizes::ImageSizes,
         vec2d::Vec2d,
     },
 };
@@ -41,38 +44,31 @@ const SHOW_DESERIALIZATION_PROGRESS: bool = true;
 
 
 
-// TODO: ? change [Value] to [HashMap<String, String>]
+// TODO(refactor): move all deserialize funcs to their corresponding files.
 pub fn deserialize_to_sivf_struct(value: &Value) -> SivfStruct {
     if SHOW_DESERIALIZATION_PROGRESS {
-        println!("------------------------------------------------ deserializing to SIVF STRUCT:");
+        // TODO(refactor): extract `"-".repeat(N)` to function.
+        println!();
+        println!("{} deserializing to SIVF STRUCT:", "-".repeat(48));
         println!("{value:#?}");
     }
-    if value.get(KW_IMAGE_SIZES).is_none() { panic!("{KW_IMAGE_SIZES} not found in root") }
-    // if value.get(KW_COLOR_MODEL).is_none() { panic!("{KW_COLOR_MODEL} not found in root") }
-    // if value.get(KW_ROOT_LAYER).is_none() { panic!("{KW_ROOT_LAYER} not found in root") }
+    let image_sizes = deserialize_to_image_sizes(value);
+    let color_model = deserialize_to_color_model(value);
+    let vals = deserialize_to_vals(value);
 
-    let image_sizes: &Value = value.get(KW_IMAGE_SIZES).unwrap();
-    let (w, h): (usize, usize) = (
-        image_sizes.as_sequence().unwrap().get(0).unwrap().as_u64().unwrap() as usize,
-        image_sizes.as_sequence().unwrap().get(1).unwrap().as_u64().unwrap() as usize
-    );
-
-    let argb_value: &Value = &ARGB.to_value();
-    let color_model_value: &Value = value.get(KW_COLOR_MODEL).unwrap_or(argb_value);
-    let color_model_str: &str = color_model_value.as_str().unwrap();
-
-    // TODO: rewrite, so it works for list of layers (without root layer?)
-    let root_layer_value = value.get(KW_ROOT_LAYER).unwrap();
-    let layer_element: LayerElement = deserialize_to_layer_element(root_layer_value);
+    // TODO: rewrite, so it works for list of layers (without root layer?).
+    let root_layer_value = value.get(KW_ROOT_LAYER).expect(&format!("{KW_ROOT_LAYER} not found in root"));
+    let layer_element: LayerElement = deserialize_to_layer_element(root_layer_value, Some(&vals));
     let sivf_object: SivfObject =
         if let LayerElement::SivfObject(sivf_object) =
             layer_element { sivf_object } else { panic!() };
     let root_layer: Layer = if let SivfObject::Layer(layer) = sivf_object { layer } else { panic!() };
 
     SivfStruct {
-        image_sizes: ImageSizes::new(w, h),
-        color_model: ColorModel::from(color_model_str),
-        root_layer
+        image_sizes,
+        color_model,
+        vals,
+        root_layer,
     }
 }
 
@@ -94,10 +90,88 @@ impl ExtensionToValue for String {
 
 
 
-// TODO(refactor): remove all `panic!` and use `Option`+`.unwrap()` instead.
-fn deserialize_to_layer_element(value: &Value) -> LayerElement {
+fn deserialize_to_image_sizes(value: &Value) -> ImageSizes {
+    let image_sizes: &Value = value.get(KW_IMAGE_SIZES).expect(&format!("{KW_IMAGE_SIZES} not found in root"));
     if SHOW_DESERIALIZATION_PROGRESS {
-        println!("------------------------- deserializing to LAYER ELEMENT:");
+        println!("{} deserializing to IMAGE SIZES:", "-".repeat(25));
+        println!("{image_sizes:#?}");
+    }
+    let (w, h): (usize, usize) = (
+        image_sizes.as_sequence().unwrap().get(0).unwrap().as_u64().unwrap() as usize,
+        image_sizes.as_sequence().unwrap().get(1).unwrap().as_u64().unwrap() as usize
+    );
+    ImageSizes::new(w, h)
+}
+
+
+fn deserialize_to_color_model(value: &Value) -> ColorModel {
+    // if value.get(KW_COLOR_MODEL).is_none() { panic!("{KW_COLOR_MODEL} not found in root") }
+    let color_model: &Value = &ARGB.to_value();
+    if SHOW_DESERIALIZATION_PROGRESS {
+        println!("{} deserializing to COLOR MODEL:", "-".repeat(25));
+        println!("{color_model:#?}");
+    }
+    let color_model_value: &Value = value.get(KW_COLOR_MODEL).unwrap_or(color_model);
+    let color_model_str: &str = color_model_value.as_str().unwrap();
+    ColorModel::from(color_model_str)
+}
+
+
+fn deserialize_to_vals(value: &Value) -> Vals {
+    let value_vals = value.get(KW_VALS);
+    let vals = match value_vals {
+        None => { Vec::new() }
+        Some(value_vals) => {
+            if SHOW_DESERIALIZATION_PROGRESS {
+                println!("{} deserializing to VALS:", "-".repeat(25));
+                println!("{value_vals:#?}");
+            }
+            let value_vals_as_seq = value_vals.as_sequence().unwrap();
+            value_vals_as_seq.iter().fold(Vec::with_capacity(value_vals_as_seq.len()),
+                |mut acc, el| {
+                    let key_value = el.as_mapping().unwrap();
+
+                    let key: String = {
+                        let mut keys = key_value.keys();
+                        assert_eq!(1, keys.len());
+                        keys.next().unwrap().as_str().unwrap().to_string()
+                    };
+
+                    let val = {
+                        let mut values = key_value.values();
+                        assert_eq!(1, values.len());
+                        let val = values.next().unwrap().clone();
+                        eval_expr_with_vals(
+                            if let Some(val) = val.as_str() {
+                                val.to_string()
+                            } else {
+                                val.to_f64().to_string()
+                            },
+                            Some(&acc)
+                        )
+                    };
+
+                    acc.push((key, val));
+                    acc
+                }
+            )
+        }
+    };
+    let mut vals = vals.iter().collect_to_vec();
+    vals.sort_by(|l, r| r.0.len().cmp(&l.0.len()));
+    let vals: Vals = vals.iter().map(|&kv| kv.clone()).collect_to_vec();
+    if SHOW_DESERIALIZATION_PROGRESS {
+        println!("vals: {vals:?}");
+    }
+    vals
+}
+
+
+
+// TODO(refactor): remove all `panic!` and use `Option`+`.unwrap()` instead.
+fn deserialize_to_layer_element(value: &Value, vals: Option<&Vals>) -> LayerElement {
+    if SHOW_DESERIALIZATION_PROGRESS {
+        println!("{} deserializing to LAYER ELEMENT:", "-".repeat(25));
         println!("{value:#?}");
     }
     match value {
@@ -105,9 +179,9 @@ fn deserialize_to_layer_element(value: &Value) -> LayerElement {
             let array = value.as_sequence().unwrap();
             let layer_elements: Vec<LayerElement> = array.iter().fold(vec![],
             |mut acc, el| {
-                // println!("-------------");
+                // println!("{}", "-".repeat(12));
                 // println!("{el:#?}");
-                let layer_element: LayerElement = deserialize_to_layer_element(el);
+                let layer_element: LayerElement = deserialize_to_layer_element(el, vals);
                 acc.push(layer_element);
                 acc
             });
@@ -139,32 +213,32 @@ fn deserialize_to_layer_element(value: &Value) -> LayerElement {
                 // }
                 map if map.contains_key(key_circle) => {
                     let value = map.get(key_circle).unwrap();
-                    let circle: Circle = deserialize_to_circle(value);
+                    let circle: Circle = deserialize_to_circle(value, vals);
                     LayerElement::SivfObject(SivfObject::Circle(circle))
                 }
                 map if map.contains_key(key_rectangle) => {
                     let value = map.get(key_rectangle).unwrap();
-                    let rectangle: Rectangle = deserialize_to_rectangle(value);
+                    let rectangle: Rectangle = deserialize_to_rectangle(value, vals);
                     LayerElement::SivfObject(SivfObject::Rectangle(rectangle))
                 }
                 map if map.contains_key(key_square) => {
                     let value = map.get(key_square).unwrap();
-                    let square: Square = deserialize_to_square(value);
+                    let square: Square = deserialize_to_square(value, vals);
                     LayerElement::SivfObject(SivfObject::Square(square))
                 }
                 map if map.contains_key(key_triangle) => {
                     let value = map.get(key_triangle).unwrap();
-                    let triangle: Triangle = deserialize_to_triangle(value);
+                    let triangle: Triangle = deserialize_to_triangle(value, vals);
                     LayerElement::SivfObject(SivfObject::Triangle(triangle))
                 }
                 map if map.contains_key(key_gradient) => {
                     let value = map.get(key_gradient).unwrap();
-                    let gradient: Gradient = deserialize_to_gradient(value);
+                    let gradient: Gradient = deserialize_to_gradient(value, vals);
                     LayerElement::SivfObject(SivfObject::Gradient(gradient))
                 }
                 _ => {
-                    // TODO: create list of all KW and search for similar, and if so, show it
-                    println!("------");
+                    // TODO: create list of all KW and search for similar, and if so, show it.
+                    println!("{}", "-".repeat(6));
                     println!("found unknown structure: {map:#?}");
                     let unknown_thing_name = map.iter().next().unwrap().0.as_str().unwrap();
                     todo!("{unknown_thing_name}")
@@ -186,7 +260,7 @@ const VALUE_FALSE: &Value = &Value::Bool(false);
 
 fn deserialize_to_color(value: &Value) -> Color {
     if SHOW_DESERIALIZATION_PROGRESS {
-        println!("-------- deserializing to COLOR:");
+        println!("{} deserializing to COLOR:", "-".repeat(8));
         println!("{value:#?}");
     }
     let res = match value {
@@ -223,7 +297,7 @@ fn deserialize_to_color(value: &Value) -> Color {
 
 fn deserialize_to_blend_types(value: &Value) -> BlendTypes {
     if SHOW_DESERIALIZATION_PROGRESS {
-        println!("-------- deserializing to BLEND TYPES:");
+        println!("{} deserializing to BLEND TYPES:", "-".repeat(8));
         println!("{value:#?}");
     }
     trait ExtensionToBlendType {
@@ -256,18 +330,32 @@ fn deserialize_to_blend_types(value: &Value) -> BlendTypes {
 
 
 
-fn deserialize_to_metric_unit(value: &Value) -> MetricUnit {
-    if SHOW_DESERIALIZATION_PROGRESS {
-        println!("-------- deserializing to METRIC UNITS:");
-        println!("{value:#?}");
+trait ExtToF64 {
+    fn to_f64(&self) -> f64;
+}
+impl ExtToF64 for Value {
+    fn to_f64(&self) -> f64 {
+        self.as_f64().unwrap_or_else(|| self.as_i64().unwrap() as f64)
     }
-    trait ExtToF64 {
-        fn to_f64(&self) -> f64;
-    }
-    impl ExtToF64 for Value {
-        fn to_f64(&self) -> f64 {
-            self.as_f64().unwrap_or(self.as_i64().unwrap() as f64)
+}
+trait ExtToF64Safe {
+    fn to_f64_safe(&self) -> Option<f64>;
+}
+impl ExtToF64Safe for Value {
+    fn to_f64_safe(&self) -> Option<f64> {
+        match self.as_f64() {
+            Some(x) => { Some(x) }
+            None => {
+                self.as_i64().map(|x| x as f64)
+            }
         }
+    }
+}
+
+fn deserialize_to_metric_unit(value: &Value, vals: Option<&Vals>) -> MetricUnit {
+    if SHOW_DESERIALIZATION_PROGRESS {
+        println!("{} deserializing to METRIC UNITS:", "-".repeat(8));
+        println!("{value:#?}");
     }
     let res = match value {
         value if value.is_number() => {
@@ -281,31 +369,31 @@ fn deserialize_to_metric_unit(value: &Value) -> MetricUnit {
                     assert!(s.count_chars('%') == 1);
                     let percents_str: &str = &s[0..s.len()-1];
                     if SHOW_DESERIALIZATION_PROGRESS {
-                        println!("----- STARTING EVAL: `{percents_str}`");
+                        println!("{} STARTING EVAL: `{percents_str}`", "-".repeat(5));
                     }
-                    let percents_number: f64 = eval_expr(percents_str);
+                    let percents_number: f64 = eval_expr_with_vals(percents_str, vals);
                     MetricUnit::Percents(percents_number, None)
                 }
-                s if s.ends_with("%x") => {
+                s if s.ends_with("%x") || s.ends_with("%w") => {
                     assert!(s.count_chars('%') == 1);
                     let percents_str: &str = &s[0..s.len()-2];
                     if SHOW_DESERIALIZATION_PROGRESS {
-                        println!("----- STARTING EVAL: `{percents_str}`");
+                        println!("{} STARTING EVAL: `{percents_str}`", "-".repeat(5));
                     }
-                    let percents_number: f64 = eval_expr(percents_str);
+                    let percents_number: f64 = eval_expr_with_vals(percents_str, vals);
                     MetricUnit::Percents(percents_number, Some(Axis::X))
                 }
-                s if s.ends_with("%y") => {
+                s if s.ends_with("%y") || s.ends_with("%h") => {
                     assert!(s.count_chars('%') == 1);
                     let percents_str: &str = &s[0..s.len()-2];
                     if SHOW_DESERIALIZATION_PROGRESS {
-                        println!("----- STARTING EVAL: `{percents_str}`");
+                        println!("{} STARTING EVAL: `{percents_str}`", "-".repeat(5));
                     }
-                    let percents_number: f64 = eval_expr(percents_str);
+                    let percents_number: f64 = eval_expr_with_vals(percents_str, vals);
                     MetricUnit::Percents(percents_number, Some(Axis::Y))
                 }
                 _ => {
-                    let result: f64 = eval_expr(s);
+                    let result: f64 = eval_expr_with_vals(s, vals);
                     MetricUnit::Pixels(result)
                 }
             }
@@ -320,9 +408,9 @@ fn deserialize_to_metric_unit(value: &Value) -> MetricUnit {
 
 
 
-fn deserialize_to_vec2d_metric_unit(value: &Value) -> Vec2d<MetricUnit> {
+fn deserialize_to_vec2d_metric_unit(value: &Value, vals: Option<&Vals>) -> Vec2d<MetricUnit> {
     if SHOW_DESERIALIZATION_PROGRESS {
-        println!("-------- deserializing to POSITION (Vec2d MetricUnit):");
+        println!("{} deserializing to POSITION (Vec2d of MetricUnit):", "-".repeat(8));
         println!("{value:#?}");
     }
     match value {
@@ -330,8 +418,8 @@ fn deserialize_to_vec2d_metric_unit(value: &Value) -> Vec2d<MetricUnit> {
             let array = value.as_sequence().unwrap();
             assert_eq!(None, array.get(2));
             Vec2d::new(
-                deserialize_to_metric_unit(array.get(0).unwrap()),
-                deserialize_to_metric_unit(array.get(1).unwrap()),
+                deserialize_to_metric_unit(array.get(0).unwrap(), vals),
+                deserialize_to_metric_unit(array.get(1).unwrap(), vals),
             )
         }
         _ => { panic!() }
@@ -340,17 +428,17 @@ fn deserialize_to_vec2d_metric_unit(value: &Value) -> Vec2d<MetricUnit> {
 
 
 
-fn deserialize_to_circle(value: &Value) -> Circle {
+fn deserialize_to_circle(value: &Value, vals: Option<&Vals>) -> Circle {
     if SHOW_DESERIALIZATION_PROGRESS {
-        println!("-------- deserializing to CIRCLE:");
+        println!("{} deserializing to CIRCLE:", "-".repeat(8));
         println!("{value:#?}");
     }
     match value {
         value if value.is_mapping() => {
             let map = value.as_mapping().unwrap();
             Circle::new(
-                deserialize_to_vec2d_metric_unit(map.get(&KW_XY.to_value()).unwrap()),
-                deserialize_to_metric_unit(map.get(&KW_CIRCLE_RADIUS.to_value()).unwrap()),
+                deserialize_to_vec2d_metric_unit(map.get(&KW_XY.to_value()).unwrap(), vals),
+                deserialize_to_metric_unit(map.get(&KW_CIRCLE_RADIUS.to_value()).unwrap(), vals),
                 deserialize_to_color(map.get(&KW_COLOR.to_value()).unwrap()),
                 map.get(&KW_INVERSE.to_value()).unwrap_or(&VALUE_FALSE).as_bool().unwrap()
             )
@@ -361,17 +449,17 @@ fn deserialize_to_circle(value: &Value) -> Circle {
 
 
 
-fn deserialize_to_rectangle(value: &Value) -> Rectangle {
+fn deserialize_to_rectangle(value: &Value, vals: Option<&Vals>) -> Rectangle {
     if SHOW_DESERIALIZATION_PROGRESS {
-        println!("-------- deserializing to RECTANGLE:");
+        println!("{} deserializing to RECTANGLE:", "-".repeat(8));
         println!("{value:#?}");
     }
     match value {
         value if value.is_mapping() => {
             let map = value.as_mapping().unwrap();
             Rectangle::new(
-                deserialize_to_vec2d_metric_unit(map.get(&KW_XY.to_value()).unwrap()),
-                deserialize_to_vec2d_metric_unit(map.get(&KW_RECTANGLE_WH.to_value()).unwrap()),
+                deserialize_to_vec2d_metric_unit(map.get(&KW_XY.to_value()).unwrap(), vals),
+                deserialize_to_vec2d_metric_unit(map.get(&KW_RECTANGLE_WH.to_value()).unwrap(), vals),
                 deserialize_to_color(map.get(&KW_COLOR.to_value()).unwrap()),
                 map.get(&KW_INVERSE.to_value()).unwrap_or(&VALUE_FALSE).as_bool().unwrap()
             )
@@ -382,17 +470,17 @@ fn deserialize_to_rectangle(value: &Value) -> Rectangle {
 
 
 
-fn deserialize_to_square(value: &Value) -> Square {
+fn deserialize_to_square(value: &Value, vals: Option<&Vals>) -> Square {
     if SHOW_DESERIALIZATION_PROGRESS {
-        println!("-------- deserializing to SQUARE:");
+        println!("{} deserializing to SQUARE:", "-".repeat(8));
         println!("{value:#?}");
     }
     match value {
         value if value.is_mapping() => {
             let map = value.as_mapping().unwrap();
             Square::new(
-                deserialize_to_vec2d_metric_unit(map.get(&KW_XY.to_value()).unwrap()),
-                deserialize_to_metric_unit(map.get(&KW_SQUARE_SIDE.to_value()).unwrap()),
+                deserialize_to_vec2d_metric_unit(map.get(&KW_XY.to_value()).unwrap(), vals),
+                deserialize_to_metric_unit(map.get(&KW_SQUARE_SIDE.to_value()).unwrap(), vals),
                 deserialize_to_color(map.get(&KW_COLOR.to_value()).unwrap()),
                 map.get(&KW_INVERSE.to_value()).unwrap_or(&VALUE_FALSE).as_bool().unwrap()
             )
@@ -403,18 +491,18 @@ fn deserialize_to_square(value: &Value) -> Square {
 
 
 
-fn deserialize_to_triangle(value: &Value) -> Triangle {
+fn deserialize_to_triangle(value: &Value, vals: Option<&Vals>) -> Triangle {
     if SHOW_DESERIALIZATION_PROGRESS {
-        println!("-------- deserializing to TRIANGLE:");
+        println!("{} deserializing to TRIANGLE:", "-".repeat(8));
         println!("{value:#?}");
     }
     match value {
         value if value.is_mapping() => {
             let map = value.as_mapping().unwrap();
             Triangle::new(
-                deserialize_to_vec2d_metric_unit(map.get(&KW_TRIANGLE_P1.to_value()).unwrap()),
-                deserialize_to_vec2d_metric_unit(map.get(&KW_TRIANGLE_P2.to_value()).unwrap()),
-                deserialize_to_vec2d_metric_unit(map.get(&KW_TRIANGLE_P3.to_value()).unwrap()),
+                deserialize_to_vec2d_metric_unit(map.get(&KW_TRIANGLE_P1.to_value()).unwrap(), vals),
+                deserialize_to_vec2d_metric_unit(map.get(&KW_TRIANGLE_P2.to_value()).unwrap(), vals),
+                deserialize_to_vec2d_metric_unit(map.get(&KW_TRIANGLE_P3.to_value()).unwrap(), vals),
                 deserialize_to_color(map.get(&KW_COLOR.to_value()).unwrap()),
                 map.get(&KW_INVERSE.to_value()).unwrap_or(&VALUE_FALSE).as_bool().unwrap()
             )
@@ -425,24 +513,24 @@ fn deserialize_to_triangle(value: &Value) -> Triangle {
 
 
 
-fn deserialize_to_gradient(value: &Value) -> Gradient {
+fn deserialize_to_gradient(value: &Value, vals: Option<&Vals>) -> Gradient {
     if SHOW_DESERIALIZATION_PROGRESS {
-        println!("-------- deserializing to GRADIENT:");
+        println!("{} deserializing to GRADIENT:", "-".repeat(8));
         println!("{value:#?}");
     }
     match value {
         value if value.is_mapping() => {
             let map = value.as_mapping().unwrap();
-            let points: Vec<GradientPoint<MetricUnit>> =
-                map.get(&KW_GRADIENT_POINTS.to_value()).unwrap()
+            let points: Vec<GradientPoint<MetricUnit>> = map
+                .get(&KW_GRADIENT_POINTS.to_value()).unwrap()
                 .as_sequence().unwrap()
-                .chunks_exact(3).collect_vec()
-                // TODO: assert remainder is zero
+                .chunks_exact(3).collect_to_vec()
+                // TODO: assert remainder is zero.
                 .iter()
                 .map(|p|(
-                    deserialize_to_vec2d_metric_unit(&p[0]),
+                    deserialize_to_vec2d_metric_unit(&p[0], vals),
                     deserialize_to_color(&p[1]),
-                    deserialize_to_metric_unit(&p[2])
+                    deserialize_to_metric_unit(&p[2], vals)
                 ))
                 .map(|(pos, color, sigma)| GradientPoint::new(pos, sigma, color))
                 .collect();
@@ -463,28 +551,29 @@ mod tests {
     use super::*;
 
     use crate::{
-        utils::{
-            color::{ColorModel, Color},
-            sizes::ImageSizes,
-            vec2d::Vec2d,
-        },
         sivf_misc::{
             blending::{BlendTypes, BlendType},
+            color::{ColorModel, Color},
             metric_units::MetricUnit,
+            sizes::ImageSizes,
         },
         sivf_objects::{
             complex::layer::{Layer, LayerElement},
             shapes::circle::Circle,
         },
+        utils::vec2d::Vec2d,
     };
 
-    // TODO: write A LOT of tests
+    // TODO(tests): write A LOT of tests
 
     #[test]
     fn deserialize_to_metric_units_pixels() {
         let test_cases: Vec<(MetricUnit, &str)> = vec![
             (MetricUnit::Pixels(0.0), "0"),
             (MetricUnit::Pixels(7.0), "7"),
+            (MetricUnit::Pixels(7.0), "7.0"),
+            (MetricUnit::Pixels(7.0), "7."),
+            (MetricUnit::Pixels(0.7), ".7"),
             (MetricUnit::Pixels(7.645), "7.645"),
             (MetricUnit::Pixels(4.7), "1.2+3.5"),
             (MetricUnit::Pixels(1.4142135623730951), "sqrt(2)"),
@@ -493,7 +582,7 @@ mod tests {
             (MetricUnit::Pixels(8.122417494872465), "((((((((((sqrt(((((2))))))))+((((3))))*sqrt(((((5))))))))))))"),
         ];
         for (ans, input) in test_cases {
-            assert_eq!(ans, deserialize_to_metric_unit(&input.to_value()));
+            assert_eq!(ans, deserialize_to_metric_unit(&input.to_value(), None));
         }
     }
 
@@ -502,15 +591,52 @@ mod tests {
         let test_cases: Vec<(MetricUnit, &str)> = vec![
             (MetricUnit::Percents(0.0, None), "0%"),
             (MetricUnit::Percents(7.0, None), "7%"),
+            (MetricUnit::Percents(7.0, None), "7.0%"),
             (MetricUnit::Percents(7.654, None), "7.654%"),
             (MetricUnit::Percents(4.7, None), "(1.2+3.5)%"),
             (MetricUnit::Percents(1.4142135623730951, None), "sqrt(2)%"),
             (MetricUnit::Percents(8.122417494872465, None), "sqrt(2)+3*sqrt(5)%"),
             (MetricUnit::Percents(8.122417494872465, None), "(sqrt(2)+3*sqrt(5))%"),
             (MetricUnit::Percents(8.122417494872465, None), "((((((((((sqrt(((((2))))))))+((((3))))*sqrt(((((5))))))))))))%"),
+            (MetricUnit::Percents(0.0, Some(Axis::X)), "0%x"),
+            (MetricUnit::Percents(7.0, Some(Axis::X)), "7%x"),
+            (MetricUnit::Percents(7.0, Some(Axis::X)), "7.0%x"),
+            (MetricUnit::Percents(7.654, Some(Axis::X)), "7.654%x"),
+            (MetricUnit::Percents(4.7, Some(Axis::X)), "(1.2+3.5)%x"),
+            (MetricUnit::Percents(1.4142135623730951, Some(Axis::X)), "sqrt(2)%x"),
+            (MetricUnit::Percents(8.122417494872465, Some(Axis::X)), "sqrt(2)+3*sqrt(5)%x"),
+            (MetricUnit::Percents(8.122417494872465, Some(Axis::X)), "(sqrt(2)+3*sqrt(5))%x"),
+            (MetricUnit::Percents(8.122417494872465, Some(Axis::X)), "((((((((((sqrt(((((2))))))))+((((3))))*sqrt(((((5))))))))))))%x"),
+            (MetricUnit::Percents(0.0, Some(Axis::X)), "0%w"),
+            (MetricUnit::Percents(7.0, Some(Axis::X)), "7%w"),
+            (MetricUnit::Percents(7.0, Some(Axis::X)), "7.0%w"),
+            (MetricUnit::Percents(7.654, Some(Axis::X)), "7.654%w"),
+            (MetricUnit::Percents(4.7, Some(Axis::X)), "(1.2+3.5)%w"),
+            (MetricUnit::Percents(1.4142135623730951, Some(Axis::X)), "sqrt(2)%w"),
+            (MetricUnit::Percents(8.122417494872465, Some(Axis::X)), "sqrt(2)+3*sqrt(5)%w"),
+            (MetricUnit::Percents(8.122417494872465, Some(Axis::X)), "(sqrt(2)+3*sqrt(5))%w"),
+            (MetricUnit::Percents(8.122417494872465, Some(Axis::X)), "((((((((((sqrt(((((2))))))))+((((3))))*sqrt(((((5))))))))))))%w"),
+            (MetricUnit::Percents(0.0, Some(Axis::Y)), "0%y"),
+            (MetricUnit::Percents(7.0, Some(Axis::Y)), "7%y"),
+            (MetricUnit::Percents(7.0, Some(Axis::Y)), "7.0%y"),
+            (MetricUnit::Percents(7.654, Some(Axis::Y)), "7.654%y"),
+            (MetricUnit::Percents(4.7, Some(Axis::Y)), "(1.2+3.5)%y"),
+            (MetricUnit::Percents(1.4142135623730951, Some(Axis::Y)), "sqrt(2)%y"),
+            (MetricUnit::Percents(8.122417494872465, Some(Axis::Y)), "sqrt(2)+3*sqrt(5)%y"),
+            (MetricUnit::Percents(8.122417494872465, Some(Axis::Y)), "(sqrt(2)+3*sqrt(5))%y"),
+            (MetricUnit::Percents(8.122417494872465, Some(Axis::Y)), "((((((((((sqrt(((((2))))))))+((((3))))*sqrt(((((5))))))))))))%y"),
+            (MetricUnit::Percents(0.0, Some(Axis::Y)), "0%h"),
+            (MetricUnit::Percents(7.0, Some(Axis::Y)), "7%h"),
+            (MetricUnit::Percents(7.0, Some(Axis::Y)), "7.0%h"),
+            (MetricUnit::Percents(7.654, Some(Axis::Y)), "7.654%h"),
+            (MetricUnit::Percents(4.7, Some(Axis::Y)), "(1.2+3.5)%h"),
+            (MetricUnit::Percents(1.4142135623730951, Some(Axis::Y)), "sqrt(2)%h"),
+            (MetricUnit::Percents(8.122417494872465, Some(Axis::Y)), "sqrt(2)+3*sqrt(5)%h"),
+            (MetricUnit::Percents(8.122417494872465, Some(Axis::Y)), "(sqrt(2)+3*sqrt(5))%h"),
+            (MetricUnit::Percents(8.122417494872465, Some(Axis::Y)), "((((((((((sqrt(((((2))))))))+((((3))))*sqrt(((((5))))))))))))%h"),
         ];
         for (ans, input) in test_cases {
-            assert_eq!(ans, deserialize_to_metric_unit(&input.to_value()));
+            assert_eq!(ans, deserialize_to_metric_unit(&input.to_value(), None));
         }
     }
 
@@ -526,6 +652,7 @@ mod tests {
             let expected: SivfStruct = SivfStruct {
                 image_sizes: ImageSizes::new(3840, 2160),
                 color_model: ColorModel::ARGB,
+                vals: Vec::new(),
                 root_layer: Layer::from(vec![
                     LayerElement::BlendTypes(BlendTypes::from(BlendType::Overlap, BlendType::Add)),
                 ])
@@ -543,6 +670,7 @@ mod tests {
             let expected: SivfStruct = SivfStruct {
                 image_sizes: ImageSizes::new(3840, 2160),
                 color_model: ColorModel::RGBA,
+                vals: Vec::new(),
                 root_layer: Layer::from(vec![
                     LayerElement::BlendTypes(BlendTypes::from(BlendType::Overlap, BlendType::Add)),
                 ])
@@ -567,6 +695,7 @@ mod tests {
         let expected: SivfStruct = SivfStruct {
             image_sizes: ImageSizes::new(3840, 2160),
             color_model: ColorModel::ARGB,
+            vals: Vec::new(),
             root_layer: Layer::from(vec![
                 LayerElement::BlendTypes(BlendTypes::from(BlendType::Overlap, BlendType::Overlap)),
                 LayerElement::SivfObject(SivfObject::Circle(Circle::new(
@@ -596,6 +725,7 @@ mod tests {
         let expected: SivfStruct = SivfStruct {
             image_sizes: ImageSizes::new(3840, 2160),
             color_model: ColorModel::ARGB,
+            vals: Vec::new(),
             root_layer: Layer::from(vec![
                 LayerElement::BlendTypes(BlendTypes::from(BlendType::Overlap, BlendType::Overlap)),
                 LayerElement::SivfObject(SivfObject::Rectangle(Rectangle::new(
@@ -625,6 +755,7 @@ mod tests {
         let expected: SivfStruct = SivfStruct {
             image_sizes: ImageSizes::new(3840, 2160),
             color_model: ColorModel::ARGB,
+            vals: Vec::new(),
             root_layer: Layer::from(vec![
                 LayerElement::BlendTypes(BlendTypes::from(BlendType::Overlap, BlendType::Overlap)),
                 LayerElement::SivfObject(SivfObject::Square(Square::new(
@@ -655,12 +786,53 @@ mod tests {
         let expected: SivfStruct = SivfStruct {
             image_sizes: ImageSizes::new(3840, 2160),
             color_model: ColorModel::ARGB,
+            vals: Vec::new(),
             root_layer: Layer::from(vec![
                 LayerElement::BlendTypes(BlendTypes::from(BlendType::Overlap, BlendType::Overlap)),
                 LayerElement::SivfObject(SivfObject::Triangle(Triangle::new(
                     Vec2d::new(MetricUnit::Pixels(-10.0), MetricUnit::Pixels(-99.0)),
                     Vec2d::new(MetricUnit::Pixels(27.0), MetricUnit::Percents(67.0, None)),
                     Vec2d::new(MetricUnit::Percents(43.0, None), MetricUnit::Pixels(83.0)),
+                    Color::new(0xff, 0x11, 0x22, 0x33),
+                    false
+                ))),
+            ])
+        };
+        let actual: SivfStruct = SivfStruct::from(&serde_yaml::from_str(&s).unwrap());
+        assert_eq!(expected, actual);
+    }
+
+    #[test]
+    fn vals() {
+        let s: String = r#"
+            image_sizes: [3840, 2160]
+            color_model: ARGB
+            vals:
+              - v1: 145
+              - v2: 2.0
+              - v3: -0.999
+              - v4: v1-187
+            root_layer:
+              - triangle:
+                  p1: ["v1+v2", "v1-v2"]
+                  p2: ["v1*v3", "v2%"]
+                  p3: ["v2*sin(v3)", "v1*(v2+sin(v2-v3+v1/v4))-v4"]
+                  color: ff112233
+        "#.to_string();
+        let expected: SivfStruct = SivfStruct {
+            image_sizes: ImageSizes::new(3840, 2160),
+            color_model: ColorModel::ARGB,
+            vals: vec![
+                ("v1", 145.0),
+                ("v2", 2.0),
+                ("v3", -0.999),
+                ("v4", -42.0),
+            ].iter().map(|(k, v)| (k.to_string(), *v)).collect_to_vec(),
+            root_layer: Layer::from(vec![
+                LayerElement::SivfObject(SivfObject::Triangle(Triangle::new(
+                    Vec2d::new(MetricUnit::Pixels(145.0+2.0), MetricUnit::Pixels(145.0-2.0)),
+                    Vec2d::new(MetricUnit::Pixels(145.0*-0.999), MetricUnit::Percents(2.0, None)),
+                    Vec2d::new(MetricUnit::Pixels(2.0*(-0.999_f64).sin()), MetricUnit::Pixels(145.0*(2.0+(2.0-(-0.999)+145.0/-42.0_f64).sin())-(-42.0))),
                     Color::new(0xff, 0x11, 0x22, 0x33),
                     false
                 ))),

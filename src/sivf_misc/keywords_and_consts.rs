@@ -3,7 +3,6 @@
 #![allow(unused)]
 
 
-
 // Global const:
 pub const KW_TRUE: &str = "true";
 pub const KW_FALSE: &str = "false";
@@ -12,7 +11,7 @@ pub const KW_FALSE: &str = "false";
 pub const KW_IMAGE_SIZES: &str = "image_sizes";
 pub const KW_COLOR_MODEL: &str = "color_model";
 pub const KW_ROOT_LAYER: &str = "root_layer";   // TODO: get rid of it
-pub const KW_VARS: &str = "vars";
+pub const KW_VALS: &str = "vals";
 
 // Blending and blending types:
 // TODO: maybe "blend" and "combine" is the same, so combine them?

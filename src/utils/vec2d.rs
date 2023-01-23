@@ -4,7 +4,8 @@ use std::{
     convert::TryFrom,
     ops::{Neg, Sub, Add, Div, Mul},
 };
-use crate::utils::sizes::Sizes;
+
+use crate::sivf_misc::sizes::Sizes;
 
 
 
@@ -12,7 +13,6 @@ use crate::utils::sizes::Sizes;
 pub struct Vec2d<T: Copy> { pub x: T, pub y: T }
 
 impl<T: Copy> Vec2d<T> {
-
     pub fn new(x: T, y: T) -> Self {
         Vec2d { x, y }
     }
@@ -34,11 +34,9 @@ impl<T: Copy> Vec2d<T> {
             h: R::try_from(self.y).ok().unwrap(),
         }
     }
-
 }
 
 impl Vec2d<f64> {
-
     pub fn len2(&self) -> f64 {
         // self.x.powi(2) + self.y.powi(2)
         self.x*self.x + self.y*self.y
@@ -69,7 +67,6 @@ impl Vec2d<f64> {
         let d3 = triangle_sign(*self, point3, point1);
         !((d1 < 0.0 || d2 < 0.0 || d3 < 0.0) && (d1 > 0.0 || d2 > 0.0 || d3 > 0.0))
     }
-
 }
 
 impl<T: Copy + Neg<Output=T>> Neg for Vec2d<T> {

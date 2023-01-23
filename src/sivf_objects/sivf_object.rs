@@ -1,6 +1,11 @@
 //! used for array of SIVF items
 
 use crate::{
+    sivf_misc::{
+        canvas::Canvas,
+        render::{RenderType, Render},
+        sizes::ImageSizes,
+    },
     sivf_objects::{
         complex::{gradient::Gradient, layer::Layer},
         shapes::{
@@ -10,11 +15,6 @@ use crate::{
             triangle::Triangle,
         },
     },
-    sivf_misc::{
-        canvas::Canvas,
-        render::{RenderType, Render},
-    },
-    utils::sizes::ImageSizes,
 };
 
 

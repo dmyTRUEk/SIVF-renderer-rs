@@ -3,13 +3,13 @@
 use crate::{
     sivf_misc::{
         canvas::Canvas,
+        color::Color,
         metric_units::{MetricUnit, ExtensionToPixels, Axis},
         render::{Render, RenderType},
+        sizes::ImageSizes,
     },
     utils::{
-        color::Color,
         extensions::usize::ExtensionIndices,
-        sizes::ImageSizes,
         vec2d::Vec2d,
     },
 };
@@ -130,3 +130,4 @@ impl Render for Gradient {
         canvas
     }
 }
+

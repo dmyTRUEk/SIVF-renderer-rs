@@ -1,9 +1,9 @@
 //! Color
 
-
-
 pub const ARGB: &str = "ARGB";
 pub const RGBA: &str = "RGBA";
+
+
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum ColorModel {
@@ -13,7 +13,6 @@ pub enum ColorModel {
 }
 
 impl ColorModel {
-
     pub fn from(s: &str) -> Self {
         match s {
             ARGB => {
@@ -25,7 +24,6 @@ impl ColorModel {
             _ => { panic!() }
         }
     }
-
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -37,7 +35,6 @@ pub struct Color {
 }
 
 impl Color {
-
     pub const fn new(a: u8, r: u8, g: u8, b: u8) -> Self {
         Color { a, r, g, b }
     }
@@ -50,9 +47,7 @@ impl Color {
             b: u8::from_str_radix(&str[6..=7], 16).unwrap(),
         }
     }
-
 }
-
 
 
 pub const TRANSPARENT: Color = Color { a: 0, r: 0,  g:   0, b:   0 };

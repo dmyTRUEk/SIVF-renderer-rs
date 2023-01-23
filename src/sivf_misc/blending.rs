@@ -1,6 +1,6 @@
 //! Blend types (overlap, add, add_overflow, ...)
 
-use crate::utils::color::Color;
+use crate::sivf_misc::color::Color;
 
 
 
@@ -19,7 +19,6 @@ pub enum BlendType {
 }
 
 
-
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct BlendTypes {
     pub alpha: BlendType,
@@ -27,7 +26,6 @@ pub struct BlendTypes {
 }
 
 impl BlendTypes {
-
     pub fn overlap() -> Self {
         BlendTypes { alpha: BlendType::Overlap, color: BlendType::Overlap }
     }
@@ -35,9 +33,7 @@ impl BlendTypes {
     pub fn from(alpha: BlendType, color: BlendType) -> Self {
         BlendTypes { alpha, color }
     }
-
 }
-
 
 
 // TODO: blend type different for alpha and pure color
@@ -59,7 +55,11 @@ pub fn blend_colors(color1: &Color, color2: &Color, blend_types: &BlendTypes) ->
     };
     let (r, g, b): (u8, u8, u8) = match blend_types.color {
         BlendType::Overlap => {
-            if color2.a != 0x00 { (color2.r, color2.g, color2.b) } else { (color1.r, color1.g, color1.b) }
+            if color2.a != 0x00 {
+                (color2.r, color2.g, color2.b)
+            } else {
+                (color1.r, color1.g, color1.b)
+            }
         }
         BlendType::Add => {
             (

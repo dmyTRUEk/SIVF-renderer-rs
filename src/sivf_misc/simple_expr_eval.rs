@@ -1,12 +1,16 @@
 //! Simple Expr Eval, but with sqrt, sin, cos, etc
 
 use evalexpr::eval;
-use crate::utils::{
-    extensions::{
-        str::ExtensionCountChars,
-        vec::ExtensionCollectToVec
-    },
-    random::random,
+
+use crate::{
+    sivf_misc::vals::Vals,
+    utils::{
+        extensions::{
+            str::ExtensionCountChars,
+            vec::ExtensionCollectToVec,
+        },
+        random::random,
+    }
 };
 
 
@@ -126,8 +130,22 @@ const FUNCS: [&str; 4] = [
 ];
 
 pub fn eval_expr(expr: &str) -> f64 {
-    let expr: &str = expr.trim();
-    let expr: &str = expr.trim_start_matches('+');
+    eval_expr_with_vals(expr, None)
+}
+
+pub fn eval_expr_with_vals(expr: impl ToString, vals: Option<&Vals>) -> f64 {
+    let expr = expr.to_string();
+    let mut expr: &str = expr.trim();
+    expr = expr.trim_start_matches('+');
+    expr = expr.trim();
+    let mut expr: String = expr.to_string();
+    if let Some(vals) = vals {
+        expr = vals.iter().fold(expr.to_string(),
+            |acc, el| {
+                acc.replace(&el.0, &format!("({})", &el.1.to_string()))
+            }
+        )
+    }
     let expr: &str = expr.trim();
     if !FUNCS.iter().any(|func_name| expr.contains(func_name)) {
         // simple case: eval from evalexpr can handle it
@@ -142,12 +160,12 @@ pub fn eval_expr(expr: &str) -> f64 {
             .unwrap();
         if expr.bracket_bouns() == Some((0, expr.len())) {
             // case `(…)`
-            eval_expr(&expr[1..expr.len()-1])
+            eval_expr_with_vals(&expr[1..expr.len()-1], vals)
         }
         else if expr.find(LB).unwrap() < evaling_func.0 {
             // case `…(…func(…)…)…`
             let brackets_insides: &str = expr.extract_from_brackets().unwrap();
-            let brackets_insides_res: f64 = eval_expr(brackets_insides);
+            let brackets_insides_res: f64 = eval_expr_with_vals(brackets_insides, vals);
             let br_bounds: (usize, usize) = expr.bracket_bouns().unwrap();
             let expr: &str = &format!(
                 "{l}{fres}{r}",
@@ -155,21 +173,21 @@ pub fn eval_expr(expr: &str) -> f64 {
                 fres = brackets_insides_res.to_string(),
                 r = expr[br_bounds.1+1..].to_string()
             );
-            eval_expr(expr)
+            eval_expr_with_vals(expr, vals)
         }
         else {
             // case `…func(…)`
             let brackets_insides: &str = expr.extract_from_brackets().unwrap();
             let func_res: f64 = match evaling_func.1.to_str() {
-                SQRT => { eval_expr(brackets_insides).sqrt() }
-                SIN => { eval_expr(brackets_insides).sin() }
-                COS => { eval_expr(brackets_insides).cos() }
+                SQRT => { eval_expr_with_vals(brackets_insides, vals).sqrt() }
+                SIN => { eval_expr_with_vals(brackets_insides, vals).sin() }
+                COS => { eval_expr_with_vals(brackets_insides, vals).cos() }
                 RANDOM => {
                     assert_eq!(1, brackets_insides.count_chars(','));
-                    let minmax = brackets_insides.splitn(2, ',').collect_vec();
+                    let minmax = brackets_insides.splitn(2, ',').collect_to_vec();
                     let (min, max): (f64, f64) = (
-                        eval_expr(minmax[0]),
-                        eval_expr(minmax[1])
+                        eval_expr_with_vals(minmax[0], vals),
+                        eval_expr_with_vals(minmax[1], vals)
                     );
                     random(min, max)
                 }
@@ -181,7 +199,7 @@ pub fn eval_expr(expr: &str) -> f64 {
                 fres = func_res.to_string(),
                 r = expr[evaling_func.0+evaling_func.1.len()+1+brackets_insides.len()+1..].to_string()
             );
-            eval_expr(expr)
+            eval_expr_with_vals(expr, vals)
         }
     }
 }
@@ -192,9 +210,12 @@ pub fn eval_expr(expr: &str) -> f64 {
 
 #[cfg(test)]
 mod tests {
-    use crate::utils::simple_expr_eval::ExtensionFindSubstr;
-
-    use super::{eval_expr, ExtensionBracketBounds, ExtensionExtractFromBrackets};
+    use super::{
+        ExtensionBracketBounds,
+        ExtensionExtractFromBrackets,
+        ExtensionFindSubstr,
+        eval_expr,
+    };
 
     #[test]
     fn bracket_bouns() {
